@@ -1,0 +1,112 @@
+version: '3.9'
+
+services:
+  postgre:
+    container_name: postgre
+    image: postgre
+    build:
+      context: ./service/postgre
+      dockerfile: Dockerfile
+    env_file:
+      - ./service/postgre/.env
+    volumes:
+      - postgre_data_volume:/var/lib/postgresql/data
+    networks:
+      - ft_transcendence
+    restart: unless-stopped
+    tty: true
+  nestjs:
+    container_name: nestjs
+    image: nestjs
+    build:
+      context: ./service/nestjs
+      dockerfile: Dockerfile
+    env_file:
+      - ./service/nestjs/.env
+    volumes:
+      - nestjs_src_volume:/app/src
+      - nestjs_log_volume:/app/log
+    networks:
+      - ft_transcendence
+    depends_on:
+      - mongodb
+    restart: unless-stopped
+    tty: true
+  nextjs:
+    container_name: nextjs
+    image: nextjs
+    build:
+      context: ./service/nextjs
+      dockerfile: Dockerfile
+      #args:
+      #  - NEXTJS_APP_SERVER=${NEXTJS_APP_SERVER:-http://localhost:3000}
+    env_file:
+      - ./service/nextjs/.env
+    volumes:
+      - nextjs_src_volume:/app/src
+    networks:
+      - ft_transcendence
+    depends_on:
+      - nestjs
+    restart: unless-stopped
+    tty: true
+  nginx:
+    container_name: nginx
+    image: nginx
+    build:
+      context: ./service/nginx
+      dockerfile: Dockerfile
+    env_file:
+      - ./service/nginx/.env
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - nginx_log_volume:/var/log/nginx
+    networks:
+      - ft_transcendence
+    depends_on:
+      - nextjs
+    restart: unless-stopped
+    tty: true
+
+volumes:
+  postgre_data_volume:
+    name: postgre_data_volume
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./service/postgre/db
+  nestjs_src_volume:
+    name: nestjs_src_volume
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./service/nestjs/src
+  nestjs_log_volume:
+    name: nestjs_log_volume
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./service/nestjs/log
+  nextjs_src_volume:
+    name: nextjs_src_volume
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./service/nextjs/src
+  nginx_log_volume:
+    name: nginx_log_volume
+    driver: local
+    driver_opts:
+      device: ./service/nginx/log
+      type: none
+      o: bind
+
+networks:
+  ft_transcendence:
+    name: ft_transcendence
