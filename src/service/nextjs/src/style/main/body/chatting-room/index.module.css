@@ -1,0 +1,43 @@
+.container {
+	display: flex;
+	width: 100cqw;
+	height: 21.25cqh;
+	justify-content: center;
+	align-items: center;
+	cursor: pointer;
+	background-color: #d9d9d9;
+	container-type: size;
+}
+
+.container > div {
+	width: 80cqw;
+	height: 40cqh;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	container-type: size;
+}
+
+.container > div > div:first-child {
+	display: flex;
+	height: 100cqh;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.roomInformation {
+	display: flex;
+	align-items: center;
+	gap: 5cqw;
+}
+
+.roomInformation > div:first-child {
+	display: flex;
+	align-items: center;
+}
+
+.roomInformation > div:last-child {
+	display: flex;
+	align-items: center;
+	gap: 2cqw;
+}
