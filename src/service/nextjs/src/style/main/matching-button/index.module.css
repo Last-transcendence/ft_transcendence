@@ -1,0 +1,14 @@
+.container {
+	position: absolute;
+	width: 12cqh;
+	height: 12cqh;
+	right: 4cqh;
+	bottom: 16cqh;
+	border-radius: 50%;
+	background-color: #9c27b0;
+	cursor: pointer;
+}
+
+.container > svg {
+	transform: translate(21%, 16%);
+}
