@@ -29,7 +29,7 @@ services:
     networks:
       - ft_transcendence
     depends_on:
-      - mongodb
+      - postgre
     restart: unless-stopped
     tty: true
   nextjs:

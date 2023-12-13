@@ -1,7 +1,7 @@
 import type { AppProps } from 'next/app';
 import '@/style/globals.css';
 import { Global, css } from '@emotion/react';
-import Layout from '@/component/Layout';
+import Layout from '@/component/common/Layout';
 
 const globalStyles = css`
 	body {
@@ -14,8 +14,8 @@ const globalStyles = css`
 	#__next {
 		margin: 0 auto;
 		background-color: #ffffff;
-		height: 100vh;
-		width: 480px;
+		height: max(100vh, 640px);
+		width: max(56.25vh, 360px);
 	}
 `;
 

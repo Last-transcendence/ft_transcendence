@@ -1,0 +1,13 @@
+.container {
+	position: relative;
+	container-type: size;
+	height: 89.375cqh;
+}
+
+.container > div:first-child {
+	height: 87.3cqh;
+}
+
+.container > div:last-child {
+	height: 12.7cqh;
+}
