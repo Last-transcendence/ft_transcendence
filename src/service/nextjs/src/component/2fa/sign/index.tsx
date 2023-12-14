@@ -1,8 +1,8 @@
 import { TextField, Button, Container, Box, Typography } from '@mui/material';
 import Message from './Message';
-import LockAvater from '@/component/2fa/lcokAvater';
+import LockAvater from '@/component/2fa/sign/lcokAvater';
 import { useState } from 'react';
-import styles from '@/style/2fa/index.module.css';
+import styles from '@/style/2fa/sign/index.module.css';
 
 const TwoFactorBody = () => {
 	const [value, setValue] = useState('5');
