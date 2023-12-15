@@ -1,0 +1,19 @@
+.container {
+	height: 9.5cqh;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.container > div {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.container > div > div {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: 1.5cqw;
+}
