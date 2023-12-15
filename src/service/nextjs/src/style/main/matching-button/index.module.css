@@ -1,14 +1,38 @@
 .container {
+	display: grid;
+	grid-template-rows: repeat(3, 1fr);
 	position: absolute;
 	width: 12cqh;
-	height: 12cqh;
+	height: 40cqh;
+	gap: 2cqh;
 	right: 4cqh;
 	bottom: 16cqh;
+	container-type: size;
+}
+
+.container > div {
 	border-radius: 50%;
-	background-color: #9c27b0;
 	cursor: pointer;
 }
 
-.container > svg {
+.container > div:last-child {
+	grid-row: 3;
+	background-color: #9c27b0;
+}
+
+.container > div:last-child > svg {
 	transform: translate(21%, 16%);
+}
+
+.modeButtonContainer {
+	width: calc(100cqw - 2px);
+	height: calc(100cqw - 2px);
+	border-radius: 50%;
+	border: 1px solid #a524bb;
+	color: #a524bb;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	font-size: 20cqw;
+	background-color: #fff;
 }

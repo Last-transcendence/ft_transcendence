@@ -4,7 +4,7 @@ interface IconProps {
 	onClick?: () => void;
 }
 
-export const PeopleIcon = ({ width, height, onClick }: IconProps) => {
+export const ParticipantIcon = ({ width, height, onClick }: IconProps) => {
 	return (
 		<svg
 			xmlns="http://www.w3.org/2000/svg"

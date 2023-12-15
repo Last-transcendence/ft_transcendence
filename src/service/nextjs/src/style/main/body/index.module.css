@@ -14,13 +14,6 @@
 	container-type: size;
 }
 
-.container > div > div:first-child {
-	display: flex;
-	align-items: center;
-	height: 5cqh;
-	gap: 5cqw;
-}
-
 .container > div > div:last-child {
 	display: flex;
 	flex-direction: column;
