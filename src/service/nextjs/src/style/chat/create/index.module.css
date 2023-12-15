@@ -1,0 +1,23 @@
+.container {
+	height: 89.375cqh;
+	container-type: size;
+}
+
+.container > div:first-child {
+	display: flex;
+	flex-direction: column;
+	height: 87.3cqh;
+	justify-content: center;
+	align-items: center;
+	gap: 8cqh;
+	container-type: size;
+}
+
+.container > div:first-child > div {
+	width: 70cqw;
+}
+
+.container > div:last-child {
+	height: 12.7cqh;
+	container-type: size;
+}
