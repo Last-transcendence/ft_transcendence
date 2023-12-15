@@ -1,4 +1,4 @@
-import { ChatIcon, PeopleIcon } from './icon';
+import { ChatIcon, ParticipantIcon } from './icon';
 import style from '../../../../style/main/body/chatting-room/index.module.css';
 
 interface ChattingRoomProps {
@@ -9,13 +9,13 @@ interface ChattingRoomProps {
 
 const RoomInformation = ({ title, visibility, numberOfPeople }: ChattingRoomProps) => {
 	return (
-		<div className={style.roomInformation}>
+		<div className={style.roomInformationContainer}>
 			<div>
 				<div>
 					<span>{visibility}</span>
 				</div>
 				<div>
-					<PeopleIcon width={25} height={16} />
+					<ParticipantIcon width={25} height={16} />
 					<span>{numberOfPeople}</span>
 				</div>
 			</div>
@@ -28,8 +28,8 @@ const RoomInformation = ({ title, visibility, numberOfPeople }: ChattingRoomProp
 
 const IconContainer = () => {
 	return (
-		<div>
-			<ChatIcon width={47} height={47} />
+		<div className={style.iconContainer}>
+			<ChatIcon width={'70cqh'} height={'70cqh'} />
 		</div>
 	);
 };

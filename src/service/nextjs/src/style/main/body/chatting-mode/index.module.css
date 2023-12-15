@@ -1,0 +1,11 @@
+.container {
+	display: flex;
+	align-items: center;
+	height: 5cqh;
+	gap: 5cqw;
+}
+
+.container > span {
+	cursor: pointer;
+	border-bottom: 2px solid transparent;
+}
