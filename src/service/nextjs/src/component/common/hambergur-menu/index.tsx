@@ -40,8 +40,8 @@ const HambergurMenu = ({ title, position, setIsOpened, children }: HambergurMenu
 					<div className={style.header}>
 						<span>{title}</span>
 						<CloseIcon
-							width="calc(30cqh)"
-							height="calc(30cqh)"
+							width="30"
+							height="30"
 							onClick={() => {
 								setIsOpened(false);
 							}}

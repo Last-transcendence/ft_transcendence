@@ -48,6 +48,11 @@
 	font-size: 20cqh;
 }
 
+.header > svg {
+	width: 30cqh;
+	height: 30cqh;
+}
+
 .container > div > div > div:last-child {
 	height: 87cqh;
 }

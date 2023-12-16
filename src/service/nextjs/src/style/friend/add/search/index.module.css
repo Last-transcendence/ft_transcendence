@@ -1,0 +1,26 @@
+.container {
+	width: 100cqw;
+	height: 50cqh;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	border-radius: 10cqw;
+	background-color: #ebebeb;
+	container-type: size;
+}
+
+.container > input {
+	width: 79cqw;
+	height: 80cqh;
+	margin-left: 1cqw;
+	border: none;
+	background-color: transparent;
+	outline: none;
+	font-size: 30cqh;
+}
+
+.container > svg {
+	width: 9cqw;
+	height: 9cqw;
+	cursor: pointer;
+}
