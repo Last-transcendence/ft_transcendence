@@ -1,0 +1,27 @@
+.container {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	gap: 3cqh;
+}
+
+.container > div:last-child {
+	display: flex;
+	flex-direction: column;
+	gap: 2cqh;
+}
+
+.user-brief-information {
+	display: flex;
+	gap: 5cqw;
+	align-items: center;
+}
+
+.user-brief-information > :first-child {
+	width: 11cqw;
+	height: 11cqw;
+}
+
+.user-brief-information > :nth-child(2) {
+	font-size: 5.5cqw;
+}

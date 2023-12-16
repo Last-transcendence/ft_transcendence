@@ -1,0 +1,8 @@
+.container {
+	width: 100cqw;
+	height: 30cqw;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	container-type: size;
+}

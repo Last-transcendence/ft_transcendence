@@ -1,0 +1,8 @@
+.container {
+	width: 100cqw;
+	height: 100cqh;
+	display: flex;
+	flex-direction: column;
+	gap: 8cqh;
+	container-type: size;
+}

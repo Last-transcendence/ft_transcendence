@@ -1,6 +1,7 @@
 'use client';
 
 import HambergurMenu from '@/component/common/hambergur-menu';
+import FriendPage from '@/component/friend';
 import { useState } from 'react';
 
 const TestPage = () => {
@@ -26,10 +27,8 @@ const TestPage = () => {
 				</span>
 			</div>
 			{leftIsOpened && (
-				<HambergurMenu title="test-left" position="left" setIsOpened={setLeftIsOpened}>
-					<div>
-						<span>햄버거 메뉴</span>
-					</div>
+				<HambergurMenu title="친구" position="left" setIsOpened={setLeftIsOpened}>
+					<FriendPage />
 				</HambergurMenu>
 			)}
 			{rightIsOpened && (
