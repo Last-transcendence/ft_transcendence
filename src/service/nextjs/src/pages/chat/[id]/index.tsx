@@ -1,5 +1,7 @@
-const ChatPage = () => {
-	return <div>채팅 페이지</div>;
+import ChatPage from '@/component/chat';
+
+const Chat = () => {
+	return <ChatPage />;
 };
 
-export default ChatPage;
+export default Chat;
