@@ -4,6 +4,9 @@ import style from '../style/main/index.module.css';
 import MainPageFooter from '@/component/main/footer';
 import MatchingButton from '@/component/main/matching-button';
 import MainPageBody from '@/component/main/body';
+import { MenuHeader } from '@/component/common/Header';
+import FriendPage from '@/component/friend';
+import React from 'react';
 
 const MainPage = () => {
 	return (
@@ -17,6 +20,9 @@ const MainPage = () => {
 				/>
 				<link rel="icon" href="/favicon.ico" />
 			</Head>
+			<MenuHeader title={'친구'} position={'left'}>
+				<FriendPage />
+			</MenuHeader>
 			<div className={style.container}>
 				<MainPageBody />
 				<MatchingButton />

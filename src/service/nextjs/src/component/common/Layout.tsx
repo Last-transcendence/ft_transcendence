@@ -9,7 +9,7 @@ interface LayoutProps {
 
 const Layout = ({ children }: LayoutProps) => (
 	<div style={{ height: '100%', containerType: 'size' }}>
-		<Header />
+		{/*<Header />*/}
 		{children}
 	</div>
 );
