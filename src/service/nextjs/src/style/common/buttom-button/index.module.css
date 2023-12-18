@@ -1,8 +1,6 @@
 .container {
 	height: 70px;
 	border: none;
-	position: fixed;
-	bottom: 0;
 	width: 100%;
 	background-color: lightgray;
 }

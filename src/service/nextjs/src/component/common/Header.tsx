@@ -1,43 +1,78 @@
-import { AppBar, Box, Button, IconButton, Stack, Toolbar, Typography } from '@mui/material';
-import MenuIcon from '@mui/icons-material/Menu';
+import { Avatar, Box, IconButton, Stack, Typography } from '@mui/material';
+import { Menu, ArrowBackIosNew } from '@mui/icons-material';
 import HambergurMenu from '@/component/common/hambergur-menu';
-import FriendPage from '@/component/friend';
 import React, { ReactNode, useState } from 'react';
+import { useRouter } from 'next/router';
 
-export const Header = () => {
-	return (
-		<Box bgcolor={'skyblue'} width={'100%'} height={'70px'}>
-			헤더
-		</Box>
-	);
-};
-export const MenuHeader = ({
-	title,
-	position,
-	children,
-}: {
+interface MenuHeaderProps {
+	type?: 'friend' | 'chat';
 	title: string;
-	position: 'left' | 'right';
-	children: ReactNode;
-}) => {
-	const [openMenu, setOpenMenu] = useState(false);
+	children?: ReactNode;
+}
 
+export const Header = ({ title }: { title: string }) => {
+	const router = useRouter();
 	return (
 		<Stack
 			bgcolor={'skyblue'}
 			width={'100%'}
 			height={'70px'}
 			flexDirection={'row'}
-			justifyContent={position === 'left' ? 'flex-start' : 'flex-end'}
+			justifyContent={'space-between'}
+			alignItems={'center'}
 		>
+			<Stack flex={1}>
+				<Box>
+					<IconButton onClick={() => router.back()}>
+						<ArrowBackIosNew fontSize={'large'} />
+					</IconButton>
+				</Box>
+			</Stack>
+			<Stack flex={1} alignItems={'center'}>
+				<Typography>{title}</Typography>
+			</Stack>
+			<Box flex={1} />
+		</Stack>
+	);
+};
+
+export const MenuHeader = ({ type, title, children }: MenuHeaderProps) => {
+	const [openMenu, setOpenMenu] = useState(false);
+	const router = useRouter();
+
+	return (
+		<div>
 			{openMenu && (
-				<HambergurMenu title={title} position={position} setIsOpened={setOpenMenu}>
+				<HambergurMenu
+					title={title}
+					position={type === 'friend' ? 'left' : 'right'}
+					setIsOpened={setOpenMenu}
+				>
 					{children}
 				</HambergurMenu>
 			)}
-			<IconButton onClick={() => setOpenMenu(true)}>
-				<MenuIcon fontSize={'large'} />
-			</IconButton>
-		</Stack>
+			<Stack
+				bgcolor={'skyblue'}
+				width={'100%'}
+				height={'70px'}
+				flexDirection={type === 'chat' ? 'row' : 'row-reverse'}
+				justifyContent={'space-between'}
+				alignItems={'center'}
+			>
+				{type === 'chat' ? (
+					<IconButton onClick={() => router.back()}>
+						<ArrowBackIosNew fontSize={'large'} />
+					</IconButton>
+				) : (
+					<IconButton onClick={() => router.push('/my-page')}>
+						<Avatar />
+					</IconButton>
+				)}
+				<Typography>{title}</Typography>
+				<IconButton onClick={() => setOpenMenu(true)}>
+					<Menu fontSize={'large'} />
+				</IconButton>
+			</Stack>
+		</div>
 	);
 };

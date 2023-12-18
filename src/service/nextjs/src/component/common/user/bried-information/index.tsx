@@ -4,7 +4,7 @@ import Image from 'next/image';
 
 interface UserBriefInformationProps {
 	profileImageSrc: string | null;
-	nickName: string;
+	nickName: string | ReactNode;
 	condition?: ReactNode;
 	className?: string;
 }

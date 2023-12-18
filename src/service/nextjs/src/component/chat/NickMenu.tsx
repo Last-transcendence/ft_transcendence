@@ -1,7 +1,10 @@
 import React from 'react';
 import { Menu, MenuItem, Typography } from '@mui/material';
 
-const NickMenu = () => {
+interface NickMenuProps {
+	nick: string;
+}
+export const NickMenu = ({ nick }: NickMenuProps) => {
 	const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
 	const open = Boolean(anchorEl);
@@ -37,7 +40,7 @@ const NickMenu = () => {
 		<>
 			<Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
 				<MenuItem id={'nickBtn'} onClick={handleMenuClick}>
-					닉네임
+					{nick}
 				</MenuItem>
 				<MenuItem id={'kickBtn'} onClick={handleMenuClick}>
 					추방하기
@@ -53,7 +56,7 @@ const NickMenu = () => {
 				</MenuItem>
 			</Menu>
 			<Typography fontWeight={'bold'} sx={{ cursor: 'pointer' }} onClick={handleClick}>
-				닉네임
+				{nick}
 			</Typography>
 		</>
 	);

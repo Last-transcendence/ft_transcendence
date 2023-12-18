@@ -1,17 +1,13 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Button, Stack } from '@mui/material';
+import { Stack } from '@mui/material';
 import { ChatMsg, HelpMsg, StatusMsg } from '@/component/chat/Message';
 import SendChat from '@/component/chat/SendChat';
-import { MenuHeader } from '@/component/common/Header';
-import UserBriefInformation from '@/component/common/user/bried-information';
-import FriendStatus from '@/component/friend/list/status';
-import style from '@/style/friend/list/index.module.css';
 import ChattingListPage from '@/component/chat/ChatList';
+import { MenuHeader } from '@/component/common/Header';
 
 const ChatPage = () => {
 	return (
 		<div>
-			<MenuHeader title={'채팅'} position={'right'}>
+			<MenuHeader title={'채팅'} type={'chat'}>
 				<ChattingListPage />
 			</MenuHeader>
 			{/*채팅 영역*/}

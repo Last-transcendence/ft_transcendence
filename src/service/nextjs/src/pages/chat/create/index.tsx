@@ -6,6 +6,8 @@ import CreateChatTitle from '@/component/chat/create/title';
 import CreateChatPassword from '@/component/chat/create/password';
 import { useState } from 'react';
 import { BottomButton } from '@/component/common/ButtomButton';
+import { Header } from '@/component/common/Header';
+import { Stack } from '@mui/material';
 
 export type Visibility = 'public' | 'protected' | 'private';
 
@@ -17,11 +19,12 @@ const ChatCreatePage = () => {
 	return (
 		<div>
 			<div className={style.container}>
-				<div>
+				<Header title={'채널 생성'} />
+				<Stack gap={4}>
 					<CreateChatVisibility visibility={visibility} setVisibility={setVisibility} />
 					<CreateChatTitle title={title} setTitle={setTitle} />
 					<CreateChatPassword password={password} setPassword={setPassword} />
-				</div>
+				</Stack>
 				<BottomButton
 					title={'생성하기'}
 					onClick={() => {
