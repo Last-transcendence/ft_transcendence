@@ -1,0 +1,36 @@
+.container {
+	height: 70px;
+	border: none;
+	position: fixed;
+	bottom: 0;
+	width: 100%;
+	background-color: lightgray;
+}
+
+.container:hover {
+	background-color: #7a7a7a;
+}
+
+.container:active {
+	background-color: #6a6a6a;
+}
+
+.confirmContainer {
+	position: fixed;
+	bottom: 0;
+	width: 100%;
+}
+
+.button:hover {
+	background-color: #7a7a7a;
+}
+
+.button:active {
+	background-color: #6a6a6a;
+}
+
+.button {
+	height: 70px;
+	border: none;
+	background-color: lightgray;
+}

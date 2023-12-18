@@ -1,10 +1,11 @@
 .container {
-	position: relative;
+	display: flex;
+	flex-direction: column;
 	container-type: size;
-	height: 89.375cqh;
+	height: 100vh;
 }
 
-.container > div:first-child {
+.container > div:nth-child(2) {
 	height: 87.3cqh;
 }
 

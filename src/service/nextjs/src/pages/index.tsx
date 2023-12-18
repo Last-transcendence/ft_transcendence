@@ -1,12 +1,12 @@
 import Head from 'next/head';
-import { Box } from '@mui/material';
 import style from '../style/main/index.module.css';
-import MainPageFooter from '@/component/main/footer';
 import MatchingButton from '@/component/main/matching-button';
 import MainPageBody from '@/component/main/body';
 import { MenuHeader } from '@/component/common/Header';
 import FriendPage from '@/component/friend';
 import React from 'react';
+import { BottomButton } from '@/component/common/ButtomButton';
+import Link from 'next/link';
 
 const MainPage = () => {
 	return (
@@ -20,13 +20,15 @@ const MainPage = () => {
 				/>
 				<link rel="icon" href="/favicon.ico" />
 			</Head>
-			<MenuHeader title={'친구'} position={'left'}>
-				<FriendPage />
-			</MenuHeader>
 			<div className={style.container}>
+				<MenuHeader title={'친구'} position={'left'}>
+					<FriendPage />
+				</MenuHeader>
 				<MainPageBody />
 				<MatchingButton />
-				<MainPageFooter />
+				<Link href={'/chat/create'}>
+					<BottomButton title={'채널생성'} />
+				</Link>
 			</div>
 		</>
 	);

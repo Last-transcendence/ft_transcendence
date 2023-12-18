@@ -4,8 +4,8 @@ import style from '../../../style/chat/create/index.module.css';
 import CreateChatVisibility from '@/component/chat/create/visibility';
 import CreateChatTitle from '@/component/chat/create/title';
 import CreateChatPassword from '@/component/chat/create/password';
-import CreateChatSubmit from '@/component/chat/create/submit';
 import { useState } from 'react';
+import { BottomButton } from '@/component/common/ButtomButton';
 
 export type Visibility = 'public' | 'protected' | 'private';
 
@@ -15,13 +15,20 @@ const ChatCreatePage = () => {
 	const [password, setPassword] = useState<string>('');
 
 	return (
-		<div className={style.container}>
-			<div>
-				<CreateChatVisibility visibility={visibility} setVisibility={setVisibility} />
-				<CreateChatTitle title={title} setTitle={setTitle} />
-				<CreateChatPassword password={password} setPassword={setPassword} />
+		<div>
+			<div className={style.container}>
+				<div>
+					<CreateChatVisibility visibility={visibility} setVisibility={setVisibility} />
+					<CreateChatTitle title={title} setTitle={setTitle} />
+					<CreateChatPassword password={password} setPassword={setPassword} />
+				</div>
+				<BottomButton
+					title={'생성하기'}
+					onClick={() => {
+						alert(JSON.stringify({ visibility, title, password }));
+					}}
+				/>
 			</div>
-			<CreateChatSubmit visibility={visibility} title={title} password={password} />
 		</div>
 	);
 };

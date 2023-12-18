@@ -8,7 +8,6 @@
 .container > div {
 	display: flex;
 	flex-direction: column;
-	justify-content: space-between;
 	width: 80cqw;
 	height: 90cqh;
 	container-type: size;
