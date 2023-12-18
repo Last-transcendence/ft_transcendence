@@ -1,5 +1,5 @@
 import { Visibility } from '@/pages/chat/create';
-import style from '../../../../style/chat/create/submit/index.module.css';
+import { BottomButton } from '@/component/common/ButtomButton';
 
 interface CreateChatSubmitProps {
 	visibility: Visibility;
@@ -9,14 +9,12 @@ interface CreateChatSubmitProps {
 
 const CreateChatSubmit = ({ visibility, title, password }: CreateChatSubmitProps) => {
 	return (
-		<div
-			className={style.container}
+		<BottomButton
+			title={'생성하기'}
 			onClick={() => {
 				alert(JSON.stringify({ visibility, title, password }));
 			}}
-		>
-			<span>생성하기</span>
-		</div>
+		/>
 	);
 };
 
