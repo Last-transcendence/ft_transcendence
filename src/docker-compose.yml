@@ -1,16 +1,16 @@
 version: '3.9'
 
 services:
-  postgre:
-    container_name: postgre
-    image: postgre
+  postgres:
+    container_name: postgres
+    image: postgres
     build:
-      context: ./service/postgre
+      context: ./service/postgres
       dockerfile: Dockerfile
     env_file:
-      - ./service/postgre/.env
+      - ./service/postgres/.env
     volumes:
-      - postgre_data_volume:/var/lib/postgresql/data
+      - postgres_data_volume:/var/lib/postgresql/data
     networks:
       - ft_transcendence
     restart: unless-stopped
@@ -29,7 +29,7 @@ services:
     networks:
       - ft_transcendence
     depends_on:
-      - postgre
+      - postgres
     restart: unless-stopped
     tty: true
   nextjs:
@@ -38,8 +38,6 @@ services:
     build:
       context: ./service/nextjs
       dockerfile: Dockerfile
-      #args:
-      #  - NEXTJS_APP_SERVER=${NEXTJS_APP_SERVER:-http://localhost:3000}
     env_file:
       - ./service/nextjs/.env
     volumes:
@@ -71,13 +69,13 @@ services:
     tty: true
 
 volumes:
-  postgre_data_volume:
-    name: postgre_data_volume
+  postgres_data_volume:
+    name: postgres_data_volume
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: ./service/postgre/db
+      device: ./service/postgres/data
   nestjs_src_volume:
     name: nestjs_src_volume
     driver: local
