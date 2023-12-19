@@ -11,7 +11,6 @@ export const Header = () => {
 		</Box>
 	);
 };
-
 export const MenuHeader = ({
 	title,
 	position,

@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import { ReactNode } from 'react';
-import { Header } from './Header';
+import Header from '@/component/common/Header';
 import { Box } from '@mui/material';
 
 interface LayoutProps {
