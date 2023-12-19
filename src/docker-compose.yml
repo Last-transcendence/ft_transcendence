@@ -38,6 +38,8 @@ services:
     build:
       context: ./service/nextjs
       dockerfile: Dockerfile
+      #args:
+      #  - NEXTJS_APP_SERVER=${NEXTJS_APP_SERVER:-http://localhost:3000}
     env_file:
       - ./service/nextjs/.env
     volumes:

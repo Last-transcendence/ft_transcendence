@@ -1,24 +1,17 @@
-FROM node:21-alpine3.19
+FROM node:16-alpine3.14 AS builder
 
-LABEL 	name="NestJS" \
+LABEL	name="nestjs" \
 		version="1.0" \
-		description="NestJS"
+		description="nestjs"
 
 EXPOSE 3000
 
-ENV HOME /app
-
-WORKDIR $HOME
+WORKDIR /app
 
 COPY . .
 
-COPY ./tool/docker-entrypoint.sh /usr/local/bin/
-
-RUN cp ./tool/docker-entrypoint.sh /usr/local/bin/ && \
-	chmod +x /usr/local/bin/docker-entrypoint.sh
+ENV HOME=/app
 
 RUN yarn install --frozen-lockfile && yarn build
 
-ENTRYPOINT [ "docker-entrypoint.sh" ]
-
-CMD [ "yarn", "run", "start:dev" ]
+ENTRYPOINT [ "yarn", "run", "start:dev" ]

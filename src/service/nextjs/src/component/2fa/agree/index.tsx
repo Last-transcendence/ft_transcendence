@@ -1,5 +1,5 @@
 import { Container } from '@mui/material';
-import Agree2FABody from './agree2FABody';
+import Agree2FABody from './Agree2FABody';
 import Agree2FAButton from './agree2FAButton';
 
 const Agree2FAPage = () => {
