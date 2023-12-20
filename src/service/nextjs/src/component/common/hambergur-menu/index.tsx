@@ -1,6 +1,6 @@
 'use client';
 
-import React, { Dispatch, ReactNode, SetStateAction, useEffect, useState } from 'react';
+import { Dispatch, ReactNode, SetStateAction, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import style from '../../../style/common/hambergur-menu/index.module.css';
 import { Close } from '@mui/icons-material';
