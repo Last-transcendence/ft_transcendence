@@ -1,6 +1,11 @@
 #!/bin/sh
 set -e
 
+# Prisma
+#if [ -n "$DATABASE_URL" ]; then
+#	yarn prisma migrate deploy --preview-feature
+#fi
+
 # Run command with node if the first argument contains a "-" or is not a system command. The last
 # part inside the "{}" is a workaround for the following bug in ash/dash:
 # https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=874264

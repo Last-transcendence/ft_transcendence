@@ -25,7 +25,7 @@ services:
       - ./service/nestjs/.env
     volumes:
       - nestjs_src_volume:/app/src
-      - nestjs_log_volume:/app/log
+      - nestjs_prisma_volume:/app/prisma
     networks:
       - ft_transcendence
     depends_on:
@@ -83,13 +83,13 @@ volumes:
       type: none
       o: bind
       device: ./service/nestjs/src
-  nestjs_log_volume:
-    name: nestjs_log_volume
+  nestjs_prisma_volume:
+    name: nestjs_prisma_volume
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: ./service/nestjs/log
+      device: ./service/nestjs/prisma
   nextjs_src_volume:
     name: nextjs_src_volume
     driver: local

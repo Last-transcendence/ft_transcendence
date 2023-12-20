@@ -1,0 +1,226 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+enum UserStatus {
+    ONLINE
+    OFFLINE
+    PLAYING
+}
+
+model User {
+    // Attributes
+    id              String     @id @default(uuid()) @db.Uuid
+    intraId         String     @unique
+    nickname        String
+    profileImageURI String
+    email2fa        String     @unique
+    use2fa          Boolean    @default(false)
+    status          UserStatus @default(OFFLINE)
+
+    // Timestamps
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    // Related with
+    friend     Friend[] @relation("user")
+    friendedBy Friend[] @relation("friended")
+
+    block     Block[] @relation("user")
+    blockedBy Block[] @relation("blocked")
+
+    player1 Game[] @relation("player1")
+    player2 Game[] @relation("player2")
+
+    participate Participant[] @relation("user")
+    ban         Ban[]         @relation("user")
+    mute        Mute[]        @relation("user")
+
+    src  ChatRoom[] @relation("src")
+    dest ChatRoom[] @relation("dest")
+
+    @@index([intraId], name: "intraId")
+}
+
+model Friend {
+    // Attributes
+    id       String @id @default(uuid()) @db.Uuid
+    userId   String @db.Uuid
+    friendId String @db.Uuid
+
+    // Timestamps
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    // Refer to
+    user     User @relation("user", fields: [userId], references: [id])
+    friended User @relation("friended", fields: [friendId], references: [id])
+
+    @@index([userId], name: "friendUserId")
+}
+
+model Block {
+    // Attributes
+    id        String @id @default(uuid()) @db.Uuid
+    userId    String @db.Uuid
+    blockedId String @db.Uuid
+
+    // Timestamps
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    // Refer to
+    user    User @relation("user", fields: [userId], references: [id])
+    blocked User @relation("blocked", fields: [blockedId], references: [id])
+
+    @@index([userId], name: "blockUserId")
+}
+
+enum GameMode {
+    NORMAL
+    HARD
+    RANK
+}
+
+enum GameResult {
+    PENDING
+    WIN
+    LOSE
+    DRAW
+}
+
+model Game {
+    // Attributes
+    id           String     @id @default(uuid()) @db.Uuid
+    player1Id    String     @db.Uuid
+    player2Id    String     @db.Uuid
+    mode         GameMode   @default(NORMAL)
+    player1Score Int        @default(0)
+    player2Score Int        @default(0)
+    result       GameResult @default(PENDING)
+
+    // Timestamps
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    // Refer to
+    player1 User @relation("player1", fields: [player1Id], references: [id])
+    player2 User @relation("player2", fields: [player2Id], references: [id])
+
+    @@index([player1Id], name: "player1Id")
+}
+
+enum ChannelVisibility {
+    PUBLIC
+    PROTECTED
+    PRIVATE
+}
+
+model Channel {
+    // Attributes
+    id         String            @id @default(uuid()) @db.Uuid
+    title      String
+    visibility ChannelVisibility @default(PUBLIC)
+    password   String?
+
+    // Timestamps
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    // Related with
+    participant Participant[] @relation("channel")
+    ban         Ban[]         @relation("channel")
+    mute        Mute[]        @relation("channel")
+}
+
+enum ParticipantRole {
+    OWNER
+    ADMIN
+    USER
+}
+
+model Participant {
+    // Attributes
+    id        String          @id @default(uuid()) @db.Uuid
+    channelId String          @db.Uuid
+    userId    String          @db.Uuid
+    role      ParticipantRole @default(USER)
+
+    // Timestamps
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    // Refer to
+    channel Channel @relation("channel", fields: [channelId], references: [id])
+    user    User    @relation("user", fields: [userId], references: [id])
+}
+
+model Ban {
+    // Attributes
+    id        String @id @default(uuid()) @db.Uuid
+    channelId String @db.Uuid
+    userId    String @db.Uuid
+
+    // Timestamps
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    // Refer to
+    channel Channel @relation("channel", fields: [channelId], references: [id])
+    user    User    @relation("user", fields: [userId], references: [id])
+}
+
+model Mute {
+    // Attributes
+    id        String @id @default(uuid()) @db.Uuid
+    channelId String @db.Uuid
+    userId    String @db.Uuid
+
+    // Timestamps
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    // Refer to
+    channel Channel @relation("channel", fields: [channelId], references: [id])
+    user    User    @relation("user", fields: [userId], references: [id])
+}
+
+model ChatRoom {
+    // Attributes
+    id      String @id @default(uuid()) @db.Uuid
+    src_id  String @db.Uuid
+    dest_id String @db.Uuid
+
+    // Timestamps
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    // Refer to
+    src  User @relation("src", fields: [src_id], references: [id])
+    dest User @relation("dest", fields: [dest_id], references: [id])
+
+    // Related with
+    chat Chat[] @relation("chatRoom")
+}
+
+model Chat {
+    // Attributes
+    id         String @id @default(uuid()) @db.Uuid
+    chatRoomId String @db.Uuid
+    content    String
+
+    // Timestamps
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    // Refer to
+    chatRoom ChatRoom @relation("chatRoom", fields: [chatRoomId], references: [id])
+}
