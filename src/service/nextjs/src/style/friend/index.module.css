@@ -5,4 +5,5 @@
 	flex-direction: column;
 	gap: 8cqh;
 	container-type: size;
+	overflow-y: auto;
 }
