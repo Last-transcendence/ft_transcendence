@@ -1,8 +1,8 @@
 .container {
 	display: flex;
 	align-items: center;
-	height: 5cqh;
 	gap: 5cqw;
+	margin-bottom: 1cqh;
 }
 
 .container > span {

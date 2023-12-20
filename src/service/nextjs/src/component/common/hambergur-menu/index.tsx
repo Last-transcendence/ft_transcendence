@@ -1,9 +1,10 @@
 'use client';
 
-import { Dispatch, ReactNode, SetStateAction, useEffect, useRef, useState } from 'react';
+import { Dispatch, ReactNode, SetStateAction, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import style from '../../../style/common/hambergur-menu/index.module.css';
-import CloseIcon from './icon';
+import { Close } from '@mui/icons-material';
+import { IconButton } from '@mui/material';
 
 interface HambergurMenuProps {
 	title: string;
@@ -13,17 +14,10 @@ interface HambergurMenuProps {
 }
 
 const HambergurMenu = ({ title, position, setIsOpened, children }: HambergurMenuProps) => {
-	const divRef = useRef<HTMLDivElement>(null);
 	const [isClient, setIsClient] = useState(false);
 	useEffect(() => {
 		setIsClient(true);
 	}, []);
-	useEffect(() => {
-		if (divRef.current) {
-			const div = divRef.current as HTMLDivElement;
-			div.style.margin = position === 'right' ? '0 0 0 auto' : '0 auto 0 0';
-		}
-	}, [position]);
 
 	return (
 		isClient &&
@@ -39,17 +33,13 @@ const HambergurMenu = ({ title, position, setIsOpened, children }: HambergurMenu
 						onClick={event => {
 							event.stopPropagation();
 						}}
-						ref={divRef}
+						style={{ margin: position === 'right' ? '0 0 0 auto' : '0 auto 0 0' }}
 					>
 						<div className={style.header}>
 							<span>{title}</span>
-							<CloseIcon
-								width="30"
-								height="30"
-								onClick={() => {
-									setIsOpened(false);
-								}}
-							/>
+							<IconButton onClick={() => setIsOpened(false)}>
+								<Close width={32} height={32} />
+							</IconButton>
 						</div>
 						<div>{children}</div>
 					</div>

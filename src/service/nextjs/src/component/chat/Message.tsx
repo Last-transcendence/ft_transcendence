@@ -7,7 +7,7 @@ export const ChatMsg = () => {
 		<Stack flexDirection={'row'} alignItems={'center'} gap={1}>
 			<Stack flexDirection={'row'} width={'280px'} gap={1} alignItems={'center'}>
 				<Avatar alt="avatar" src="/static/images/avatar/2.jpg" />
-				<NickMenu />
+				<NickMenu nick={'닉네임'} />
 			</Stack>
 			<Typography>
 				프로필 이미지는 안 보이는 게 낫나? 프로필 이미지는 안 보이는 게 낫나? 프로필 이미지는 안

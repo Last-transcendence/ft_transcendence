@@ -4,7 +4,7 @@ import Image from 'next/image';
 
 interface UserBriefInformationProps {
 	profileImageSrc: string | null;
-	nickName: string;
+	nickName: ReactNode;
 	condition?: ReactNode;
 	className?: string;
 }
@@ -22,8 +22,8 @@ const UserBriefInformation = ({
 			) : (
 				<DefaultProfileImageIcon width={32} height={32} />
 			)}
-			<span>{nickName}</span>
-			{condition}
+			<div>{nickName}</div>
+			<div>{condition}</div>
 		</div>
 	);
 };

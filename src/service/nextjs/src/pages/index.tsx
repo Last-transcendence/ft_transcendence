@@ -2,11 +2,11 @@ import Head from 'next/head';
 import style from '../style/main/index.module.css';
 import MatchingButton from '@/component/main/matching-button';
 import MainPageBody from '@/component/main/body';
-import { MenuHeader } from '@/component/common/Header';
 import FriendPage from '@/component/friend';
 import React from 'react';
 import { BottomButton } from '@/component/common/ButtomButton';
 import Link from 'next/link';
+import { MenuHeader } from '@/component/common/Header';
 
 const MainPage = () => {
 	return (
@@ -21,7 +21,7 @@ const MainPage = () => {
 				<link rel="icon" href="/favicon.ico" />
 			</Head>
 			<div className={style.container}>
-				<MenuHeader title={'친구'} position={'left'}>
+				<MenuHeader title={'친구'} type={'friend'}>
 					<FriendPage />
 				</MenuHeader>
 				<MainPageBody />
