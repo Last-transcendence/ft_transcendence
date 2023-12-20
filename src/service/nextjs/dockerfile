@@ -21,4 +21,4 @@ RUN yarn install --frozen-lockfile && yarn build
 
 ENTRYPOINT [ "docker-entrypoint.sh" ]
 
-CMD [ "yarn", "run", "start:dev" ]
+CMD [ "yarn", "run", "dev" ]
