@@ -4,5 +4,5 @@
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
-	container-type: size;
+	gap: 6cqw;
 }
