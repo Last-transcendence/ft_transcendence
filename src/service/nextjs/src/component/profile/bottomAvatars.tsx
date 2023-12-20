@@ -1,4 +1,4 @@
-import { Grid, Box, Avatar, Typography } from '@mui/material';
+import { Grid, Box } from '@mui/material';
 import NewIcon, { NewIconProps } from './newIcon';
 
 interface bottomAvatarsType {
