@@ -3,8 +3,8 @@ import Avatar from '@mui/material/Avatar';
 import { Container } from '@mui/material';
 import { useState } from 'react';
 import Profile from './Profile';
-import ProfileModar from '@/component/profile/profileModar';
-import ProfileMenus from '@/component/profile/profileMenus';
+import ProfileModar from '@/component/profile/otherProfile/profileModar';
+import ProfileMenus from '@/component/profile/otherProfile/profileMenus';
 
 const UserProfile = () => {
 	const [click, setClick] = useState(false);

@@ -1,12 +1,12 @@
 import { Container, Typography, Box } from '@mui/material';
-import NewIcon from './newIcon';
+import NewIcon from '../common/newIcon';
 import BottomProfile from './bottomProfile';
 
 const ar = {
 	image: '/Mail.png',
-	altText: 'DM',
+	name: 'DM',
 	sxStyle: { width: 150, height: 150 },
-	imageStyle: {},
+	imgStyle: {},
 	message: undefined,
 };
 

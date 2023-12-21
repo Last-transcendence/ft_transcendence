@@ -1,12 +1,15 @@
 import { Box } from '@mui/material';
-import BottomAvatarsGrid from '@/component/profile/bottomAvatars';
+import BottomAvatarsGrid from '@/component/profile/otherProfile/bottomAvatars';
+import { avatarStyle } from '../common/newAvatar';
+import { imgStyle } from '../common/myImage';
 
-const sxStyle = {
+const sxStyle: avatarStyle = {
 	width: 50,
 	height: 50,
+	backgroundColor: '#DDDD99',
 };
 
-const imageStyle = {
+const imageStyle: imgStyle = {
 	width: '50%',
 	height: '50%',
 };
@@ -15,23 +18,23 @@ const BottomProfile = () => {
 	const bottomAvatars = [
 		{
 			image: '/Mail.png',
-			altText: 'DM',
+			name: 'DM',
 			sxStyle: sxStyle,
-			imageStyle: imageStyle,
+			avatarImgStyle: imageStyle,
 			message: 'DM',
 		},
 		{
 			image: '/Add User Male.png',
-			altText: '1:1 게임',
+			name: '1:1 게임',
 			sxStyle: sxStyle,
-			imageStyle: imageStyle,
+			avatarImgStyle: imageStyle,
 			message: '1:1 게임',
 		},
 		{
 			image: '/Ping Pong.png',
-			altText: '친구 추가 제거',
+			name: '친구 추가 제거',
 			sxStyle: sxStyle,
-			imageStyle: imageStyle,
+			avatarImgStyle: imageStyle,
 			message: '친구 추가 제거',
 		},
 	];

@@ -23,12 +23,12 @@ const ProfileMenus = () => {
 		setOpen(false);
 	};
 
-	const handleListKeyDown = (event: KeyboardEvent) => {
+	function handleListKeyDown(event: KeyboardEvent) {
 		if (event.key === 'Escape') {
 			event.preventDefault();
 			setOpen(false);
 		}
-	};
+	}
 
 	return (
 		<div>
