@@ -1,6 +1,6 @@
 import ProfilePage from '@/component/profile';
 
-const Profile = () => {
+const Index = () => {
 	return (
 		<>
 			<ProfilePage />
@@ -8,4 +8,4 @@ const Profile = () => {
 	);
 };
 
-export default Profile;
+export default Index;
