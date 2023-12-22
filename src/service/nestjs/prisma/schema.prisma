@@ -18,13 +18,13 @@ enum UserStatus {
 
 model User {
     // Attributes
-    id              String     @id @default(uuid()) @db.Uuid
-    intraId         String     @unique
-    nickname        String
-    profileImageURI String
-    email2fa        String     @unique
-    use2fa          Boolean    @default(false)
-    status          UserStatus @default(OFFLINE)
+    id              String      @id @default(uuid()) @db.Uuid
+    intraId         String      @unique
+    nickname        String?
+    profileImageURI String?
+    email2fa        String?     @unique
+    use2fa          Boolean?    @default(false)
+    status          UserStatus? @default(OFFLINE)
 
     // Timestamps
     createdAt DateTime @default(now())

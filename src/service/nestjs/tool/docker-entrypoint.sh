@@ -2,9 +2,9 @@
 set -e
 
 # Prisma
-#if [ -n "$DATABASE_URL" ]; then
-#	yarn prisma migrate deploy --preview-feature
-#fi
+if [ -n "$DATABASE_URL" ]; then
+	yarn prisma migrate dev --name init --preview-feature
+fi
 
 # Run command with node if the first argument contains a "-" or is not a system command. The last
 # part inside the "{}" is a workaround for the following bug in ash/dash:
