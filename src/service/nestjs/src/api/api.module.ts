@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
-import UserModule from './user/user.module';
 import PrismaModule from 'common/prisma/prisma.module';
+import UserModule from './user/user.module';
+import FriendModule from './friend/friend.module';
 
 @Module({
-	imports: [UserModule, PrismaModule],
+	imports: [PrismaModule, UserModule, FriendModule],
 })
 class ApiModule {}
 
