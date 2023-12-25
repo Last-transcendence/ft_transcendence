@@ -19,7 +19,7 @@ const MyProfileBody = ({ fightRecords, odds, ...userType }: myProfilePageProps) 
 				<ProfileAvartar {...userType} />
 				<UserId userName={userType.name} />
 				<Box display="flex" flexDirection="column" alignItems="center">
-					<TwoFACheck TwoFA={true} />
+					<TwoFACheck twoFA={true} />
 					<div style={{ marginTop: '-30px' }}>
 						<Odds odds={odds} />
 					</div>
