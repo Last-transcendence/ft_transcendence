@@ -22,9 +22,6 @@ const AddFriend = () => {
 		{ profileImageSrc: null, nickName: '친구인사람', condition: '친구' },
 		{ profileImageSrc: null, nickName: '친구인사람', condition: '친구' },
 		{ profileImageSrc: null, nickName: '친구인사람', condition: '친구' },
-		{ profileImageSrc: null, nickName: '친구인사람', condition: '친구' },
-		{ profileImageSrc: null, nickName: '친구인사람', condition: '친구' },
-		{ profileImageSrc: null, nickName: '친구인사람', condition: '친구' },
 	];
 
 	const removeFriend = () => {
@@ -51,12 +48,12 @@ const AddFriend = () => {
 							className={style['user-brief-information']}
 						/>
 						{v?.condition === '친구' ? (
-							<Button variant={'contained'} onClick={() => removeFriend()}>
-								친구삭제
+							<Button variant={'contained'} size={"small"} onClick={() => removeFriend()}>
+								삭제
 							</Button>
 						) : (
-							<Button variant={'contained'} onClick={() => addFriend()}>
-								친구추가
+							<Button variant={'contained'}  size={"small"} onClick={() => addFriend()}>
+								추가
 							</Button>
 						)}
 					</div>
