@@ -1,3 +1,1 @@
-import FriendRequestDto from './request';
-
-export { FriendRequestDto };
+export * as Request from './request';

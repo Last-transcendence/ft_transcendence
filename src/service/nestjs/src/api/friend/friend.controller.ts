@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, HttpException, Post, Req } from '@nestjs
 import FriendService from './friend.service';
 import { FriendModel } from 'common/model';
 import { ApiTags } from '@nestjs/swagger';
-import { FriendRequestDto } from './dto';
+import * as Dto from './dto';
 
 @ApiTags('friend')
 @Controller('friend')
@@ -19,7 +19,7 @@ class FriendController {
 	}
 
 	@Post()
-	async addFriend(@Body() friendRequestDto: FriendRequestDto, @Req() req): Promise<FriendModel> {
+	async addFriend(@Body() friendRequestDto: Dto.Request.Friend, @Req() req): Promise<FriendModel> {
 		try {
 			return await this.friendService.addFriend(req.user.id, friendRequestDto.friendId);
 		} catch (error) {

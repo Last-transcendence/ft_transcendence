@@ -2,7 +2,7 @@ import { Body, Controller, Get, HttpException, Post, Req } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger';
 import BlockService from './block.service';
 import { BlockModel } from 'common/model';
-import { BlockRequestDto } from './dto';
+import * as Dto from './dto';
 
 @Controller('block')
 @ApiTags('block')
@@ -19,7 +19,7 @@ class BlockController {
 	}
 
 	@Post()
-	async blockUser(@Body() blockRequestDto: BlockRequestDto, @Req() req): Promise<BlockModel> {
+	async blockUser(@Body() blockRequestDto: Dto.Request.Block, @Req() req): Promise<BlockModel> {
 		try {
 			return await this.blockService.blockUser(req.user.id, blockRequestDto.blockedId);
 		} catch (error) {
