@@ -2,7 +2,7 @@ import { Trim } from '@miaooo/class-transformer-trim';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString } from 'class-validator';
 
-export class ChatRoomRequestDto {
+export class ChatRoom {
 	@IsString()
 	@IsNotEmpty()
 	@Trim()
@@ -10,7 +10,7 @@ export class ChatRoomRequestDto {
 	destId: string;
 }
 
-export class ChatRequestDto {
+export class Chat {
 	@IsString()
 	@IsNotEmpty()
 	@Trim()

@@ -2,7 +2,7 @@ import { Body, Controller, Get, HttpException, Post, Query, Req } from '@nestjs/
 import ChatRoomService from './chatroom.service';
 import { ApiBadRequestResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ChatModel, ChatRoomModel } from 'common/model';
-import { ChatRoomRequestDto, ChatRequestDto } from './dto';
+import * as Dto from './dto';
 
 @Controller('chatroom')
 @ApiTags('chatroom')
@@ -26,7 +26,7 @@ class ChatRoomController {
 	@ApiOkResponse({ description: 'Create chat room successfully', type: ChatRoomModel })
 	@ApiBadRequestResponse({ description: 'Bad request' })
 	async createChatRoom(
-		@Body() chatRoomRequestDto: ChatRoomRequestDto,
+		@Body() chatRoomRequestDto: Dto.Request.ChatRoom,
 		@Req() req,
 	): Promise<ChatRoomModel> {
 		try {
@@ -52,7 +52,7 @@ class ChatRoomController {
 	@ApiOperation({ summary: 'Create chat' })
 	@ApiOkResponse({ description: 'Create chat successfully', type: ChatModel })
 	@ApiBadRequestResponse({ description: 'Bad request' })
-	async createChat(@Body() chatRequestDto: ChatRequestDto, @Req() req): Promise<ChatModel> {
+	async createChat(@Body() chatRequestDto: Dto.Request.Chat, @Req() req): Promise<ChatModel> {
 		try {
 			return await this.chatRoomService.createChat(
 				req.user.id,
