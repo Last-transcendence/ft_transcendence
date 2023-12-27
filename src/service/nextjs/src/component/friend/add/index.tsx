@@ -48,11 +48,11 @@ const AddFriend = () => {
 							className={style['user-brief-information']}
 						/>
 						{v?.condition === '친구' ? (
-							<Button variant={'contained'} size={"small"} onClick={() => removeFriend()}>
+							<Button variant={'contained'} size={'small'} onClick={() => removeFriend()}>
 								삭제
 							</Button>
 						) : (
-							<Button variant={'contained'}  size={"small"} onClick={() => addFriend()}>
+							<Button variant={'contained'} size={'small'} onClick={() => addFriend()}>
 								추가
 							</Button>
 						)}
