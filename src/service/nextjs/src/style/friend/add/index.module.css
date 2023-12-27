@@ -1,8 +1,43 @@
 .container {
+	display: flex;
+	flex-direction: column;
+	gap: 2cqh;
+	overflow-y: auto;
+	overflow-x: hidden;
+}
+
+.add-container {
 	width: 100cqw;
 	height: 30cqw;
 	display: flex;
 	flex-direction: column;
-	justify-content: space-between;
 	gap: 6cqw;
+}
+
+.user-container {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	gap: 2cqh;
+}
+
+.user-container > div {
+	display: flex;
+	gap: 2cqh;
+	justify-content: space-between;
+}
+
+.user-brief-information {
+	display: flex;
+	gap: 5cqw;
+	align-items: center;
+}
+
+.user-brief-information > :first-child {
+	width: 11cqw;
+	height: 11cqw;
+}
+
+.user-brief-information > :nth-child(2) {
+	font-size: 5.5cqw;
 }
