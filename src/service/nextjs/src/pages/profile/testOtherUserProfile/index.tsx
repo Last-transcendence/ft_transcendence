@@ -2,9 +2,9 @@ import React from 'react';
 import Avatar from '@mui/material/Avatar';
 import { Container } from '@mui/material';
 import { useState } from 'react';
-import Profile from './Profile';
 import ProfileModar from '@/component/profile/otherProfile/profileModar';
 import ProfileMenus from '@/component/profile/otherProfile/profileMenus';
+import Profile from "@/pages/profile";
 
 const UserProfile = () => {
 	const [click, setClick] = useState(false);
