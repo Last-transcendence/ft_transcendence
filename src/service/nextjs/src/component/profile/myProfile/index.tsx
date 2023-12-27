@@ -1,4 +1,4 @@
-import MyProfileBody, { myProfilePageProps } from './myProfileBody';
+import MyProfileBody, { myProfilePageProps } from './myProfileBodys';
 import { BottomButton } from '@/component/common/ButtomButton';
 
 const MyProfilePage = ({ fightRecords, odds, ...userType }: myProfilePageProps) => {
