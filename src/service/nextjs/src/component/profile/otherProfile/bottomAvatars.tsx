@@ -1,5 +1,5 @@
 import { Grid, Box } from '@mui/material';
-import NewIcon, { NewIconProps } from './newIcon';
+import NewIcon, { NewIconProps } from '../common/newIcon';
 
 interface bottomAvatarsType {
 	avatars: NewIconProps[];

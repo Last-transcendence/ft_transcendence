@@ -1,4 +1,4 @@
-import { Dispatch, ReactNode, SetStateAction } from 'react';
+import { Dispatch, ReactNode, SetStateAction, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import styles from '@/style/profile/profileModar.module.css';
 import CloseIcon from '@/component/common/hambergur-menu/icon';
