@@ -1,3 +1,1 @@
-import { ChatRoomRequestDto, ChatRequestDto } from './request';
-
-export { ChatRoomRequestDto, ChatRequestDto };
+export * as Request from './request';
