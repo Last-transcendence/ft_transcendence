@@ -11,7 +11,7 @@ class UserModel implements User {
 	@ApiProperty({ description: 'Nickname', required: false, default: null, nullable: true })
 	nickname: string;
 
-	@ApiProperty({ description: 'Index image URI', required: false, default: null, nullable: true })
+	@ApiProperty({ description: 'Profile image URI', required: false, default: null, nullable: true })
 	profileImageURI: string;
 
 	@ApiProperty({

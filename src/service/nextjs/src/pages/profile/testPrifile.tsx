@@ -5,6 +5,7 @@ import { useState } from 'react';
 import Index from './index';
 import ProfileModar from '@/component/profile/profileModar';
 import ProfileMenus from '@/component/profile/profileMenus';
+import Profile from "./index";
 
 const UserProfile = () => {
 	const [click, setClick] = useState(false);
@@ -18,7 +19,7 @@ const UserProfile = () => {
 			<Avatar alt="User Avatar" onClick={handleAvatarClick} />
 			{click && (
 				<ProfileModar setClick={setClick} childMenu={<ProfileMenus />}>
-					<Index />
+					<Profile />
 				</ProfileModar>
 			)}
 		</Container>
