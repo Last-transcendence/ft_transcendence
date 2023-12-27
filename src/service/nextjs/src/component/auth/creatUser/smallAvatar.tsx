@@ -1,4 +1,3 @@
-import AddAPhotoIcon from '@mui/icons-material/AddAPhoto';
 import { styled } from '@mui/material/styles';
 import { Avatar } from '@mui/material';
 

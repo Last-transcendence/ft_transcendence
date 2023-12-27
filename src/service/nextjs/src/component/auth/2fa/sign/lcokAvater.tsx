@@ -1,6 +1,6 @@
 import { Box, Avatar, Typography } from '@mui/material';
 import LockIcon from '@mui/icons-material/Lock';
-import styles from '@/style/2fa/sign/index.module.css';
+import styles from '@/style/auth/2fa/sign/index.module.css';
 
 const LockAvater = () => {
 	return (

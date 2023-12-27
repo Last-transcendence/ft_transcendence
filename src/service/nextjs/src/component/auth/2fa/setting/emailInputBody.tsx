@@ -1,5 +1,5 @@
 import { Button, TextField, Box, Typography } from '@mui/material';
-import styles from '@/style/2fa/setting/index.module.css';
+import styles from '@/style/auth/2fa/setting/index.module.css';
 const EmailInputBody = () => {
 	return (
 		<Box>

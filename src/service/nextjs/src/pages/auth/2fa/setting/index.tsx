@@ -1,4 +1,4 @@
-import Setting from '@/component/2fa/setting';
+import Setting from '@/component/auth/2fa/setting';
 
 const Setting2FA = () => {
 	return (

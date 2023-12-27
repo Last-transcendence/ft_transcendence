@@ -1,5 +1,5 @@
 import { Button, TextField, Typography, Box } from '@mui/material';
-import styles from '@/style/2fa/setting/index.module.css';
+import styles from '@/style/auth/2fa/setting/index.module.css';
 const Certification = () => {
 	return (
 		<Box style={{ marginTop: '2em' }}>

@@ -1,7 +1,7 @@
 // import { useRouter } from "next/router";
 import { Box, Container, Typography } from '@mui/material';
 import CustomButton from './customButton';
-import styles from '@/style/login/index.module.css';
+import styles from '@/style/auth/login/index.module.css';
 
 const LoginBody = () => {
 	// 아직 oauth 시 어떻게 할지 안정했음.
