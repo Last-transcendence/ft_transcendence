@@ -1,3 +1,1 @@
-import BlockRequestDto from './request';
-
-export { BlockRequestDto };
+export * as Request from './request';
