@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, HttpException, Post, Req } from '@nestjs/common';
 import FriendService from './friend.service';
 import { FriendModel } from 'common/model';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { FriendRequestDto } from './dto';
 
 @ApiTags('friend')
@@ -10,24 +10,33 @@ class FriendController {
 	constructor(private readonly friendService: FriendService) {}
 
 	@Get()
-	async getFriendList(@Req() req): Promise<FriendModel[]> {
+	@ApiOperation({ summary: 'Get friend' })
+	@ApiOkResponse({ description: 'Get friend successfully', type: FriendModel })
+	@ApiBadRequestResponse({ description: 'Bad request' })
+	async getFriend(@Req() req): Promise<FriendModel[]> {
 		try {
-			return await this.friendService.getFriendList(req.user.id);
+			return await this.friendService.getFriend(req.user.id);
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
 		}
 	}
 
 	@Post()
-	async addFriend(@Body() friendRequestDto: FriendRequestDto, @Req() req): Promise<FriendModel> {
+	@ApiOperation({ summary: 'Create friend' })
+	@ApiOkResponse({ description: 'Create friend successfully', type: FriendModel })
+	@ApiBadRequestResponse({ description: 'Bad request' })
+	async createFriend(@Body() friendRequestDto: FriendRequestDto, @Req() req): Promise<FriendModel> {
 		try {
-			return await this.friendService.addFriend(req.user.id, friendRequestDto.friendId);
+			return await this.friendService.createFriend(req.user.id, friendRequestDto.friendId);
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
 		}
 	}
 
 	@Delete(':id')
+	@ApiOperation({ summary: 'Delete friend' })
+	@ApiOkResponse({ description: 'Delete friend successfully', type: FriendModel })
+	@ApiBadRequestResponse({ description: 'Bad request' })
 	async deleteFriend(@Req() req): Promise<FriendModel> {
 		try {
 			return await this.friendService.deleteFriend(req.user.id, req.params.id);

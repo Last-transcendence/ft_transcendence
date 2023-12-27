@@ -203,23 +203,23 @@ model Mute {
 
 model ChatRoom {
     // Attributes
-    id      String @id @default(uuid()) @db.Uuid
-    src_id  String @db.Uuid
-    dest_id String @db.Uuid
+    id     String @id @default(uuid()) @db.Uuid
+    srcId  String @db.Uuid
+    destId String @db.Uuid
 
     // Timestamps
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
     // Refer to
-    src  User @relation("src", fields: [src_id], references: [id])
-    dest User @relation("dest", fields: [dest_id], references: [id])
+    src  User @relation("src", fields: [srcId], references: [id])
+    dest User @relation("dest", fields: [destId], references: [id])
 
     // Related with
     chat Chat[] @relation("chatRoom")
 
-    @@unique([src_id, dest_id], name: "srcId_destId")
-    @@index([src_id], name: "srcId")
+    @@unique([srcId, destId], name: "srcId_destId")
+    @@index([srcId], name: "srcId")
 }
 
 model Chat {

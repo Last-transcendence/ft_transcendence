@@ -6,7 +6,7 @@ import PrismaService from 'common/prisma/prisma.service';
 class FriendService {
 	constructor(private readonly prismaService: PrismaService) {}
 
-	async getFriendList(userId: string): Promise<FriendModel[]> {
+	async getFriend(userId: string): Promise<FriendModel[]> {
 		try {
 			return await this.prismaService.friend.findMany({ where: { userId } });
 		} catch (error) {
@@ -14,7 +14,7 @@ class FriendService {
 		}
 	}
 
-	async addFriend(userId: string, friendId: string): Promise<FriendModel> {
+	async createFriend(userId: string, friendId: string): Promise<FriendModel> {
 		try {
 			return await this.prismaService.friend.create({
 				data: { userId, friendId },
