@@ -10,9 +10,9 @@ class BlockController {
 	constructor(private readonly blockService: BlockService) {}
 
 	@Get()
-	async getBlockList(@Req() req): Promise<BlockModel[]> {
+	async getBlock(@Req() req): Promise<BlockModel[]> {
 		try {
-			return await this.blockService.getBlockList(req.user.id);
+			return await this.blockService.getBlock(req.user.id);
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
 		}
