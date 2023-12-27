@@ -25,7 +25,7 @@ class FriendController {
 	@ApiOperation({ summary: 'Create friend' })
 	@ApiOkResponse({ description: 'Create friend successfully', type: FriendModel })
 	@ApiBadRequestResponse({ description: 'Bad request' })
-	async createFriend(@Body() friendRequestDto: FriendRequestDto, @Req() req): Promise<FriendModel> {
+	async createFriend(@Body() friendRequestDto: Dto.Request.Friend, @Req() req): Promise<FriendModel> {
 		try {
 			return await this.friendService.createFriend(req.user.id, friendRequestDto.friendId);
 		} catch (error) {
