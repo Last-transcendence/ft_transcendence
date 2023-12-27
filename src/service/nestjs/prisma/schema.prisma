@@ -64,6 +64,7 @@ model Friend {
     user     User @relation("user", fields: [userId], references: [id])
     friended User @relation("friended", fields: [friendId], references: [id])
 
+    @@unique([userId, friendId], name: "userId_friendId")
     @@index([userId], name: "friendUserId")
 }
 
@@ -81,6 +82,7 @@ model Block {
     user    User @relation("user", fields: [userId], references: [id])
     blocked User @relation("blocked", fields: [blockedId], references: [id])
 
+    @@unique([userId, blockedId], name: "userId_blockedId")
     @@index([userId], name: "blockUserId")
 }
 
@@ -161,6 +163,8 @@ model Participant {
     // Refer to
     channel Channel @relation("channel", fields: [channelId], references: [id])
     user    User    @relation("user", fields: [userId], references: [id])
+
+    @@unique([channelId, userId], name: "channelId_userId")
 }
 
 model Ban {
@@ -176,6 +180,8 @@ model Ban {
     // Refer to
     channel Channel @relation("channel", fields: [channelId], references: [id])
     user    User    @relation("user", fields: [userId], references: [id])
+
+    @@unique([channelId, userId], name: "channelId_userId")
 }
 
 model Mute {
@@ -191,6 +197,8 @@ model Mute {
     // Refer to
     channel Channel @relation("channel", fields: [channelId], references: [id])
     user    User    @relation("user", fields: [userId], references: [id])
+
+    @@unique([channelId, userId], name: "channelId_userId")
 }
 
 model ChatRoom {
@@ -209,6 +217,9 @@ model ChatRoom {
 
     // Related with
     chat Chat[] @relation("chatRoom")
+
+    @@unique([src_id, dest_id], name: "srcId_destId")
+    @@index([src_id], name: "srcId")
 }
 
 model Chat {
@@ -223,4 +234,6 @@ model Chat {
 
     // Refer to
     chatRoom ChatRoom @relation("chatRoom", fields: [chatRoomId], references: [id])
+
+    @@index([chatRoomId], name: "chatRoomId")
 }

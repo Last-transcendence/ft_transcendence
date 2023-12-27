@@ -1,15 +1,17 @@
 import { Module } from '@nestjs/common';
-import ApiModule from './api/api.module';
 import { ConfigModule } from '@nestjs/config';
+import ApiModule from './api/api.module';
 
 @Module({
 	imports: [
-		ApiModule,
 		ConfigModule.forRoot({
 			cache: true,
 			isGlobal: true,
 			envFilePath: '.env',
 		}),
+		ApiModule,
 	],
 })
-export class AppModule {}
+class AppModule {}
+
+export default AppModule;

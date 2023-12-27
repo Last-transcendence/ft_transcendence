@@ -149,7 +149,7 @@ ENV PGDATA /var/lib/postgresql/data
 
 RUN mkdir -p "$PGDATA" && chown -R postgres:postgres "$PGDATA" && chmod 1777 "$PGDATA"
 
-VOLUME /var/lib/postgresql/data
+#VOLUME /var/lib/postgresql/data
 
 COPY ./tool/docker-entrypoint.sh ./tool/docker-ensure-initdb.sh /usr/local/bin/
 
