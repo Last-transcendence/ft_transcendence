@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, HttpException, Post, Req } from '@nestjs
 import FriendService from './friend.service';
 import { FriendModel } from 'common/model';
 import { ApiBadRequestResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { FriendRequestDto } from './dto';
+import * as Dto from './dto';
 
 @ApiTags('friend')
 @Controller('friend')
