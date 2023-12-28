@@ -1,4 +1,4 @@
-import Agree2FAPage from '@/component/2fa/agree';
+import Agree2FAPage from '@/component/auth/2fa/agree';
 
 const Agree2FA = () => {
 	return (

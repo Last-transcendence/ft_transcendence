@@ -1,4 +1,4 @@
-import CreatUserBody from '@/component/creatUser';
+import CreatUserBody from '@/component/auth/creatUser';
 
 const CreatPage = () => {
 	return (

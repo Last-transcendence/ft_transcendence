@@ -2,7 +2,7 @@ import { Container, Typography, Box } from '@mui/material';
 import HttpsIcon from '@mui/icons-material/Https';
 import EmailInputBody from './emailInputBody';
 import Certification from './checkCertification';
-import styles from '@/style/2fa/setting/index.module.css';
+import styles from '@/style/auth/2fa/setting/index.module.css';
 
 const Setting = () => {
 	return (

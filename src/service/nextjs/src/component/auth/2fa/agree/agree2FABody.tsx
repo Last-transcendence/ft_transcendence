@@ -1,6 +1,6 @@
 import DoneOutlineIcon from '@mui/icons-material/DoneOutline';
 import { Box, Typography } from '@mui/material';
-import styles from '@/style/2fa/agree/index.module.css';
+import styles from '@/style/auth/2fa/agree/index.module.css';
 
 const Agree2FABody = () => {
 	return (

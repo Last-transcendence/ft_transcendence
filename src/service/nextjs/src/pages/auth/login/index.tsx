@@ -1,4 +1,4 @@
-import LoginBody from '@/component/login';
+import LoginBody from '@/component/auth/login';
 
 const LoginPage = () => {
 	return (

@@ -1,7 +1,7 @@
-import styles from '@/style/creatUser/index.module.css';
+import styles from '@/style/auth/creatUser/index.module.css';
 import { TextField, Container, Box, Typography } from '@mui/material';
-import UserPhoto from '@/component/creatUser/userPhoto';
-import CustomButton from '@/component/creatUser/newButton';
+import UserPhoto from '@/component/auth/creatUser/userPhoto';
+import CustomButton from '@/component/auth/creatUser/newButton';
 
 const CreatUserBody = () => {
 	return (
