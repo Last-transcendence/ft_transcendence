@@ -1,6 +1,5 @@
-
+import MyProfileBody, { myProfilePageProps } from './myProfileBodys';
 import { BottomButton } from '@/component/common/ButtomButton';
-import MyProfileBody, {myProfilePageProps} from "@/component/profile/myProfile/myProfileBodys";
 
 const MyProfilePage = ({ fightRecords, odds, ...userType }: myProfilePageProps) => {
 	const onClick = () => {};
