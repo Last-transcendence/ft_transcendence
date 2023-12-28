@@ -131,7 +131,7 @@ model Channel {
     id         String            @id @default(uuid()) @db.Uuid
     title      String
     visibility ChannelVisibility @default(PUBLIC)
-    password   String?
+    password   Int?
 
     // Timestamps
     createdAt DateTime @default(now())
