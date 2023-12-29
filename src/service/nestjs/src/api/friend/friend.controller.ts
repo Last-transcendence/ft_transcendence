@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpException, Post, Req } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpException, Param, Post, Req } from '@nestjs/common';
 import FriendService from './friend.service';
 import { FriendModel } from 'common/model';
 import {
@@ -46,9 +46,9 @@ class FriendController {
 	@ApiOperation({ summary: 'Delete friend' })
 	@ApiOkResponse({ description: 'Delete friend successfully', type: FriendModel })
 	@ApiNotFoundResponse({ description: 'Friend not found' })
-	async deleteFriend(@Req() req): Promise<FriendModel> {
+	async deleteFriend(@Param('id') id: string, @Req() req): Promise<FriendModel> {
 		try {
-			return await this.friendService.deleteFriend(req.user.id, req.params.id);
+			return await this.friendService.deleteFriend(req.user.id, id);
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
 		}
