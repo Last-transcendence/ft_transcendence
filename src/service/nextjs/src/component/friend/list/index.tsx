@@ -33,6 +33,42 @@ const FriendList = () => {
 					condition={<FriendStatus status="오프라인" />}
 					className={style['user-brief-information']}
 				/>
+				<UserBriefInformation
+					profileImageSrc={null}
+					nickName="친구3"
+					condition={<FriendStatus status="오프라인" />}
+					className={style['user-brief-information']}
+				/>
+				<UserBriefInformation
+					profileImageSrc={null}
+					nickName="친구3"
+					condition={<FriendStatus status="오프라인" />}
+					className={style['user-brief-information']}
+				/>
+				<UserBriefInformation
+					profileImageSrc={null}
+					nickName="친구3"
+					condition={<FriendStatus status="오프라인" />}
+					className={style['user-brief-information']}
+				/>
+				<UserBriefInformation
+					profileImageSrc={null}
+					nickName="친구3"
+					condition={<FriendStatus status="오프라인" />}
+					className={style['user-brief-information']}
+				/>
+				<UserBriefInformation
+					profileImageSrc={null}
+					nickName="친구3"
+					condition={<FriendStatus status="오프라인" />}
+					className={style['user-brief-information']}
+				/>
+				<UserBriefInformation
+					profileImageSrc={null}
+					nickName="친구3"
+					condition={<FriendStatus status="오프라인" />}
+					className={style['user-brief-information']}
+				/>
 			</div>
 		</div>
 	);

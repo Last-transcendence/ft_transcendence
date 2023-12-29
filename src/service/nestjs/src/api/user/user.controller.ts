@@ -1,7 +1,7 @@
 import { Controller, Get, HttpException, Param, Post, Query } from '@nestjs/common';
 import { ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { UserModel } from 'common/model';
 import UserService from './user.service';
-import UserModel from 'common/model/user.model';
 
 @Controller('user')
 @ApiTags('user')
