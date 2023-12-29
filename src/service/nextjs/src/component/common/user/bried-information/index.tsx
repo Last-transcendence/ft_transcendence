@@ -1,9 +1,9 @@
 import { ReactNode } from 'react';
 import { DefaultProfileImageIcon } from './icon';
-import Image from 'next/image';
+import Avatar from '@mui/material/Avatar';
 
 interface UserBriefInformationProps {
-	profileImageSrc: string | null;
+	profileImageSrc: string | null | undefined;
 	nickName: ReactNode;
 	condition?: ReactNode;
 	className?: string;
@@ -18,12 +18,12 @@ const UserBriefInformation = ({
 	return (
 		<div className={className}>
 			{profileImageSrc ? (
-				<Image src={profileImageSrc} width={32} height={32} alt="profile" />
+				<Avatar src={profileImageSrc} alt="profile" />
 			) : (
 				<DefaultProfileImageIcon width={32} height={32} />
 			)}
 			<div>{nickName}</div>
-			<div>{condition}</div>
+			{condition && <div>{condition}</div>}
 		</div>
 	);
 };

@@ -3,7 +3,6 @@ import style from '../style/main/index.module.css';
 import MatchingButton from '@/component/main/matching-button';
 import MainPageBody from '@/component/main/body';
 import FriendPage from '@/component/friend';
-import React from 'react';
 import { BottomButton } from '@/component/common/ButtomButton';
 import Link from 'next/link';
 import { MenuHeader } from '@/component/common/Header';

@@ -1,4 +1,4 @@
-enum UserStatus {
+export enum UserStatus {
 	ONLINE,
 	OFFLINE,
 	PLAYING,
