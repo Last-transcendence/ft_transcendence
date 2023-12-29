@@ -4,7 +4,7 @@ import SendChat from '@/component/chat/SendChat';
 import ChattingListPage from '@/component/chat/ChatList';
 import { MenuHeader } from '@/component/common/Header';
 
-const ChatPage = () => {
+export const CommonChatRoom = () => {
 	return (
 		<div>
 			<MenuHeader title={'채팅'} type={'chat'}>
@@ -21,4 +21,19 @@ const ChatPage = () => {
 	);
 };
 
-export default ChatPage;
+export const PrivateChatRoom = () => {
+	return (
+		<div>
+			<MenuHeader title={'채팅'} type={'chat'}>
+				<ChattingListPage />
+			</MenuHeader>
+			{/*채팅 영역*/}
+			<Stack padding={2} gap={2}>
+				<ChatMsg />
+				<StatusMsg />
+				<HelpMsg />
+			</Stack>
+			<SendChat />
+		</div>
+	);
+};
