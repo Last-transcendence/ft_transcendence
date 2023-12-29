@@ -20,6 +20,7 @@ class UserController {
 		}
 	}
 
+	//PATCH 유저 정보 업데이트
 	@Post('search')
 	@ApiOperation({ summary: 'Search user by nickname' })
 	@ApiOkResponse({ description: 'Search user by nickname successfully', type: UserModel })
