@@ -30,10 +30,10 @@ const ChattingListPage = () => {
 		);
 	};
 	const datas = [
-		{ profileImageSrc: null, nickName: '닉네임', condition: '방장' },
-		{ profileImageSrc: null, nickName: '닉네임2', condition: '관리자' },
-		{ profileImageSrc: null, nickName: '닉네임3', condition: '일반' },
-		{ profileImageSrc: null, nickName: '닉네임4', condition: '일반' },
+		{ profileImageSrc: null, nickname: '닉네임', condition: '방장' },
+		{ profileImageSrc: null, nickname: '닉네임2', condition: '관리자' },
+		{ profileImageSrc: null, nickname: '닉네임3', condition: '일반' },
+		{ profileImageSrc: null, nickname: '닉네임4', condition: '일반' },
 	];
 
 	const changeSetting = () => {
@@ -67,7 +67,7 @@ const ChattingListPage = () => {
 							<UserBriefInformation
 								key={index}
 								profileImageSrc={data?.profileImageSrc}
-								nickName={<NickMenu nick={data?.nickName} />}
+								nickname={<NickMenu nick={data?.nickname} />}
 								condition={<ChatStatus status={data?.condition as '방장' | '관리자' | undefined} />}
 								className={style['user-brief-information']}
 							/>
