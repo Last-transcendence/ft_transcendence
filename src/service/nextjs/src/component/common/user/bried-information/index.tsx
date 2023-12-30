@@ -4,14 +4,14 @@ import Avatar from '@mui/material/Avatar';
 
 interface UserBriefInformationProps {
 	profileImageSrc: string | null | undefined;
-	nickName: ReactNode;
+	nickname: ReactNode;
 	condition?: ReactNode;
 	className?: string;
 }
 
 const UserBriefInformation = ({
 	profileImageSrc,
-	nickName,
+	nickname,
 	condition,
 	className,
 }: UserBriefInformationProps) => {
@@ -22,7 +22,7 @@ const UserBriefInformation = ({
 			) : (
 				<DefaultProfileImageIcon width={32} height={32} />
 			)}
-			<div>{nickName}</div>
+			<div>{nickname}</div>
 			{condition && <div>{condition}</div>}
 		</div>
 	);

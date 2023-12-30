@@ -109,7 +109,7 @@ const AddFriend = () => {
 						<div key={user.id}>
 							<UserBriefInformation
 								profileImageSrc={user?.profileImageURI}
-								nickName={user?.nickname}
+								nickname={user?.nickname}
 								className={style['user-brief-information']}
 							/>
 							<button onClick={() => addFriend(user.id)}>추가</button>

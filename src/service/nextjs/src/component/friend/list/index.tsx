@@ -72,7 +72,7 @@ const FriendList = () => {
 					<div key={user.id}>
 						<UserBriefInformation
 							profileImageSrc={user?.profileImageURI}
-							nickName={user?.nickname}
+							nickname={user?.nickname}
 							condition={<FriendStatus status={user?.status} />}
 							className={style['user-brief-information']}
 						/>
