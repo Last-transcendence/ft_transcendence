@@ -18,13 +18,13 @@ export class FtSeoulStrategy extends PassportStrategy(Strategy, 'ft') {
     }
 
     async validate(accessToken: string) {
-    const res = await axios.get('https://api.intra.42.fr/v2/me', {
-        headers: { Authorization: `Bearer ${accessToken}`},
-    });
-    const intraId = res.data.login;
-    const user: User = await this.userService.getUserByintraId(
-        intraId
-    );
-    return user;
-    }
+        const res = await axios.get('https://api.intra.42.fr/v2/me', {
+            headers: { Authorization: `Bearer ${accessToken}`},
+        });
+        const intraId = res.data.login;
+        const user: User = await this.userService.getUserByintraId(
+            intraId
+        );
+        return user;
+        }
 }

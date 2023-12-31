@@ -14,7 +14,6 @@ import ApiModule from './api/api.module';
 		UserModule,
 		ApiModule,
 	],
-	providers: [AuthService],
 })
 class AppModule {}
 

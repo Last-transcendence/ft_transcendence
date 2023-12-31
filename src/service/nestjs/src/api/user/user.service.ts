@@ -42,7 +42,7 @@ class UserService {
 		return null;
 	}
 
-	CreateByintraId(user: User): Promise<User>{
+	async createByintraId(user: User): Promise<User>{
 		try {
 			return this.prismaService.user.create({ data: user });
 		} catch (error) {
@@ -52,15 +52,16 @@ class UserService {
 
 	async updateUserById(id: string, _user: User) {
 		try {
-			const user = await this.prismaService.user.findUnique({ where: { id } });
+			// const user = await this.prismaService.user.findUnique({ where: { id } });
 
-			if (!user) {
-				throw new HttpException('User not found', 404);
-			}
-			_user.nickname ? user.nickname = user.nickname : user.nickname = _user.nickname;
-			_user.email2fa ? user.email2fa = user.email2fa : user.email2fa = _user.email2fa;
-			_user.profileImageURI ? user.profileImageURI = user.profileImageURI : user.profileImageURI = _user.profileImageURI;
-			_user.use2fa === true ? user.use2fa = true : user.use2fa = false;
+			// if (!user) {
+			// 	throw new HttpException('User not found', 404);
+			// }
+			// _user.nickname ? user.nickname = user.nickname : user.nickname = _user.nickname;
+			// _user.email2fa ? user.email2fa = user.email2fa : user.email2fa = _user.email2fa;
+			// _user.profileImageURI ? user.profileImageURI = user.profileImageURI : user.profileImageURI = _user.profileImageURI;
+			// _user.use2fa === true ? user.use2fa = true : user.use2fa = false;
+			await this.prismaService.user.update({ where: { id }, data: _user });
 		} catch (error) {
 			throw new Error(error.message);
 		}
