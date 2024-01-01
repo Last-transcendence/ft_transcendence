@@ -10,6 +10,7 @@ export type ChattingMode = 'normal' | 'private';
 
 const MainPageBody = () => {
 	const [mode, setMode] = useState<ChattingMode>('normal');
+
 	const datas = [
 		{ id: 1, title: 'Mockup data 1', visibility: 'public', numberOfPeople: 1 },
 		{ id: 2, title: 'Mockup data 2', visibility: 'protected', numberOfPeople: 2 },
