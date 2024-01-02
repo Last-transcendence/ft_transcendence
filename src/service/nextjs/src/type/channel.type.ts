@@ -19,10 +19,6 @@ interface Channel {
 	password?: string | null;
 	createdAt: Date;
 	updatedAt: Date;
-	// Related with
-	participants: Participant[];
-	bans: Ban[];
-	mutes: Mute[];
 }
 
 interface CommonInterface {
@@ -36,10 +32,10 @@ interface CommonInterface {
 	user: User;
 }
 
-interface Participant extends CommonInterface {
+export interface Participant extends CommonInterface {
 	role: ParticipantRole;
 }
 
-interface Ban extends CommonInterface {}
+export interface Ban extends CommonInterface {}
 
-interface Mute extends CommonInterface {}
+export interface Mute extends CommonInterface {}

@@ -12,10 +12,10 @@ export const CommonChatRoom = () => {
 	return (
 		<div>
 			<MenuHeader title={'채팅'} type={'chat'}>
-				<ChattingListPage />
+				<ChattingListPage id={id} />
 			</MenuHeader>
 			{/*채팅 영역*/}
-			<Stack padding={2} gap={2}>
+			<Stack padding={2} spacing={2}>
 				<ChatMsg />
 				<StatusMsg />
 				<HelpMsg />
@@ -52,7 +52,7 @@ export const PrivateChatRoom = () => {
 	return (
 		<div>
 			<MenuHeader title={'1:1 채팅'} type={'chat'}>
-				<ChattingListPage />
+				<ChattingListPage id={id} />
 			</MenuHeader>
 			{/*채팅 영역*/}
 			<Stack padding={2} gap={2}>
