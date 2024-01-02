@@ -2,13 +2,13 @@
 
 import { Dispatch, SetStateAction } from 'react';
 import style from '../../../../style/chat/create/visibility/index.module.css';
-import { Visibility } from '@/pages/chat/create';
+import { ChannelVisibility } from '@/type/channel.type';
 
 interface ButtonProps {
 	readonly name: string;
-	readonly value: Visibility;
-	visibility: Visibility;
-	setVisibility: Dispatch<SetStateAction<Visibility>>;
+	readonly value: ChannelVisibility;
+	visibility: ChannelVisibility;
+	setVisibility: Dispatch<SetStateAction<ChannelVisibility>>;
 }
 
 const Button = ({ name, value, visibility, setVisibility }: ButtonProps) => {
@@ -27,8 +27,8 @@ const Button = ({ name, value, visibility, setVisibility }: ButtonProps) => {
 };
 
 interface CreateChatVisibilityProps {
-	visibility: Visibility;
-	setVisibility: Dispatch<SetStateAction<Visibility>>;
+	visibility: ChannelVisibility;
+	setVisibility: Dispatch<SetStateAction<ChannelVisibility>>;
 }
 
 const CreateChatVisibility = ({ visibility, setVisibility }: CreateChatVisibilityProps) => {
@@ -38,19 +38,19 @@ const CreateChatVisibility = ({ visibility, setVisibility }: CreateChatVisibilit
 			<div>
 				<Button
 					name="visibility"
-					value="public"
+					value={ChannelVisibility.PUBLIC}
 					visibility={visibility}
 					setVisibility={setVisibility}
 				/>
 				<Button
 					name="visibility"
-					value="protected"
+					value={ChannelVisibility.PROTECTED}
 					visibility={visibility}
 					setVisibility={setVisibility}
 				/>
 				<Button
 					name="visibility"
-					value="private"
+					value={ChannelVisibility.PRIVATE}
 					visibility={visibility}
 					setVisibility={setVisibility}
 				/>
