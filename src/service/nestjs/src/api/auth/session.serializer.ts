@@ -7,17 +7,17 @@ export class SessionSerializer extends PassportSerializer {
   constructor(private userSerivice: UserService) {
     super();
   }
-
-  serializeUser(user: any, done: (err: Error, user: any) => void): any {
-    done(null, user.intraId);
+  
+  serializeUser(accessToken: any, done: (err: Error, accessToken: any) => void): any {
+    done(null, accessToken);
   }
-
+  
   async deserializeUser(
     payload: any,
     done: (err: Error, payload: any) => void,
   ): Promise<any> {
 
-    const user = await this.userSerivice.getUserByintraId(payload);
+    const user = await this.userSerivice.getUserByIntraId(payload);
     if (!user) {
       done(new Error('No User'), null);
       return;

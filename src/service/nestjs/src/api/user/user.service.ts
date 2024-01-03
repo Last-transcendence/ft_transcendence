@@ -19,12 +19,9 @@ class UserService {
 		}
 	}
 
-	async getUserByintraId(intraId: string) {
+	async getUserByIntraId(intraId: string) {
 		try {
 			const user = await this.prismaService.user.findUnique({ where: { intraId } });
-			if (!user) {
-				throw new HttpException('User not found', 404);
-			}
 			return user;
 		} catch (error) {
 			if (error.status === 404) {
@@ -34,7 +31,7 @@ class UserService {
 		}
 	}
 
-	async findByintraId(intraId: string): Promise<User> {
+	async findByIntraId(intraId: string): Promise<User> {
 		const foundUser = await this.prismaService.user.findUnique({ where: { intraId } });
 		if (foundUser) {
 			return foundUser;
@@ -42,14 +39,14 @@ class UserService {
 		return null;
 	}
 
-	async createByintraId(user: User): Promise<User>{
+	async createByIntraId(user: User): Promise<User>{
 		try {
 			return this.prismaService.user.create({ data: user });
 		} catch (error) {
 			throw new Error(error.message);
 		}
 	}
-
+	//partial<Dto.Request.User>
 	async updateUserById(id: string, _user: User) {
 		try {
 			// const user = await this.prismaService.user.findUnique({ where: { id } });

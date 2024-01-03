@@ -22,9 +22,9 @@ export class FtSeoulStrategy extends PassportStrategy(Strategy, 'ft') {
             headers: { Authorization: `Bearer ${accessToken}`},
         });
         const intraId = res.data.login;
-        const user: User = await this.userService.getUserByintraId(
+        const user: User = await this.userService.getUserByIntraId(
             intraId
         );
-        return user;
+        return accessToken;
         }
 }

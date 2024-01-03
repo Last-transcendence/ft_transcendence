@@ -8,7 +8,7 @@ export class AuthService {
     constructor(private userSerivice: UserService) {}
 
     async register(userDto: User) {
-        const user = await this.userSerivice.findByintraId(userDto.intraId);
+        const user = await this.userSerivice.findByIntraId(userDto.intraId);
         if (user) {
             throw new HttpException(
                 '해당 유저가 이미 있습니다.', 
@@ -17,7 +17,7 @@ export class AuthService {
         }
 
         try {
-            const user = await this.userSerivice.createByintraId(
+            const user = await this.userSerivice.createByIntraId(
                 userDto);
             return user;
         } catch (error) {
