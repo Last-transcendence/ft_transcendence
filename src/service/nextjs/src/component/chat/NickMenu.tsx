@@ -1,6 +1,5 @@
 import React from 'react';
 import { Menu, MenuItem, Typography } from '@mui/material';
-import api from '@/component/api/base';
 import { postFetcher } from '../../../service/api';
 
 //@todo 추후에 props의 optional 빼기
