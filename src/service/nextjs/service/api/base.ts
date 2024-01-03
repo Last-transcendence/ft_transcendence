@@ -1,7 +1,7 @@
 import axios from 'axios';
 // import CookieLoader from './cookieLoader';
 
-const api = axios.create({
+const axiosInstance = axios.create({
 	baseURL: process.env.NEXT_PUBLIC_API_URL,
 	timeout: 5000,
 	// headers: {
@@ -9,4 +9,4 @@ const api = axios.create({
 	// },
 });
 
-export default api;
+export default axiosInstance;
