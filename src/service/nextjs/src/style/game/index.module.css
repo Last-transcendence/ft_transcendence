@@ -1,0 +1,10 @@
+.container {
+	width: 100cqw;
+	height: 100cqh;
+	container-type: size;
+}
+
+.container > canvas {
+	width: 100cqw;
+	height: 100cqh;
+}

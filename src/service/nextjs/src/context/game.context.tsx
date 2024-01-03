@@ -3,8 +3,8 @@ import axios from 'axios';
 import { Dispatch, ReactNode, SetStateAction, createContext, useEffect, useState } from 'react';
 
 const GameContext = createContext<{
-	game: Game | null;
-	setGame: Dispatch<SetStateAction<Game | null>>;
+	game: Game[] | null;
+	setGame: Dispatch<SetStateAction<Game[] | null>>;
 }>({
 	game: null,
 	setGame: () => {},
@@ -12,7 +12,7 @@ const GameContext = createContext<{
 
 export const GameProvider = (props: { children: ReactNode }) => {
 	const { children } = props;
-	const [game, setGame] = useState<Game | null>(null);
+	const [game, setGame] = useState<Game[] | null>(null);
 
 	useEffect(() => {
 		if (!game) {

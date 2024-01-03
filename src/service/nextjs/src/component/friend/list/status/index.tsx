@@ -2,24 +2,22 @@
 
 import style from '../../../../style/friend/list/status/index.module.css';
 import { Typography } from '@mui/material';
+import { UserStatus } from '@/type';
 
-export type statusType = '온라인' | '오프라인' | '게임 중' | '친구' | '';
+const statusLabel = [
+	{ color: '#1CB119', label: '온라인' },
+	{ color: '#495D49', label: '오프라인' },
+	{ color: '#9C27B0', label: '게임중' },
+];
+
 interface StatusProps {
-	status: statusType;
+	status: UserStatus;
 }
 
 const FriendStatus = ({ status }: StatusProps) => {
-	const colors: { [key in statusType]: string } = {
-		온라인: '#1CB119',
-		오프라인: '#495D49',
-		'게임 중': '#9C27B0',
-		친구: '#1CB119',
-		'': 'black',
-	};
-
 	return (
 		<div className={style.container}>
-			<Typography color={colors[status]}>{status}</Typography>
+			<Typography color={statusLabel[status]?.color}>{statusLabel[status]?.label}</Typography>
 		</div>
 	);
 };

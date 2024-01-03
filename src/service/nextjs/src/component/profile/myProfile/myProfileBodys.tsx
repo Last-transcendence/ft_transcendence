@@ -13,7 +13,7 @@ export interface myProfilePageProps extends myImageProps, fightRecordsProps {
 
 const MyProfileBody = ({ fightRecords, odds, ...userType }: myProfilePageProps) => {
 	return (
-		<Box height="92.5vh" overflow="auto">
+		<Box height="92vh" overflow="auto">
 			<Container maxWidth="xs" sx={{ paddingBottom: 15 }}>
 				<MyProfileMenu />
 				<ProfileAvartar {...userType} />
