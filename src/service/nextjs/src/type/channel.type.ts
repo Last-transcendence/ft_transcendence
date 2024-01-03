@@ -7,9 +7,9 @@ export enum ChannelVisibility {
 }
 
 export enum ParticipantRole {
-	OWNER,
-	ADMIN,
-	USER,
+	OWNER = 'OWNER',
+	ADMIN = 'ADMIN',
+	USER = 'USER',
 }
 
 interface Channel {

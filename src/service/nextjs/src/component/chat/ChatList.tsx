@@ -37,11 +37,7 @@ const ChattingListPage = ({ id }: { id: string }) => {
 		useEffect(() => {
 			if (spanRef.current) {
 				spanRef.current.style.color =
-					status === ParticipantRole.OWNER
-						? '#1CB119'
-						: status === ParticipantRole.ADMIN
-							? '#495D49'
-							: '#9C27B0';
+					status === 'OWNER' ? '#1CB119' : status === 'ADMIN' ? '#495D49' : '#9C27B0';
 			}
 		}, [status]);
 
@@ -89,7 +85,9 @@ const ChattingListPage = ({ id }: { id: string }) => {
 							<UserBriefInformation
 								key={index}
 								profileImageSrc={data?.profileImageURI}
-								nickname={<NickMenu nick={data?.nickname} />}
+								nickname={
+									<NickMenu nickname={data?.nickname} userId={me?.id} channelId={data?.id} />
+								}
 								condition={<ChatStatus status={data?.role} />}
 								className={style['user-brief-information']}
 							/>
