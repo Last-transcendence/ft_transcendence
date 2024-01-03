@@ -30,8 +30,7 @@ class ChannelController {
 	async createChannel(@Body() channelRequestDto: Dto.Request.Channel)
 													: Promise<ChannelModel> {
 		try {
-			return await this.channelService.createChannel(channelRequestDto.title, 
-				channelRequestDto.visibility, channelRequestDto.password);
+			return await this.channelService.createChannel(channelRequestDto);
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
 		}
