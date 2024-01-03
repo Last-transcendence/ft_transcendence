@@ -1,36 +1,43 @@
 import React from 'react';
 import { Menu, MenuItem, Typography } from '@mui/material';
+import api from '@/component/api/base';
 
+//@todo 추후에 props의 optional 빼기
 interface NickMenuProps {
-	nick: string;
+	nickname: string;
+	userId?: string;
+	channelId?: string;
 }
-export const NickMenu = ({ nick }: NickMenuProps) => {
+export const NickMenu = ({ nickname, userId, channelId }: NickMenuProps) => {
 	const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-
 	const open = Boolean(anchorEl);
+
 	const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
 		setAnchorEl(event.currentTarget);
 	};
 	const handleClose = () => {
 		setAnchorEl(null);
 	};
-	const handleMenuClick = (e: React.MouseEvent<HTMLLIElement, MouseEvent>) => {
+	const handleMenuClick = async (e: React.MouseEvent<HTMLLIElement, MouseEvent>) => {
 		const { id: targetId } = e.target as HTMLLIElement;
 		switch (targetId) {
 			case 'nickBtn':
-				alert('nickBtn');
+				// navigate(`/profile/${id}`)
+				// 프로필 오픈
 				break;
 			case 'kickBtn':
-				alert('kickBtn');
+				await api.post(`/channel/${channelId}/kick/${userId}`);
 				break;
 			case 'banBtn':
-				alert('banBtn');
+				//how to ban?
+				///channel/{id}/ban
 				break;
 			case 'muteBtn':
-				alert('muteBtn');
+				//how to mute?
+				///channel/{id}/mute
 				break;
 			case 'adminBtn':
-				alert('adminBtn');
+				//how to set admin?
 				break;
 			default:
 				break;
@@ -40,7 +47,7 @@ export const NickMenu = ({ nick }: NickMenuProps) => {
 		<>
 			<Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
 				<MenuItem id={'nickBtn'} onClick={handleMenuClick}>
-					{nick}
+					{nickname}
 				</MenuItem>
 				<MenuItem id={'kickBtn'} onClick={handleMenuClick}>
 					추방하기
@@ -56,7 +63,7 @@ export const NickMenu = ({ nick }: NickMenuProps) => {
 				</MenuItem>
 			</Menu>
 			<Typography fontWeight={'bold'} sx={{ cursor: 'pointer' }} onClick={handleClick}>
-				{nick}
+				{nickname}
 			</Typography>
 		</>
 	);

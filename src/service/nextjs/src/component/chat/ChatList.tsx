@@ -4,46 +4,64 @@ import { Stack, Typography } from '@mui/material';
 import UserBriefInformation from '@/component/common/user/bried-information';
 import NickMenu from '@/component/chat/NickMenu';
 import CustomModal from '@/component/common/CustomModal';
+import { getFetcher } from '@/component/api/getFetcher';
+import api from '@/component/api/base';
+import { ParticipantRole } from '@/type/channel.type';
 
-interface StatusProps {
-	status?: '방장' | '관리자';
-}
-
-const ChattingListPage = () => {
+const ChattingListPage = ({ id }: { id: string }) => {
 	const [open, setOpen] = useState(false);
 	const [password, setPassword] = useState('');
 	const [title, setTitle] = useState('');
-	const ChatStatus = ({ status }: StatusProps) => {
+	const [data, setData] = useState<any[]>([]);
+	const [isLoading, setLoading] = useState(false);
+	const fetchData = async () => {
+		try {
+			setLoading(true);
+			const res = await getFetcher(`/channel/${id}/participant`);
+			setData(res);
+			setLoading(false);
+		} catch (error) {
+			console.error('Error fetching data:', error);
+			setLoading(false);
+		}
+	};
+
+	useEffect(() => {
+		fetchData();
+	}, []);
+
+	const ChatStatus = ({ status }: { status: ParticipantRole }) => {
 		const spanRef = useRef<HTMLSpanElement>(null);
+		const chatStatusLabel = { OWNER: '방장', ADMIN: '관리자', USER: '일반' };
 
 		useEffect(() => {
 			if (spanRef.current) {
 				spanRef.current.style.color =
-					status === '방장' ? '#1CB119' : status === '관리자' ? '#495D49' : '#9C27B0';
+					status === 'OWNER' ? '#1CB119' : status === 'ADMIN' ? '#495D49' : '#9C27B0';
 			}
 		}, [status]);
 
 		return (
 			<div className={style.container}>
-				<span ref={spanRef}>{status}</span>
+				<span ref={spanRef}>{chatStatusLabel[status]}</span>
 			</div>
 		);
 	};
 	const datas = [
-		{ profileImageSrc: null, nickname: '닉네임', condition: '방장' },
-		{ profileImageSrc: null, nickname: '닉네임2', condition: '관리자' },
-		{ profileImageSrc: null, nickname: '닉네임3', condition: '일반' },
-		{ profileImageSrc: null, nickname: '닉네임4', condition: '일반' },
+		{ profileImageURI: null, nickname: '닉네임', role: ParticipantRole.OWNER },
+		{ profileImageURI: null, nickname: '닉네임2', role: ParticipantRole.ADMIN },
+		{ profileImageURI: null, nickname: '닉네임3', role: ParticipantRole.USER },
+		{ profileImageURI: null, nickname: '닉네임4', role: ParticipantRole.USER },
 	];
 
-	const changeSetting = () => {
-		alert(password);
-		alert(title);
+	const changeSetting = async () => {
+		await api.patch(`/channel/${id}`, { password, title });
 	};
 
 	return (
 		<div>
 			{/*채널이 protected일때만 비밀번호 변경 보임*/}
+			{/*채널 정보 가져와야함*/}
 			{open && (
 				<CustomModal setIsOpened={setOpen}>
 					<Stack height="100cqh" justifyContent={'space-around'} alignItems={'center'}>
@@ -66,9 +84,11 @@ const ChattingListPage = () => {
 						{datas?.map((data, index) => (
 							<UserBriefInformation
 								key={index}
-								profileImageSrc={data?.profileImageSrc}
-								nickname={<NickMenu nick={data?.nickname} />}
-								condition={<ChatStatus status={data?.condition as '방장' | '관리자' | undefined} />}
+								profileImageSrc={data?.profileImageURI}
+								nickname={
+									<NickMenu nickname={data?.nickname} userId={me?.id} channelId={data?.id} />
+								}
+								condition={<ChatStatus status={data?.role} />}
 								className={style['user-brief-information']}
 							/>
 						))}
