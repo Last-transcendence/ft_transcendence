@@ -14,7 +14,7 @@ class ChannelController {
 	@ApiOkResponse({description : 'Get channel list successfully', 
 					type: ChannelModel})
 	@ApiNotFoundResponse({description : 'Channel not found'})
-	async getChannelList() {
+	async getChannelList(): Promise<ChannelModel[]> {
 		try {
 			return await this.channelService.getChannelList();
 		} catch (error) {
