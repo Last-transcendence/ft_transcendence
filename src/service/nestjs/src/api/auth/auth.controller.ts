@@ -23,7 +23,7 @@ export class AuthController {
     @Get('login')
     @UseGuards(FtSeoulAuthGuard)
     async FtAuthRedirect(@Request() req) {
-        const { accessToken } = req;
-        return accessToken;
+        // const { user } = req;
+        // return user;
     }
 }

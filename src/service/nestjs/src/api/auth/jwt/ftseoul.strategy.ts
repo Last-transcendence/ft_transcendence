@@ -25,6 +25,6 @@ export class FtSeoulStrategy extends PassportStrategy(Strategy, 'ft') {
         const user: User = await this.userService.getUserByIntraId(
             intraId
         );
-        return accessToken;
+        return user;
         }
 }
