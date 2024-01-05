@@ -13,18 +13,19 @@ export class FtSeoulStrategy extends PassportStrategy(Strategy, 'ft') {
             tokenURL: 'https://api.intra.42.fr/oauth/token',
             clientID: process.env.CLIENT_ID,
             clientSecret: process.env.CLIENT_SECRET,
-            callbackURL: 'https://dev.transcendence.42seoul.kr/auth/login',
+            callbackURL: 'https://dev.transcendence.42seoul.kr/auth/ft/callback',
         });
     }
 
-    async validate(accessToken: string) {
-        const res = await axios.get('https://api.intra.42.fr/v2/me', {
-            headers: { Authorization: `Bearer ${accessToken}`},
-        });
-        const intraId = res.data.login;
-        const user: User = await this.userService.getUserByIntraId(
-            intraId
-        );
-        return user;
+    async validate(accessToken: string, refreshToken: string, profile: any, done: (err: Error, user: any) => void) {
+        try {
+            const res = await axios.get('https://api.intra.42.fr/v2/me', {
+                headers: { Authorization: `Bearer ${accessToken}`},
+            });
+            const intraId = res.data.login;
+            done(null, { intraId: intraId });
+        } catch (err) {
+            done(err, null);
         }
+    }
 }

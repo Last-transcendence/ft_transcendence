@@ -3,10 +3,9 @@ import { AuthGuard } from '@nestjs/passport';
 
 @Injectable()
 export class FtSeoulAuthGuard extends AuthGuard('ft') {
-  async canActivate(context: any): Promise<boolean> {
-    const result = (await super.canActivate(context)) as boolean;
-    const request = context.switchToHttp().getRequest();
-    await super.logIn(request);
-    return result;
-  }
+  // async canActivate(context: any): Promise<boolean> {
+  //   const request = context.switchToHttp().getRequest();
+  //   const result = (await super.canActivate(context)) as boolean;
+  //   return result;
+  // }
 }

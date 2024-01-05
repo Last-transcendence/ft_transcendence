@@ -3,6 +3,7 @@ import { ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nest
 import { UserModel } from 'common/model';
 import UserService from './user.service';
 import { FtSeoulAuthGuard } from 'api/auth/auth.guard';
+import { JwtAuthGuard } from 'api/auth/jwt-auth.guard';
 
 @Controller('user')
 @ApiTags('user')
@@ -10,7 +11,7 @@ class UserController {
 	constructor(private readonly userService: UserService) {}
 
 	@Get('me')
-	// @UseGuards(FtSeoulAuthGuard)
+	@UseGuards(JwtAuthGuard)
 	@ApiOperation({ summary: 'Get my information' })
 	@ApiOkResponse({ description: 'Get my info successfully', type: UserModel })
 	@ApiNotFoundResponse({ description: 'User not found' })

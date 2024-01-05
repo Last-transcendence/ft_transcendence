@@ -32,16 +32,24 @@ class UserService {
 	}
 
 	async findByIntraId(intraId: string): Promise<User> {
-		const foundUser = await this.prismaService.user.findUnique({ where: { intraId } });
+		const foundUser = await this.prismaService.user.findFirst({ where: { intraId } });
 		if (foundUser) {
 			return foundUser;
 		}
 		return null;
 	}
 
-	async createByIntraId(user: User): Promise<User>{
+	async findByNickName(nickname: string): Promise<User> {
+		const foundNick = await this.prismaService.user.findFirst({ where: { nickname } });
+		if (foundNick) {
+			return foundNick;
+		}
+		return null;
+	}
+
+	async createByIntraId(intraId: string, use2fa: boolean, nickname?: string, profileImageURI?: string): Promise<User>{
 		try {
-			return this.prismaService.user.create({ data: user });
+			return this.prismaService.user.create({ data: { intraId, nickname, profileImageURI, use2fa } });
 		} catch (error) {
 			throw new Error(error.message);
 		}
