@@ -11,8 +11,8 @@ import {
 } from 'react';
 
 const BlockContext = createContext<{
-	block: Block | null;
-	setBlock: Dispatch<SetStateAction<Block | null>>;
+	block: Block[] | null;
+	setBlock: Dispatch<SetStateAction<Block[] | null>>;
 }>({
 	block: null,
 	setBlock: () => {},
@@ -20,7 +20,7 @@ const BlockContext = createContext<{
 
 export const BlockProvider = (props: { children: ReactNode }) => {
 	const { children } = props;
-	const [block, setBlock] = useState<Block | null>(null);
+	const [block, setBlock] = useState<Block[] | null>(null);
 
 	useEffect(() => {
 		if (!block) {

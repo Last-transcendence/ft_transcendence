@@ -5,9 +5,10 @@ import ChatroomModule from './chatroom/chatroom.module';
 import BlockModule from './block/block.module';
 import PrismaModule from 'common/prisma/prisma.module';
 import FriendModule from './friend/friend.module';
+import ChannelModule from './channel/channel.module';
 
 @Module({
-	imports: [PrismaModule, UserModule, FriendModule, BlockModule, ChatroomModule, AuthModule],
+	imports: [PrismaModule, UserModule, FriendModule, BlockModule, ChatroomModule, ChannelModule, AuthModule],
 })
 class ApiModule {}
 

@@ -1,8 +1,13 @@
 import style from '../../../style/friend/add/index.module.css';
 import SearchFriend from './search';
-import FriendStatus, { statusType } from '@/component/friend/list/status';
 import UserBriefInformation from '@/component/common/user/bried-information';
-import { Button } from '@mui/material';
+import { Skeleton } from '@mui/material';
+import User, { UserStatus } from '@/type/user.type';
+import { useState } from 'react';
+// import { getFetcher } from '@/component/api/getFetcher';
+// import Friend from '@/type/friend.type';
+import api from '@/component/api/base';
+import CustomSnackbar from '@/component/profile/modifyProfile/customSnackbar';
 
 const Title = () => {
 	return (
@@ -12,53 +17,115 @@ const Title = () => {
 	);
 };
 
-const AddFriend = () => {
-	const friendList = [
-		{ profileImageSrc: null, nickName: '친구인사람', condition: '친구' },
-		{ profileImageSrc: null, nickName: '친구인사람', condition: '' },
-		{ profileImageSrc: null, nickName: '친구인사람', condition: '' },
-		{ profileImageSrc: null, nickName: '친구인사람', condition: '친구' },
-		{ profileImageSrc: null, nickName: '친구인사람', condition: '친구' },
-		{ profileImageSrc: null, nickName: '친구인사람', condition: '친구' },
-		{ profileImageSrc: null, nickName: '친구인사람', condition: '친구' },
-		{ profileImageSrc: null, nickName: '친구인사람', condition: '친구' },
-	];
+const dummyUsers: User[] = [
+	{
+		id: '1',
+		intraId: 'john_doe',
+		nickname: 'John Doe',
+		profileImageURI: 'https://example.com/john_doe.jpg',
+		email2fa: 'john@example.com',
+		use2fa: true,
+		status: UserStatus.ONLINE,
+	},
+	{
+		id: '2',
+		intraId: 'jane_smith',
+		nickname: 'Jane Smith',
+		profileImageURI: undefined,
+		email2fa: 'jane@example.com',
+		use2fa: false,
+		status: UserStatus.OFFLINE,
+	},
+];
 
-	const removeFriend = () => {
-		alert('친구 삭제');
+// const removeFriend = () => {
+// 	alert('친구 삭제');
+// };
+
+const AddFriend = () => {
+	const [searchData, setSearchData] = useState<User[]>([]);
+	const [isLoading, setLoading] = useState(false);
+	const [showSuccessSnackbar, setShowSuccessSnackbar] = useState(false);
+	const [message, setMessage] = useState({
+		title: '',
+		success: true,
+	});
+	const onSearch = (name: string) => {
+		if (isLoading) return;
+		if (name.length === 0) setSearchData([]);
+		setSearchData(dummyUsers);
+		//@todo api test
+		// try {
+		// 	setLoading(true);
+		// 	const res = await api.post(`/user/search?queryString=${name}`);
+		// 	setSearchData(res.data);
+		// 	setLoading(false);
+		// } catch (error) {
+		// 	console.error('Error fetching data:', error);
+		// 	setLoading(false);
+		// }
 	};
 
-	const addFriend = () => {
-		alert('친구 추가');
+	if (isLoading) return <Skeleton />;
+	if (!searchData) return <div>유저가 없습니다.</div>;
+
+	const addFriend = async (id: string) => {
+		try {
+			await api.post('/friend', { friendId: id });
+			setMessage({
+				title: '친구 추가 성공',
+				success: true,
+			});
+			setShowSuccessSnackbar(true);
+		} catch (error) {
+			setMessage({
+				title: '친구 추가 실패',
+				success: false,
+			});
+			setShowSuccessSnackbar(true);
+		}
 	};
 
 	return (
 		<div className={style.container}>
+			<CustomSnackbar
+				open={showSuccessSnackbar}
+				onClose={() => setShowSuccessSnackbar(false)}
+				message={message.title}
+				success={message.success}
+				position={'bottom'}
+			/>
 			<div className={style['add-container']}>
 				<Title />
-				<SearchFriend />
+				<SearchFriend onSearch={onSearch} />
 			</div>
-			<div className={style['user-container']}>
-				{friendList?.map((v, index) => (
-					<div key={index}>
-						<UserBriefInformation
-							profileImageSrc={v.profileImageSrc}
-							nickName={v.nickName}
-							condition={<FriendStatus status={(v?.condition ?? '') as statusType} />}
-							className={style['user-brief-information']}
-						/>
-						{v?.condition === '친구' ? (
-							<Button variant={'contained'} size={'small'} onClick={() => removeFriend()}>
-								삭제
-							</Button>
-						) : (
-							<Button variant={'contained'} size={'small'} onClick={() => addFriend()}>
-								추가
-							</Button>
-						)}
-					</div>
-				))}
-			</div>
+			{isLoading ? (
+				<Skeleton />
+			) : !searchData ? (
+				<>데이터가 없습니다</>
+			) : (
+				<div className={style['user-container']}>
+					{searchData?.map(user => (
+						<div key={user.id}>
+							<UserBriefInformation
+								profileImageSrc={user?.profileImageURI}
+								nickname={user?.nickname}
+								className={style['user-brief-information']}
+							/>
+							<button onClick={() => addFriend(user.id)}>추가</button>
+							{/*{v?.condition === '친구' ? (*/}
+							{/*	<Button variant={'contained'} size={'small'} onClick={() => removeFriend()}>*/}
+							{/*		삭제*/}
+							{/*	</Button>*/}
+							{/*) : (*/}
+							{/*	<Button variant={'contained'} size={'small'} onClick={() => addFriend()}>*/}
+							{/*		추가*/}
+							{/*	</Button>*/}
+							{/*)}*/}
+						</div>
+					))}
+				</div>
+			)}
 		</div>
 	);
 };

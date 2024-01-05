@@ -8,7 +8,7 @@ class ChatModel implements Chat {
 	@ApiProperty({ description: 'Chat room id' })
 	chatRoomId: string;
 
-	@ApiProperty({ description: 'User id' })
+	@ApiProperty({ description: 'Chat content' })
 	content: string;
 
 	@ApiProperty({ required: false })
