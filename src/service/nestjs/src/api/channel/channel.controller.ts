@@ -9,11 +9,10 @@ import {
 	Post,
 } from '@nestjs/common';
 import { ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import ChannelService from './channel.service';
-import ChannelModel from 'common/model/channel.model';
-
-import * as Dto from './dto';
 import { User } from '@prisma/client';
+import ChannelModel from 'common/model/channel.model';
+import ChannelService from './channel.service';
+import * as Dto from './dto';
 
 @Controller('channel')
 @ApiTags('channel')
@@ -42,7 +41,7 @@ class ChannelController {
 		type: ChannelModel,
 	})
 	@ApiNotFoundResponse({ description: 'Failed to create channel' })
-	async createChannel(@Body() channelRequestDto: Dto.Request.ChannelDto): Promise<ChannelModel> {
+	async createChannel(@Body() channelRequestDto: Dto.Request.Channel): Promise<ChannelModel> {
 		try {
 			return await this.channelService.createChannel(channelRequestDto);
 		} catch (error) {
@@ -59,7 +58,7 @@ class ChannelController {
 	@ApiNotFoundResponse({ description: 'Failed to change channel info' })
 	async updateChannel(
 		@Param('id', ParseUUIDPipe) id: string,
-		@Body() updateChannelDto: Dto.Request.Channel.Update.PartialChannel,
+		@Body() updateChannelDto: Partial<Dto.Request.Channel>,
 	) {
 		try {
 			return await this.channelService.updateChannel(id, updateChannelDto);
