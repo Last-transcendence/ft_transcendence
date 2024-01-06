@@ -1,14 +1,16 @@
 import React from 'react';
 import { Menu, MenuItem, Typography } from '@mui/material';
 import api from '@/component/api/base';
+import { ParticipantRole } from '@/type/channel.type';
 
 //@todo 추후에 props의 optional 빼기
 interface NickMenuProps {
 	nickname: string;
-	userId?: string;
-	channelId?: string;
+	userId: string;
+	channelId: string;
+	isOwner: boolean;
 }
-export const NickMenu = ({ nickname, userId, channelId }: NickMenuProps) => {
+export const AdminNickMenu = ({ nickname, userId, channelId, isOwner }: NickMenuProps) => {
 	const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 	const open = Boolean(anchorEl);
 
@@ -18,23 +20,23 @@ export const NickMenu = ({ nickname, userId, channelId }: NickMenuProps) => {
 	const handleClose = () => {
 		setAnchorEl(null);
 	};
+
+	// admin이 owner를 kick할 수 있을까?
 	const handleMenuClick = async (e: React.MouseEvent<HTMLLIElement, MouseEvent>) => {
 		const { id: targetId } = e.target as HTMLLIElement;
 		switch (targetId) {
 			case 'nickBtn':
-				// navigate(`/profile/${id}`)
+				// navigate(`/profile/${userId}`);
 				// 프로필 오픈
 				break;
 			case 'kickBtn':
 				await api.post(`/channel/${channelId}/kick/${userId}`);
 				break;
 			case 'banBtn':
-				//how to ban?
-				///channel/{id}/ban
+				await api.post(`/channel/${channelId}/ban/${userId}`);
 				break;
 			case 'muteBtn':
-				//how to mute?
-				///channel/{id}/mute
+				await api.post(`/channel/${channelId}/mute/${userId}`);
 				break;
 			case 'adminBtn':
 				//how to set admin?
@@ -58,9 +60,11 @@ export const NickMenu = ({ nickname, userId, channelId }: NickMenuProps) => {
 				<MenuItem id={'muteBtn'} onClick={handleMenuClick}>
 					뮤트하기
 				</MenuItem>
-				<MenuItem id={'adminBtn'} onClick={handleMenuClick}>
-					어드민임명
-				</MenuItem>
+				{isOwner && (
+					<MenuItem id={'adminBtn'} onClick={handleMenuClick}>
+						어드민임명
+					</MenuItem>
+				)}
 			</Menu>
 			<Typography fontWeight={'bold'} sx={{ cursor: 'pointer' }} onClick={handleClick}>
 				{nickname}
@@ -69,4 +73,30 @@ export const NickMenu = ({ nickname, userId, channelId }: NickMenuProps) => {
 	);
 };
 
-export default NickMenu;
+export const NickMenu = ({ nickname, userId }: { nickname: string; userId: string }) => {
+	const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+	const open = Boolean(anchorEl);
+
+	const handleMenuClick = () => {
+		// navigate(`/profile/${userId}`);
+		// 프로필 오픈
+	};
+
+	const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+		setAnchorEl(event.currentTarget);
+	};
+	const handleClose = () => {
+		setAnchorEl(null);
+	};
+
+	return (
+		<>
+			<Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
+				<MenuItem onClick={handleMenuClick}>{nickname}</MenuItem>
+			</Menu>
+			<Typography fontWeight={'bold'} sx={{ cursor: 'pointer' }} onClick={handleClick}>
+				{nickname}
+			</Typography>
+		</>
+	);
+};
