@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { AuthService } from './api/auth/service/auth.service';
+import UserModule from './api/user/user.module';
 import ApiModule from './api/api.module';
 
 @Module({
@@ -9,6 +11,7 @@ import ApiModule from './api/api.module';
 			isGlobal: true,
 			envFilePath: '.env',
 		}),
+		UserModule,
 		ApiModule,
 	],
 })

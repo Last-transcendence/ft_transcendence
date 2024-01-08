@@ -3,6 +3,8 @@ import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
 import { setupSwagger } from 'util/swagger/swagger';
 import * as cookieParser from 'cookie-parser';
+import * as session from 'express-session';
+import * as passport from 'passport';
 
 import AppModule from './app.module';
 import PrismaService from './common/prisma/prisma.service';
@@ -25,6 +27,19 @@ async function bootstrap() {
 		credentials: true,
 	});
 	app.use(cookieParser());
+
+	app.use(
+		session({
+			secret: 'important-secret',
+			resave: false,
+			saveUninitialized: false,
+			cookie: {
+				maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
+			},
+		})
+	);
+	app.use(passport.initialize());
+	app.use(passport.session());
 
 	await prismaService.enableShutdownHooks(app);
 
