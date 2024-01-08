@@ -1,6 +1,7 @@
 import {
 	Body,
 	Controller,
+	Delete,
 	Get,
 	HttpException,
 	Param,
@@ -82,22 +83,24 @@ class ChannelController {
 		}
 	}
 
-	@Get(':id/participant')
+	@Get(':channelId/participant')
 	@ApiOperation({ summary: 'Get the channel participant list' })
 	@ApiOkResponse({
 		description: 'Channel participant list successfully obtained',
 		type: ChannelModel,
 	})
 	@ApiNotFoundResponse({ description: 'Failed to get channel participant list' })
-	async getChannelParticipantList(@Param('id') id: string): Promise<Dto.Response.Participant[]> {
+	async getChannelParticipantList(
+		@Param('channelId') channelId: string,
+	): Promise<Dto.Response.Participant[]> {
 		try {
-			return await this.participantService.getParticipantList(id);
+			return await this.participantService.getParticipantList(channelId);
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
 		}
 	}
 
-	@Get(':id/mute')
+	@Get(':channelId/mute')
 	@UseGuards(Auth.Guard.UserJwt)
 	@ApiOperation({ summary: 'Get the channel mute list' })
 	@ApiOkResponse({
@@ -105,15 +108,17 @@ class ChannelController {
 		type: ChannelModel,
 	})
 	@ApiBadRequestResponse({ description: 'Failed to get channel mute list' })
-	async getChannelMuteList(@Param('id', ParseUUIDPipe) id: string): Promise<MuteModel[]> {
+	async getChannelMuteList(
+		@Param('channelId', ParseUUIDPipe) channelId: string,
+	): Promise<MuteModel[]> {
 		try {
-			return await this.muteService.getMuteList(id);
+			return await this.muteService.getMuteList(channelId);
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
 		}
 	}
 
-	@Post(':id/mute')
+	@Post(':channelId/mute')
 	@UseGuards(Auth.Guard.UserJwt)
 	@ApiOperation({ summary: 'Mute user in channel' })
 	@ApiOkResponse({
@@ -123,11 +128,31 @@ class ChannelController {
 	@ApiBadRequestResponse({ description: 'Failed to mute user' })
 	async muteUser(
 		@Req() req,
-		@Param('id', ParseUUIDPipe) id: string,
+		@Param('channelId', ParseUUIDPipe) channelId: string,
 		@Body() muteRequestDto: Dto.Request.Mute,
 	): Promise<MuteModel> {
 		try {
-			return await this.muteService.muteUser(req.user.id, id, muteRequestDto);
+			return await this.muteService.muteUser(req.user.id, channelId, muteRequestDto);
+		} catch (error) {
+			throw new HttpException(error.message, error.status);
+		}
+	}
+
+	@Delete(':channelId/mute/:muteId')
+	@UseGuards(Auth.Guard.UserJwt)
+	@ApiOperation({ summary: 'Unmute user in channel' })
+	@ApiOkResponse({
+		description: 'User unmuted successfully',
+		type: ChannelModel,
+	})
+	@ApiBadRequestResponse({ description: 'Failed to unmute user' })
+	async unmuteUser(
+		@Req() req,
+		@Param('channelId', ParseUUIDPipe) channelId: string,
+		@Param('muteId', ParseUUIDPipe) muteId: string,
+	): Promise<MuteModel> {
+		try {
+			return await this.muteService.unmuteUser(req.user.id, channelId, muteId);
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
 		}

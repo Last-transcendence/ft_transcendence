@@ -33,8 +33,36 @@ class MuteService {
 				throw new Error('User is not owner or admin');
 			}
 
+			const mute = await this.prismaService.mute.findUnique({
+				where: { channelId_userId: { channelId, userId: muteRequestDto.userId } },
+			});
+			if (mute) {
+				return await this.prismaService.mute.update({
+					where: { id: mute.id },
+					data: { updatedAt: new Date() },
+				});
+			}
+
 			return await this.prismaService.mute.create({
 				data: { channelId, userId: muteRequestDto.userId },
+			});
+		} catch (error) {
+			throw new Error(error.message);
+		}
+	}
+
+	async unmuteUser(userId: string, channelId: string, muteId: string): Promise<MuteModel> {
+		try {
+			const user = await this.prismaService.participant.findUnique({
+				where: { channelId_userId: { channelId, userId } },
+			});
+
+			if (user.role !== 'OWNER' && user.role !== 'ADMIN') {
+				throw new Error('User is not owner or admin');
+			}
+
+			return await this.prismaService.mute.delete({
+				where: { id: muteId },
 			});
 		} catch (error) {
 			throw new Error(error.message);
