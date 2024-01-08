@@ -30,7 +30,7 @@ class UserModel implements User {
 	email2fa: string;
 
 	@ApiProperty({
-		description: 'State of using 2FA',
+		description: 'Status of using 2FA',
 		example: 'false',
 		required: false,
 		default: false,

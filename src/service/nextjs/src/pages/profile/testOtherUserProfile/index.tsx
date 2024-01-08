@@ -4,7 +4,7 @@ import { Container } from '@mui/material';
 import { useState } from 'react';
 import ProfileModar from '@/component/profile/otherProfile/profileModar';
 import ProfileMenus from '@/component/profile/otherProfile/profileMenus';
-import Profile from "@/pages/profile";
+import Profile from '@/pages/profile';
 
 const UserProfile = () => {
 	const [click, setClick] = useState(false);
