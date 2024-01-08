@@ -6,8 +6,8 @@ import { MenuHeader } from '@/component/common/Header';
 import { useParams } from 'next/navigation';
 import { useContext, useEffect, useMemo, useState } from 'react';
 import { Participant, ParticipantRole } from '@/type/channel.type';
-import { getFetcher } from '@/component/api/getFetcher';
 import AuthContext from '@/context/auth.context';
+import { getFetcher } from '../../../service/api';
 
 export type CommandType = 'DM' | 'INVITE' | 'GAME' | 'HELP';
 export const CommonChatRoom = () => {
