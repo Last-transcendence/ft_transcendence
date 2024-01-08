@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import { Stack, Box } from '@mui/material';
-import api from '@/component/api/base';
 import ModifyID from './modifyID';
 import Modify2FA from './modify2FA';
 import CustomSnackbar from './customSnackbar';
 import { BottomButton } from '@/component/common/ButtomButton';
 import { Header } from '@/component/common/Header';
+import { patchFetcher } from '../../../../service/api';
 
 const SUCCESS_MESSAGE: string = '변경 사항이 성공적으로 저장되었습니다.';
 const FAIL_MESSAGE: string = '저장에 실패했습니다.';
@@ -30,7 +30,7 @@ const ModifyMyProfile = ({ UserName, TwoFAtureFalse, TwoFactorEmail }: EditProfi
 		const use2fa = twoFactorState;
 		const email2fa = twoFactorEmail;
 		try {
-			const response = await api.patch('/user/me', {
+			const response = await patchFetcher<any>('/user/me', {
 				id,
 				use2fa,
 				email2fa,

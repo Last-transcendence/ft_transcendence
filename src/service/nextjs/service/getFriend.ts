@@ -1,5 +1,5 @@
 import User, { UserStatus } from '@/type/user.type';
-import axios from 'axios';
+import { getFetcher } from './api';
 
 const DummyFriend: User[] = [
 	{
@@ -83,9 +83,9 @@ const DummyFriend: User[] = [
 ];
 
 async function getFriend(): Promise<User[]> {
-	return await axios.get('/api/friend').then(response => {
+	return await getFetcher<User[]>('/api/friend').then(response => {
 		return DummyFriend;
-		return response.data;
+		return response;
 	});
 }
 
