@@ -23,7 +23,7 @@ export class Channel {
 	@ApiProperty({ description: 'Channel visibility range.' })
 	visibility: $Enums.ChannelVisibility;
 
-	@IsValidPassword({ message: 'Invalid password format' })
+	@IsValidPassword()
 	@Trim()
 	@ApiProperty({ description: 'Channel password', required: false })
 	password: string | null;
