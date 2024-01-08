@@ -6,8 +6,8 @@ import User, { UserStatus } from '@/type/user.type';
 import { useState } from 'react';
 // import { getFetcher } from '@/component/api/getFetcher';
 // import Friend from '@/type/friend.type';
-import api from '@/component/api/base';
 import CustomSnackbar from '@/component/profile/modifyProfile/customSnackbar';
+import { postFetcher } from '../../../../service/api';
 
 const Title = () => {
 	return (
@@ -20,20 +20,14 @@ const Title = () => {
 const dummyUsers: User[] = [
 	{
 		id: '1',
-		intraId: 'john_doe',
 		nickname: 'John Doe',
 		profileImageURI: 'https://example.com/john_doe.jpg',
-		email2fa: 'john@example.com',
-		use2fa: true,
 		status: UserStatus.ONLINE,
 	},
 	{
 		id: '2',
-		intraId: 'jane_smith',
 		nickname: 'Jane Smith',
 		profileImageURI: undefined,
-		email2fa: 'jane@example.com',
-		use2fa: false,
 		status: UserStatus.OFFLINE,
 	},
 ];
@@ -71,7 +65,7 @@ const AddFriend = () => {
 
 	const addFriend = async (id: string) => {
 		try {
-			await api.post('/friend', { friendId: id });
+			await postFetcher('/friend', { friendId: id });
 			setMessage({
 				title: '친구 추가 성공',
 				success: true,

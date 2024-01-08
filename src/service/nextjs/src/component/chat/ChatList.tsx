@@ -4,9 +4,8 @@ import { Stack, Typography } from '@mui/material';
 import UserBriefInformation from '@/component/common/user/bried-information';
 import NickMenu from '@/component/chat/NickMenu';
 import CustomModal from '@/component/common/CustomModal';
-import { getFetcher } from '@/component/api/getFetcher';
-import api from '@/component/api/base';
 import { ParticipantRole } from '@/type/channel.type';
+import { axiosInstance, getFetcher, patchFetcher } from '../../../service/api';
 
 const ChattingListPage = ({ id }: { id: string }) => {
 	const [open, setOpen] = useState(false);
@@ -17,7 +16,7 @@ const ChattingListPage = ({ id }: { id: string }) => {
 	const fetchData = async () => {
 		try {
 			setLoading(true);
-			const res = await getFetcher(`/channel/${id}/participant`);
+			const res = await getFetcher<any>(`/channel/${id}/participant`);
 			setData(res);
 			setLoading(false);
 		} catch (error) {
@@ -55,7 +54,7 @@ const ChattingListPage = ({ id }: { id: string }) => {
 	];
 
 	const changeSetting = async () => {
-		await api.patch(`/channel/${id}`, { password, title });
+		await patchFetcher(`/channel/${id}`, { password, title });
 	};
 
 	return (

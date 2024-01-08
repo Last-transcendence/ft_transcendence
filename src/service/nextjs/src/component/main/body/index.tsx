@@ -5,7 +5,6 @@ import style from '../../../style/main/body/index.module.css';
 import ChattingRoom from './chatting-room';
 import ChattingModeToggle from './chatting-mode';
 import Link from 'next/link';
-import { getFetcher } from '@/component/api/getFetcher';
 import { Box, Skeleton } from '@mui/material';
 import { useRouter } from 'next/router';
 import CustomSnackbar from '@/component/profile/modifyProfile/customSnackbar';
