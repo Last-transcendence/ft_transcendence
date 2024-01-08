@@ -8,7 +8,15 @@ import FriendModule from './friend/friend.module';
 import ChannelModule from './channel/channel.module';
 
 @Module({
-	imports: [PrismaModule, UserModule, FriendModule, BlockModule, ChatroomModule, ChannelModule, AuthModule],
+	imports: [
+		PrismaModule,
+		UserModule,
+		FriendModule,
+		BlockModule,
+		ChatroomModule,
+		ChannelModule,
+		AuthModule,
+	],
 })
 class ApiModule {}
 
