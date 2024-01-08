@@ -49,20 +49,18 @@ const OpenProfileAvatar = ({ isMe, otherUserId, friendList }: OpenProfileAvatarP
 
 	const [click, setClick] = useState(false);
 
-	const handleAvatarClick = () => {
-		setClick(true);
-	};
-
-	useEffect(() => {
-		if (click == true && isMe === true) {
+	const handleAvatarOpen = () => {
+		if (isMe === true) {
 			router.push('/profile/testDetailProfile');
+		} else {
+			setClick(true);
 		}
-	}, [click, isMe, router]);
+	};
 
 	return (
 		<>
-			<Avatar alt="User Avatar" onClick={handleAvatarClick} />
-			{click && isMe === false && (
+			<Avatar alt="User Avatar" onClick={handleAvatarOpen} />
+			{click && (
 				<ProfileModar setClick={setClick} childMenu={<ProfileMenus />}>
 					<ProfilePageBody otherUserId={otherUserId} {...otherUserData} />
 				</ProfileModar>
