@@ -13,27 +13,27 @@ const SendChat = ({ sendAction, commandAction }: SendChatProps) => {
 	const onEnter = () => {
 		if (chat === '' || !chat) return;
 		if (chat[0] === '/') {
-			const command = chat.split(' ')?.[0]?.[1];
-			const nickname = chat.split(' ')?.[1];
-			const message = chat.split(' ')?.[2];
+			const chatSplit = chat.split(' ');
+			const command = chatSplit?.[0];
+			const nickname = chatSplit?.[1];
+			const message = chatSplit?.[2];
 
-			console.log(command, nickname, message);
 			switch (command) {
 				case '/help':
 					commandAction('HELP');
-					return;
+					break;
 				case '/w':
 					commandAction('DM', nickname, message);
-					return;
+					break;
 				case '/i':
 					commandAction('INVITE', nickname);
-					return;
+					break;
 				case '/g':
 					commandAction('GAME', nickname);
-					return;
+					break;
 				default:
 					sendAction(chat ?? '');
-					return;
+					break;
 			}
 			setChat('');
 		} else {
@@ -46,10 +46,11 @@ const SendChat = ({ sendAction, commandAction }: SendChatProps) => {
 	};
 
 	return (
-		<Stack bgcolor={'gray'} width={'100%'} position={'fixed'} bottom={0}>
+		<Stack bgcolor={'gray'} width={'100%'} height={'80px'}>
 			<Stack flexDirection={'row'} padding={2}>
 				<Input
 					fullWidth
+					value={chat}
 					onChange={onChangeInput}
 					sx={{ backgroundColor: 'white' }}
 					onKeyDown={e => {

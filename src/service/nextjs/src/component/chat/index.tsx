@@ -65,15 +65,19 @@ export const CommonChatRoom = () => {
 	const commandAction = (type: CommandType, nickname?: string, message?: string) => {
 		switch (type) {
 			case 'HELP':
+				alert('HELP');
 				setChatLiveData(prev => [...prev, { type: 'help' }]);
 				break;
 			case 'DM':
+				alert('DM');
 				// send DM invite (nickname, message)
 				break;
 			case 'INVITE':
+				alert('INVITE');
 				// invite
 				break;
 			case 'GAME':
+				alert('GAME');
 				// game invite
 				break;
 			default:
@@ -82,7 +86,7 @@ export const CommonChatRoom = () => {
 	};
 
 	return (
-		<div>
+		<Stack width={'100%'} height={'100%'}>
 			<MenuHeader title={'채팅'} type={'chat'}>
 				<ChattingListPage
 					channelId={params?.id}
@@ -94,7 +98,7 @@ export const CommonChatRoom = () => {
 			</MenuHeader>
 			{/*채팅 영역*/}
 			{/*@todo 소켓 데이터 구조에 맞게 바꾸기, 소켓에 유저 id가 올까?*/}
-			<Stack padding={2} spacing={2}>
+			<Stack padding={2} spacing={2} sx={{ overflowY: 'scroll' }} height={'100%'}>
 				{chatLiveData?.map((data: any, index: number) =>
 					data.type === 'chat' ? (
 						<ChatMsg
@@ -112,7 +116,7 @@ export const CommonChatRoom = () => {
 				)}
 			</Stack>
 			<SendChat sendAction={sendAction} commandAction={commandAction} />
-		</div>
+		</Stack>
 	);
 };
 
