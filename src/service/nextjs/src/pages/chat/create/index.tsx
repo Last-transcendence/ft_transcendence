@@ -11,7 +11,7 @@ import { Stack } from '@mui/material';
 import { ChannelVisibility } from '@/type/channel.type';
 import axios from 'axios';
 import CustomSnackbar from '@/component/profile/modifyProfile/customSnackbar';
-import api from '@/component/api/base';
+import { postFetcher } from '../../../../service/api';
 
 const ChatCreatePage = () => {
 	const [visibility, setVisibility] = useState<ChannelVisibility>(ChannelVisibility.PUBLIC);
@@ -25,7 +25,7 @@ const ChatCreatePage = () => {
 
 	const handleSubmit = async () => {
 		try {
-			await api.post('/channel', {
+			await postFetcher('/channel', {
 				visibility,
 				title,
 				password,

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Menu, MenuItem, Typography } from '@mui/material';
-import api from '@/component/api/base';
+import { postFetcher } from '../../../service/api';
 import { ParticipantRole } from '@/type/channel.type';
 
 //@todo 추후에 props의 optional 빼기
@@ -30,13 +30,13 @@ export const AdminNickMenu = ({ nickname, userId, channelId, isOwner }: NickMenu
 				// 프로필 오픈
 				break;
 			case 'kickBtn':
-				await api.post(`/channel/${channelId}/kick/${userId}`);
+                postFetcher(`/channel/${channelId}/kick/${userId}`);
 				break;
 			case 'banBtn':
-				await api.post(`/channel/${channelId}/ban/${userId}`);
+                postFetcher(`/channel/${channelId}/ban/${userId}`);
 				break;
 			case 'muteBtn':
-				await api.post(`/channel/${channelId}/mute/${userId}`);
+                postFetcher(`/channel/${channelId}/mute/${userId}`);
 				break;
 			case 'adminBtn':
 				//how to set admin?

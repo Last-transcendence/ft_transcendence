@@ -6,8 +6,8 @@ import User, { UserStatus } from '@/type/user.type';
 import { useState } from 'react';
 // import { getFetcher } from '@/component/api/getFetcher';
 // import Friend from '@/type/friend.type';
-import api from '@/component/api/base';
 import CustomSnackbar from '@/component/profile/modifyProfile/customSnackbar';
+import { postFetcher } from '../../../../service/api';
 
 const Title = () => {
 	return (
@@ -65,7 +65,7 @@ const AddFriend = () => {
 
 	const addFriend = async (id: string) => {
 		try {
-			await api.post('/friend', { friendId: id });
+			await postFetcher('/friend', { friendId: id });
 			setMessage({
 				title: '친구 추가 성공',
 				success: true,

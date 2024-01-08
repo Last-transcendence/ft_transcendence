@@ -3,9 +3,9 @@ import style from '@/style/friend/list/index.module.css';
 import { Stack, Typography } from '@mui/material';
 import UserBriefInformation from '@/component/common/user/bried-information';
 import CustomModal from '@/component/common/CustomModal';
-import api from '@/component/api/base';
-import { Participant, ParticipantRole } from '@/type/channel.type';
-import { AdminNickMenu, NickMenu } from './NickMenu';
+import {Participant, ParticipantRole} from '@/type/channel.type';
+import { axiosInstance, getFetcher, patchFetcher } from '../../../service/api';
+import {AdminNickMenu, NickMenu} from "@/component/chat/NickMenu";
 
 //@todo 추후 1:1dm과 인터페이스 분리
 interface ChattingListPageProps {
@@ -26,8 +26,23 @@ const ChattingListPage = ({
 	const [open, setOpen] = useState(false);
 	const [password, setPassword] = useState('');
 	const [title, setTitle] = useState('');
+	const [data, setData] = useState<any[]>([]);
+	const [isLoading, setLoading] = useState(false);
+	const fetchData = async () => {
+		try {
+			setLoading(true);
+			const res = await getFetcher<any>(`/channel/${channelId}/participant`);
+			setData(res);
+			setLoading(false);
+		} catch (error) {
+			console.error('Error fetching data:', error);
+			setLoading(false);
+		}
+	};
 
-	console.log('participantData', participantData);
+	useEffect(() => {
+		fetchData();
+	}, []);
 
 	const ChatStatus = ({ status }: { status: ParticipantRole }) => {
 		const spanRef = useRef<HTMLSpanElement>(null);
@@ -54,7 +69,7 @@ const ChattingListPage = ({
 	];
 
 	const changeSetting = async () => {
-		await api.patch(`/channel/${channelId}`, { password, title });
+		await patchFetcher(`/channel/${channelId}`, { password, title });
 	};
 
 	return (
