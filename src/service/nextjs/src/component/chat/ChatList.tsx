@@ -2,12 +2,27 @@ import { useEffect, useRef, useState } from 'react';
 import style from '@/style/friend/list/index.module.css';
 import { Stack, Typography } from '@mui/material';
 import UserBriefInformation from '@/component/common/user/bried-information';
-import NickMenu from '@/component/chat/NickMenu';
 import CustomModal from '@/component/common/CustomModal';
-import { ParticipantRole } from '@/type/channel.type';
-import { axiosInstance, getFetcher, patchFetcher } from '../../../service/api';
+import { Participant, ParticipantRole } from '@/type/channel.type';
+import { getFetcher, patchFetcher } from '../../../service/api';
+import { AdminNickMenu, NickMenu } from '@/component/chat/NickMenu';
 
-const ChattingListPage = ({ id }: { id: string }) => {
+//@todo 추후 1:1dm과 인터페이스 분리
+interface ChattingListPageProps {
+	channelId: string;
+	participantData?: Participant[];
+	isParticipantLoading?: boolean;
+	myRole?: ParticipantRole;
+	isProtected?: boolean;
+}
+
+const ChattingListPage = ({
+	channelId,
+	participantData,
+	isParticipantLoading,
+	myRole,
+	isProtected,
+}: ChattingListPageProps) => {
 	const [open, setOpen] = useState(false);
 	const [password, setPassword] = useState('');
 	const [title, setTitle] = useState('');
@@ -16,7 +31,7 @@ const ChattingListPage = ({ id }: { id: string }) => {
 	const fetchData = async () => {
 		try {
 			setLoading(true);
-			const res = await getFetcher<any>(`/channel/${id}/participant`);
+			const res = await getFetcher<any>(`/channel/${channelId}/participant`);
 			setData(res);
 			setLoading(false);
 		} catch (error) {
@@ -47,14 +62,14 @@ const ChattingListPage = ({ id }: { id: string }) => {
 		);
 	};
 	const datas = [
-		{ profileImageURI: null, nickname: '닉네임', role: ParticipantRole.OWNER },
-		{ profileImageURI: null, nickname: '닉네임2', role: ParticipantRole.ADMIN },
-		{ profileImageURI: null, nickname: '닉네임3', role: ParticipantRole.USER },
-		{ profileImageURI: null, nickname: '닉네임4', role: ParticipantRole.USER },
+		{ profileImageURI: null, nickname: '닉네임', role: ParticipantRole.OWNER, id: '1' },
+		{ profileImageURI: null, nickname: '닉네임2', role: ParticipantRole.ADMIN, id: '2' },
+		{ profileImageURI: null, nickname: '닉네임3', role: ParticipantRole.USER, id: '3' },
+		{ profileImageURI: null, nickname: '닉네임4', role: ParticipantRole.USER, id: '4' },
 	];
 
 	const changeSetting = async () => {
-		await patchFetcher(`/channel/${id}`, { password, title });
+		await patchFetcher(`/channel/${channelId}`, { password, title });
 	};
 
 	return (
@@ -67,8 +82,12 @@ const ChattingListPage = ({ id }: { id: string }) => {
 						<Typography fontWeight={'bold'}>채널설정</Typography>
 						<Typography>채널명</Typography>
 						<input value={title} onChange={event => setTitle(event.target.value)} />
-						<Typography>비밀번호</Typography>
-						<input value={password} onChange={event => setPassword(event.target.value)} />
+						{isProtected && (
+							<>
+								<Typography>비밀번호</Typography>
+								<input value={password} onChange={event => setPassword(event.target.value)} />
+							</>
+						)}
 						<Stack flexDirection={'row'} gap={1}>
 							<button onClick={() => setOpen(false)}>취소</button>
 							<button onClick={changeSetting}>수정</button>
@@ -80,17 +99,30 @@ const ChattingListPage = ({ id }: { id: string }) => {
 				<div className={style.container}>
 					<div>참여 목록</div>
 					<div>
-						{datas?.map((data, index) => (
-							<UserBriefInformation
-								key={index}
-								profileImageSrc={data?.profileImageURI}
-								nickname={
-									<NickMenu nickname={data?.nickname} userId={me?.id} channelId={data?.id} />
-								}
-								condition={<ChatStatus status={data?.role} />}
-								className={style['user-brief-information']}
-							/>
-						))}
+						{isParticipantLoading ? (
+							<div>로딩중</div>
+						) : (
+							datas?.map((data, index) => (
+								<UserBriefInformation
+									key={index}
+									profileImageSrc={data?.profileImageURI}
+									nickname={
+										myRole !== ParticipantRole.USER ? (
+											<AdminNickMenu
+												nickname={data?.nickname}
+												userId={data?.id}
+												channelId={channelId}
+												isOwner={myRole === ParticipantRole.OWNER}
+											/>
+										) : (
+											<NickMenu nickname={data?.nickname} userId={data?.id} />
+										)
+									}
+									condition={<ChatStatus status={data?.role} />}
+									className={style['user-brief-information']}
+								/>
+							))
+						)}
 					</div>
 				</div>
 				<button onClick={() => setOpen(true)} style={{ marginBottom: '4cqh' }}>

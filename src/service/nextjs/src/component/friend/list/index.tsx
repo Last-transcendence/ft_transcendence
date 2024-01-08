@@ -18,20 +18,14 @@ const Title = () => {
 const dummyUsers: User[] = [
 	{
 		id: '1',
-		intraId: 'john_doe',
 		nickname: 'John Doe',
 		profileImageURI: 'https://example.com/john_doe.jpg',
-		email2fa: 'john@example.com',
-		use2fa: true,
 		status: UserStatus.ONLINE,
 	},
 	{
 		id: '2',
-		intraId: 'jane_smith',
 		nickname: 'Jane Smith',
 		profileImageURI: undefined,
-		email2fa: 'jane@example.com',
-		use2fa: false,
 		status: UserStatus.OFFLINE,
 	},
 ];

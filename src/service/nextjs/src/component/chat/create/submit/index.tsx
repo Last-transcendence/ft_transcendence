@@ -1,8 +1,9 @@
-import { Visibility } from '@/pages/chat/create';
 import { BottomButton } from '@/component/common/ButtomButton';
+import Visibility from '@/component/chat/create/visibility';
+import { ChannelVisibility } from '@/type/channel.type';
 
 interface CreateChatSubmitProps {
-	visibility: Visibility;
+	visibility: ChannelVisibility;
 	title: string;
 	password: string;
 }
