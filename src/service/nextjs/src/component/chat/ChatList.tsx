@@ -3,9 +3,9 @@ import style from '@/style/friend/list/index.module.css';
 import { Stack, Typography } from '@mui/material';
 import UserBriefInformation from '@/component/common/user/bried-information';
 import CustomModal from '@/component/common/CustomModal';
-import {Participant, ParticipantRole} from '@/type/channel.type';
-import { axiosInstance, getFetcher, patchFetcher } from '../../../service/api';
-import {AdminNickMenu, NickMenu} from "@/component/chat/NickMenu";
+import { Participant, ParticipantRole } from '@/type/channel.type';
+import { getFetcher, patchFetcher } from '../../../service/api';
+import { AdminNickMenu, NickMenu } from '@/component/chat/NickMenu';
 
 //@todo 추후 1:1dm과 인터페이스 분리
 interface ChattingListPageProps {
