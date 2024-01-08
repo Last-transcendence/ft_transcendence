@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ChannelVisibility } from '@prisma/client';
 import ChannelModel from 'common/model/channel.model';
 import PrismaService from 'common/prisma/prisma.service';
-import * as Dto from './dto';
+import * as Dto from '../dto';
 
 @Injectable()
 class ChannelService {
@@ -36,18 +36,6 @@ class ChannelService {
 				where: { id },
 				data: updateChannelDto,
 			});
-		} catch (error) {
-			throw new Error(error.message);
-		}
-	}
-
-	async getChannelParticipantList(channelId: string): Promise<Dto.Response.Participant[]> {
-		try {
-			const participant = this.prismaService.participant.findMany({
-				where: { channelId },
-			});
-
-			return participant;
 		} catch (error) {
 			throw new Error(error.message);
 		}

@@ -1,6 +1,7 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import PrismaService from 'common/prisma/prisma.service';
 import { User } from '@prisma/client';
+import * as Dto from './dto';
 
 @Injectable()
 class UserService {
@@ -9,10 +10,10 @@ class UserService {
 	async getUserById(id: string) {
 		try {
 			const user = await this.prismaService.user.findUnique({ where: { id } });
-
 			if (!user) {
-				throw new HttpException('User not found', 404);
+				throw new NotFoundException('해당 유저가 없습니다.');
 			}
+
 			return user;
 		} catch (error) {
 			throw new Error(error.message);
@@ -22,38 +23,54 @@ class UserService {
 	async getUserByIntraId(intraId: string) {
 		try {
 			const user = await this.prismaService.user.findUnique({ where: { intraId } });
+			if (!user) {
+				throw new NotFoundException('해당 유저가 없습니다.');
+			}
+
 			return user;
 		} catch (error) {
-			if (error.status === 404) {
-				throw new HttpException('User not found', 404);
-			}
 			throw new Error(error.message);
 		}
 	}
 
 	async findByIntraId(intraId: string): Promise<User> {
-		const foundUser = await this.prismaService.user.findFirst({ where: { intraId } });
-		if (foundUser) {
-			return foundUser;
-		}
-		return null;
-	}
-
-	async findByNickName(nickname: string): Promise<User> {
-		const foundNick = await this.prismaService.user.findFirst({ where: { nickname } });
-		if (foundNick) {
-			return foundNick;
-		}
-		return null;
-	}
-
-	async createByIntraId(intraId: string, use2fa: boolean, nickname?: string, profileImageURI?: string): Promise<User>{
 		try {
-			return this.prismaService.user.create({ data: { intraId, nickname, profileImageURI, use2fa } });
+			const user = await this.prismaService.user.findFirst({ where: { intraId } });
+			if (!user) {
+				return null;
+			}
+
+			return user;
 		} catch (error) {
 			throw new Error(error.message);
 		}
 	}
+
+	async findByNickname(nickname: string): Promise<User> {
+		try {
+			const user = await this.prismaService.user.findFirst({ where: { nickname } });
+			if (!user) {
+				return null;
+			}
+
+			return user;
+		} catch (error) {
+			throw new Error(error.message);
+		}
+	}
+
+	async createUser(intraId: string, registerRequestDto: Dto.Request.Create): Promise<User> {
+		try {
+			const { nickname, profileImageURI, use2fa } = registerRequestDto;
+
+			return this.prismaService.user.create({
+				data: { intraId, nickname, profileImageURI, use2fa },
+			});
+		} catch (error) {
+			throw new Error(error.message);
+		}
+	}
+
 	//partial<Dto.Request.User>
 	async updateUserById(id: string, _user: User) {
 		try {
