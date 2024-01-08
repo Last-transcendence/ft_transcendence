@@ -16,7 +16,7 @@ class UserController {
 	@ApiNotFoundResponse({ description: 'User not found' })
 	async me(@Req() req): Promise<Dto.Response.User> {
 		const { user } = req;
-		console.log('me', user);
+
 		return user;
 	}
 

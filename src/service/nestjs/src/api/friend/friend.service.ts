@@ -8,7 +8,18 @@ class FriendService {
 
 	async getFriend(userId: string): Promise<FriendModel[]> {
 		try {
-			return await this.prismaService.friend.findMany({ where: { userId } });
+			return await this.prismaService.friend.findMany({
+				where: { userId },
+				include: {
+					user: {
+						select: {
+							nickname: true,
+							profileImageURI: true,
+							status: true,
+						},
+					},
+				},
+			});
 		} catch (error) {
 			throw new Error(error.message);
 		}
