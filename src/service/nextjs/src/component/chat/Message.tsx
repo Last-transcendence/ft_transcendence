@@ -17,7 +17,7 @@ export const ChatMsg = ({ userId, channelId, nickname, myRole }: ChatMsgProps) =
 		<Stack flexDirection={'row'} alignItems={'center'} gap={1}>
 			<Stack flexDirection={'row'} gap={1} alignItems={'center'} width={'100%'}>
 				<Avatar alt="avatar" src="/static/images/avatar/2.jpg" />
-				{myRole !== ParticipantRole.USER ? (
+				{myRole && myRole !== ParticipantRole.USER ? (
 					//@todo ''는 타입스크립트 오류때문에 넣었습니다. 추후 지우겠습니다
 					<AdminNickMenu
 						nickname={nickname || ''}

@@ -12,7 +12,7 @@ export enum ParticipantRole {
 	USER = 'USER',
 }
 
-interface Channel {
+export interface Channel {
 	id: string;
 	title: string;
 	visibility: ChannelVisibility;
