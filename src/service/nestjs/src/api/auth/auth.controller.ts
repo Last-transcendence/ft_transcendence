@@ -28,7 +28,7 @@ export class AuthController {
     @Post('register')
     @UseGuards(JwtAuthGuard)
     async register(@Body() user: User) {
-        return this.authService.register(user.intraId);
+        return this.registerService.register(user);
     }
 
     @Get('test-register')

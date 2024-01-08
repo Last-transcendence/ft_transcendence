@@ -9,7 +9,6 @@ import { CookieService } from './service/cookie.service';
 import { LoginService } from './service/login.service';
 import { RegisterService } from './service/register.service';
 import { FtJwtAuthStrategy } from './jwt/jwtauth.strategy';
-// import { JwtAuthModule } from './jwt/jwtauth.module';
 
 @Module({
   imports: [UserModule, JwtModule.registerAsync({
