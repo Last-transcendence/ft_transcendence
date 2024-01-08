@@ -25,7 +25,7 @@ class ChannelController {
 		type: ChannelModel,
 	})
 	@ApiNotFoundResponse({ description: 'Channel not found' })
-	async getChannelList(): Promise<ChannelModel[]> {
+	async getChannelList(): Promise<Dto.Response.Channel[]> {
 		try {
 			return await this.channelService.getChannelList();
 		} catch (error) {

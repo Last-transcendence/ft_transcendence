@@ -8,9 +8,17 @@ import * as Dto from './dto';
 class ChannelService {
 	constructor(private readonly prismaService: PrismaService) {}
 
-	async getChannelList(): Promise<ChannelModel[]> {
+	async getChannelList(): Promise<Dto.Response.Channel[]> {
 		try {
-			return await this.prismaService.channel.findMany({});
+			const channelList: Dto.Response.Channel[] = await this.prismaService.channel.findMany({
+				select: {
+					id: true,
+					title: true,
+					visibility: true,
+				},
+			});
+
+			return channelList;
 		} catch (error) {
 			throw new Error(error.message);
 		}
