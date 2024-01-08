@@ -1,7 +1,6 @@
 import { Controller, Get, HttpException, Param, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import UserService from './user.service';
-import { FtSeoulAuthGuard } from 'api/auth/auth.guard';
 import { JwtAuthGuard } from 'api/auth/jwt-auth.guard';
 import * as Dto from './dto';
 
@@ -13,11 +12,11 @@ class UserController {
 	@Get('me')
 	@UseGuards(JwtAuthGuard)
 	@ApiOperation({ summary: 'Get my information' })
-	@ApiOkResponse({ description: 'Get my info successfully', type: UserModel })
+	@ApiOkResponse({ description: 'Get my info successfully', type: Dto.Response.User })
 	@ApiNotFoundResponse({ description: 'User not found' })
-	async me(@Req() req): Promise<UserModel> {
+	async me(@Req() req): Promise<Dto.Response.User> {
 		const { user } = req;
-		console.log('me', user, req);
+		console.log('me', user);
 		return user;
 	}
 
