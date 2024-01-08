@@ -9,7 +9,6 @@ import {
 	Post,
 } from '@nestjs/common';
 import { ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { User } from '@prisma/client';
 import ChannelModel from 'common/model/channel.model';
 import ChannelService from './channel.service';
 import * as Dto from './dto';
@@ -66,6 +65,20 @@ class ChannelController {
 			throw new HttpException(error.message, error.status);
 		}
 	}
+
+	@Get(':channel_id/participant')
+	@ApiOperation({ summary: 'Get the channel participant list' })
+	@ApiOkResponse({
+		description: 'Channel participant list successfully obtained',
+		type: ChannelModel,
+	})
+	@ApiNotFoundResponse({ description: 'Failed to get channel participant list' })
+	async getChannelParticipantList(
+		@Param('channel_id') channelId: string,
+	): Promise<Dto.Response.Participant[]> {
+		try {
+			return await this.channelService.getChannelParticipantList(channelId);
+		} catch (error) {
 			throw new HttpException(error.message, error.status);
 		}
 	}

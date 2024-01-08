@@ -40,6 +40,18 @@ class ChannelService {
 			throw new Error(error.message);
 		}
 	}
+
+	async getChannelParticipantList(channelId: string): Promise<Dto.Response.Participant[]> {
+		try {
+			const participant = this.prismaService.participant.findMany({
+				where: { channelId },
+			});
+
+			return participant;
+		} catch (error) {
+			throw new Error(error.message);
+		}
+	}
 }
 
 export default ChannelService;
