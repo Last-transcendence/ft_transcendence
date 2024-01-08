@@ -1,8 +1,8 @@
 import { Controller, Get, HttpException, Param, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import UserService from './user.service';
-import { JwtAuthGuard } from 'api/auth/jwt-auth.guard';
 import * as Dto from './dto';
+import * as Auth from '../../common/auth';
 
 @Controller('user')
 @ApiTags('user')
@@ -10,7 +10,7 @@ class UserController {
 	constructor(private readonly userService: UserService) {}
 
 	@Get('me')
-	@UseGuards(JwtAuthGuard)
+	@UseGuards(Auth.Guard.UserJwt)
 	@ApiOperation({ summary: 'Get my information' })
 	@ApiOkResponse({ description: 'Get my info successfully', type: Dto.Response.User })
 	@ApiNotFoundResponse({ description: 'User not found' })
@@ -31,7 +31,6 @@ class UserController {
 			throw new HttpException(error.message, error.status);
 		}
 	}
-
 
 	@Post('search')
 	@ApiOperation({ summary: 'Search user by nickname' })
