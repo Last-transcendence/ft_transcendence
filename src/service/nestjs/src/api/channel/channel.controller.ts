@@ -40,7 +40,7 @@ class ChannelController {
 		type: ChannelModel,
 	})
 	@ApiNotFoundResponse({ description: 'Failed to create channel' })
-	async createChannel(@Body() channelRequestDto: Dto.Request.Channel): Promise<ChannelModel> {
+	async createChannel(@Body() channelRequestDto: Dto.Request.CreateChannel): Promise<ChannelModel> {
 		try {
 			return await this.channelService.createChannel(channelRequestDto);
 		} catch (error) {
