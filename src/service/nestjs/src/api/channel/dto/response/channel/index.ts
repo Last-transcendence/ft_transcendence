@@ -11,3 +11,11 @@ export class Channel {
 	@ApiProperty({ description: 'Channel visibility range.' })
 	visibility: $Enums.ChannelVisibility;
 }
+
+export class UpdateChannel {
+	@ApiProperty({ description: 'Channel id' })
+	id: string;
+
+	@ApiProperty({ required: false })
+	updatedAt: Date;
+}

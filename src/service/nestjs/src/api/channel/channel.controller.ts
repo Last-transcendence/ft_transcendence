@@ -57,8 +57,8 @@ class ChannelController {
 	@ApiNotFoundResponse({ description: 'Failed to change channel info' })
 	async updateChannel(
 		@Param('id', ParseUUIDPipe) id: string,
-		@Body() updateChannelDto: Partial<Dto.Request.Channel>,
-	) {
+		@Body() updateChannelDto: Dto.Request.UpdateChannel,
+	): Promise<Dto.Response.UpdateChannel> {
 		try {
 			return await this.channelService.updateChannel(id, updateChannelDto);
 		} catch (error) {
