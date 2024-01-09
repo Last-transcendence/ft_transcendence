@@ -1,4 +1,14 @@
-import { Body, Controller, Delete, Get, HttpException, Param, Post, Req } from '@nestjs/common';
+import {
+	Body,
+	Controller,
+	Delete,
+	Get,
+	HttpException,
+	Param,
+	Post,
+	Req,
+	UseGuards,
+} from '@nestjs/common';
 import FriendService from './friend.service';
 import { FriendModel } from 'common/model';
 import {
@@ -9,6 +19,7 @@ import {
 	ApiTags,
 } from '@nestjs/swagger';
 import * as Dto from './dto';
+import * as Auth from '../../common/auth';
 
 @ApiTags('friend')
 @Controller('friend')
@@ -16,6 +27,7 @@ class FriendController {
 	constructor(private readonly friendService: FriendService) {}
 
 	@Get()
+	@UseGuards(Auth.Guard.UserJwt)
 	@ApiOperation({ summary: 'Get friend' })
 	@ApiOkResponse({ description: 'Get friend successfully', type: FriendModel })
 	@ApiBadRequestResponse({ description: 'Bad request' })
@@ -28,6 +40,7 @@ class FriendController {
 	}
 
 	@Post()
+	@UseGuards(Auth.Guard.UserJwt)
 	@ApiOperation({ summary: 'Create friend' })
 	@ApiOkResponse({ description: 'Create friend successfully', type: FriendModel })
 	@ApiBadRequestResponse({ description: 'Bad request' })
