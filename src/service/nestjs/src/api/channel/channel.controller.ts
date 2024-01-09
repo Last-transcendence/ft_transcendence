@@ -33,6 +33,21 @@ class ChannelController {
 		}
 	}
 
+	@Get(':id')
+	@ApiOperation({ summary: 'Get the channel info' })
+	@ApiOkResponse({
+		description: 'Get the channel info successfully',
+		type: ChannelModel,
+	})
+	@ApiNotFoundResponse({ description: 'Failed to get the channel info' })
+	async getChannel(@Param('id', ParseUUIDPipe) id: string) {
+		try {
+			return await this.channelService.getChannel(id);
+		} catch (error) {
+			throw new HttpException(error.message, error.status);
+		}
+	}
+
 	@Post()
 	@ApiOperation({ summary: 'Create channel' })
 	@ApiOkResponse({
