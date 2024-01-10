@@ -72,7 +72,6 @@ class ChannelService {
 					updatedAt: true,
 				},
 			});
-
 			return updateChannel;
 		} catch (error) {
 			throw new Error(error.message);

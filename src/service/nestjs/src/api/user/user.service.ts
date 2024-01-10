@@ -1,6 +1,7 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import PrismaService from 'common/prisma/prisma.service';
 import { User } from '@prisma/client';
+import * as Dto from './dto';
 
 @Injectable()
 class UserService {
@@ -54,10 +55,19 @@ class UserService {
 			throw new Error(error.message);
 		}
 	}
-	//partial<Dto.Request.User>
-	async updateUserById(id: string, _user: Partial<User>) {
+
+	async updateUserById(
+		id: string, 
+		_user: Dto.Request.Update) : Promise<Dto.Response.User> {
 		try {
-			await this.prismaService.user.update({ where: { id }, data: _user });
+			const updateme = await this.prismaService.user.update({ where: { id }, data: _user,
+				select: {
+					nickname: true,
+					profileImageURI: true,
+					email2fa: true,
+				}
+			});
+			return updateme;
 		} catch (error) {
 			throw new Error(error.message);
 		}

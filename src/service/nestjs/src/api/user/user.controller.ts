@@ -1,10 +1,12 @@
-import { Controller, Get, HttpException, Param, Post, Query, Req, UseGuards, UploadedFile, UseInterceptors, Patch, Body } from '@nestjs/common';
+import { Controller, Get, HttpException, Param, Post, Query, Req, UseGuards, UploadedFile, UseInterceptors, Patch,ParseUUIDPipe, Body } from '@nestjs/common';
 import { ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import UserService from './user.service';
 import { JwtAuthGuard } from 'api/auth/jwt-auth.guard';
+import { User } from '@prisma/client';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { multerOption } from '../user/multer.options';
 import * as Dto from './dto';
+import { UserModel } from 'common/model';
 
 @Controller('user')
 @ApiTags('user')
@@ -22,25 +24,24 @@ class UserController {
 		return user;
 	}
 
-	@Patch('me')
+	@Patch('me/:id')
 	// @UseGuards(JwtAuthGuard)
 	@ApiOperation({ summary: 'Update my information' })
-	@ApiOkResponse({ description: 'Get my info successfully', type: Dto.Request.Update })
-	// @ApiOkResponse({ description: 'Get my info successfully', type: Dto.Response.User })
-	// @ApiNotFoundResponse({ description: 'User not found' })
+	@ApiOkResponse({ description: 'Get my info successfully', type: UserModel })
+	@ApiNotFoundResponse({ description: 'User not found' })
     // @UseInterceptors(FileInterceptor('profileImage'))
-	// async meUpdate(@Body() updateData: Partial<Dto.Response.User>, @Req() req, @UploadedFile() file?: Express.Multer.File): Promise<string> {
-	// async meUpdate(@Body() updateData: Dto.Response.User, @Req() req, @UploadedFile() file?: Express.Multer.File): Promise<string> {
-	async meUpdate(@Body() updateData: Dto.Request.Update): Promise<string> {
+	async meUpdate(
+		@Param('id', ParseUUIDPipe) id: string,
+		@Body() updateData: Dto.Request.Update ,
+		@Req() req
+	): Promise<Dto.Response.User> {
 		try {
-			console.log('meUpdate', updateData);
 			// if (updateData.profileImageURI) {
 			// 	await this.userService.setProfileImage(req.user.id, updateData.profileImageURI);
 			// }
-			// console.log('meUpdate', updateData);
-			// await this.userService.updateUserById(req.user.id, req.user);
-			// return file ? file.filename : null;
-			return 'success';
+			console.log(updateData.nickname);
+
+			return await this.userService.updateUserById(req.user.id, updateData);
 		}
 		catch (error) {
 			throw new HttpException(error.message, error.status);
