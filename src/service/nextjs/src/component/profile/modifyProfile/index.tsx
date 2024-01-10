@@ -6,7 +6,7 @@ import Modify2FA from './modify2FA';
 import CustomSnackbar from './customSnackbar';
 import { BottomButton } from '@/component/common/ButtomButton';
 import { Header } from '@/component/common/Header';
-import { patchFetcher } from '../../../service/api';
+import { patchFetcher } from '@/service/api';
 
 const SUCCESS_MESSAGE: string = '변경 사항이 성공적으로 저장되었습니다.';
 const FAIL_MESSAGE: string = '저장에 실패했습니다.';

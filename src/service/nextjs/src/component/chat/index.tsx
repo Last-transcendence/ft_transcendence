@@ -7,7 +7,7 @@ import { useParams } from 'next/navigation';
 import { useContext, useEffect, useMemo, useState } from 'react';
 import { Participant, ParticipantRole } from '@/type/channel.type';
 import AuthContext from '@/context/auth.context';
-import { getFetcher } from '../../../service/api';
+import { getFetcher } from '@/service/api';
 
 export type CommandType = 'DM' | 'INVITE' | 'GAME' | 'HELP';
 export const CommonChatRoom = () => {
