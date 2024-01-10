@@ -1,12 +1,12 @@
 import { Controller, Get, HttpException, Param, Post, Query, Req, UseGuards, UploadedFile, UseInterceptors, Patch,ParseUUIDPipe, Body } from '@nestjs/common';
 import { ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import UserService from './user.service';
-import { JwtAuthGuard } from 'api/auth/jwt-auth.guard';
 import { User } from '@prisma/client';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { multerOption } from '../user/multer.options';
 import * as Dto from './dto';
 import { UserModel } from 'common/model';
+import * as Auth from '../../common/auth';
 
 @Controller('user')
 @ApiTags('user')
@@ -14,25 +14,25 @@ class UserController {
 	constructor(private readonly userService: UserService) {}
 
 	@Get('me')
-	@UseGuards(JwtAuthGuard)
+	@UseGuards(Auth.Guard.UserJwt)
 	@ApiOperation({ summary: 'Get my information' })
 	@ApiOkResponse({ description: 'Get my info successfully', type: Dto.Response.User })
 	@ApiNotFoundResponse({ description: 'User not found' })
 	async me(@Req() req): Promise<Dto.Response.User> {
 		const { user } = req;
-		console.log('me', user);
+
 		return user;
 	}
 	
     // @UseInterceptors(FileInterceptor('profileImage'))
 	@Patch('me')
-	@UseGuards(JwtAuthGuard)
+	@UseGuards(Auth.Guard.UserJwt)
 	@ApiOperation({ summary: 'Update my information' })
 	@ApiOkResponse({ description: 'Get my info successfully', type: UserModel })
 	@ApiNotFoundResponse({ description: 'User not found' })
 	async meUpdate(
 		// @Param('id', ParseUUIDPipe) id: string,
-		@Body() updateData: Dto.Request.Update ,
+		@Body() updateData: User ,
 		@Req() req,
 	): Promise<Dto.Response.User> {
 		try {
@@ -59,7 +59,6 @@ class UserController {
 			throw new HttpException(error.message, error.status);
 		}
 	}
-
 
 	@Post('search')
 	@ApiOperation({ summary: 'Search user by nickname' })

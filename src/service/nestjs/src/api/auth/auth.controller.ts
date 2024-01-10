@@ -1,68 +1,74 @@
 import {
-    Body,
-    Controller,
-    Get,
-    Post,
-    Request,
-    Response,
-    UnauthorizedException,
-    UseGuards,
-    } from '@nestjs/common';
+	Body,
+	Controller,
+	Get,
+	HttpException,
+	Post,
+	Req,
+	Request,
+	Response,
+	UnauthorizedException,
+	UseGuards,
+} from '@nestjs/common';
 import { AuthService } from './service/auth.service';
-import { User } from '@prisma/client';
-import { FtSeoulAuthGuard } from './auth.guard';
-import { JwtAuthGuard } from './jwt-auth.guard';
 import { CookieService } from './service/cookie.service';
-import { LoginService } from './service/login.service';
-import { RegisterService } from './service/register.service';
+import { ApiTags } from '@nestjs/swagger';
+import * as Auth from '../../common/auth';
+import * as Dto from './dto';
+import { User } from '@prisma/client';
+import { ConfigService } from '@nestjs/config';
+
 @Controller('auth')
+@ApiTags('auth')
 export class AuthController {
-    constructor(
-        private readonly authService: AuthService,
-        private readonly cookieService: CookieService,
-        private readonly loginService: LoginService,
-        private readonly registerService: RegisterService,
-        ) {}
+	constructor(
+		private readonly configService: ConfigService,
+		private readonly authService: AuthService,
+		private readonly cookieService: CookieService,
+	) {}
 
-    @Post('register')
-    @UseGuards(JwtAuthGuard)
-    async register(@Body() user: User) {
-        return this.registerService.register(user);
-    }
+	@Get('ft')
+	@UseGuards(Auth.Guard.Ft)
+	async ftAuth(): Promise<any> {
+		return;
+	}
 
-    @Get('test-register')
-    async testregister(@Request() req) {
-        return this.authService.register(req.user);
-    }
+	@Get('ft/callback')
+	@UseGuards(Auth.Guard.Ft)
+	async ftAuthCallback(@Request() req, @Response({ passthrough: true }) res): Promise<void> {
+		try {
+			const jwt = this.cookieService.createJwt(req.user);
+			const cookieOption = this.cookieService.getCookieOption();
 
-    @Get('login')
-    @UseGuards(JwtAuthGuard)
-    async login(@Request() req, @Response({ passthrough: true}) res) {
-        const user = await this.loginService.login(req.user);
+			res.cookie('ft-token', jwt, cookieOption);
+			res.redirect(`${this.configService.get('NESTJS_URL')}/auth/login`);
+		} catch (error) {
+			throw new HttpException(error.message, error.status);
+		}
+	}
 
-        if (user.use2fa) {
-            throw new UnauthorizedException('2Fa 인증이 필요합니다.')
-        }
-        const cookieOption = this.cookieService.getCookieOption();
+	@Get('login')
+	@UseGuards(Auth.Guard.FtJwt)
+	async login(@Request() req, @Response({ passthrough: true }) res): Promise<User> {
+		delete req.user.iat;
+		delete req.user.exp;
 
-        const jwt = this.cookieService.createJwt(req.user);
-        res.cookie('accesstoken', jwt, cookieOption);
+		const user = await this.authService.login(req.user.intraId);
+		if (user.use2fa) {
+			throw new UnauthorizedException('2FA 인증이 필요합니다.');
+		}
 
-        return user;
-    }
-    
-    @Get('ft')
-    @UseGuards(FtSeoulAuthGuard)
-    async FtAuth(): Promise<any> {
-        return ;
-    }
+		const jwt = this.cookieService.createJwt(req.user);
+		const cookieOption = this.cookieService.getCookieOption();
 
-    @Get('ft/callback')
-    @UseGuards(FtSeoulAuthGuard)
-    async FtAuthCallback(@Request() req, @Response({ passthrough: true}) res): Promise<any> {
-        const jwt = this.cookieService.createJwt(req.user);
-        const cookieOption = this.cookieService.getCookieOption();
-        res.cookie('ft_login', jwt, cookieOption);
-        res.redirect('https://dev.transcendence.42seoul.kr/auth/login');
-    }
+		res.cookie('accessToken', jwt, cookieOption);
+
+		return user;
+	}
+
+	@Post('register')
+	@UseGuards(Auth.Guard.FtJwt)
+	async register(@Body() registerRequestDto: Dto.Request.Register, @Req() req): Promise<User> {
+		return this.authService.register(req.user.intraId, registerRequestDto);
+	}
 }
