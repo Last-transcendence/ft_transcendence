@@ -23,17 +23,17 @@ class UserController {
 		console.log('me', user);
 		return user;
 	}
-
-	@Patch('me/:id')
-	// @UseGuards(JwtAuthGuard)
+	
+    // @UseInterceptors(FileInterceptor('profileImage'))
+	@Patch('me')
+	@UseGuards(JwtAuthGuard)
 	@ApiOperation({ summary: 'Update my information' })
 	@ApiOkResponse({ description: 'Get my info successfully', type: UserModel })
 	@ApiNotFoundResponse({ description: 'User not found' })
-    // @UseInterceptors(FileInterceptor('profileImage'))
 	async meUpdate(
-		@Param('id', ParseUUIDPipe) id: string,
+		// @Param('id', ParseUUIDPipe) id: string,
 		@Body() updateData: Dto.Request.Update ,
-		@Req() req
+		@Req() req,
 	): Promise<Dto.Response.User> {
 		try {
 			// if (updateData.profileImageURI) {
