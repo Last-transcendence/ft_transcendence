@@ -1,6 +1,7 @@
 import { Container, Typography, Box } from '@mui/material';
-import NewIcon from '../common/newIcon';
+import NewIcon from '../../profile/common/newIcon';
 import BottomProfile from './bottomProfile';
+import { otherUser } from './openProfileAvatar';
 
 const ar = {
 	image: '/Mail.png',
@@ -10,21 +11,27 @@ const ar = {
 	message: undefined,
 };
 
-const ProfilePage = () => {
+const ProfilePageBody = ({
+	otherUserId,
+	img,
+	name,
+	state,
+	isFriend,
+}: { otherUserId: string } & otherUser) => {
 	return (
 		<div>
 			<Container maxWidth="xs">
-				<NewIcon {...ar} />
+				<NewIcon {...ar} image={img} />
 				<Box marginTop="10%" display="flex" flexDirection="column" alignItems="center">
-					<Typography variant="h5">이름</Typography>
+					<Typography variant="h5">{name}</Typography>
 					<Typography style={{ opacity: 0.5 }} variant="h6">
-						상태
+						{state}
 					</Typography>
 				</Box>
-				<BottomProfile />
+				<BottomProfile otherUserId={otherUserId} isFriend={isFriend} />
 			</Container>
 		</div>
 	);
 };
 
-export default ProfilePage;
+export default ProfilePageBody;

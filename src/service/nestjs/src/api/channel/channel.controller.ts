@@ -25,9 +25,24 @@ class ChannelController {
 		type: ChannelModel,
 	})
 	@ApiNotFoundResponse({ description: 'Channel not found' })
-	async getChannelList(): Promise<ChannelModel[]> {
+	async getChannelList(): Promise<Dto.Response.Channel[]> {
 		try {
 			return await this.channelService.getChannelList();
+		} catch (error) {
+			throw new HttpException(error.message, error.status);
+		}
+	}
+
+	@Get(':id')
+	@ApiOperation({ summary: 'Get the channel info' })
+	@ApiOkResponse({
+		description: 'Get the channel info successfully',
+		type: ChannelModel,
+	})
+	@ApiNotFoundResponse({ description: 'Failed to get the channel info' })
+	async getChannel(@Param('id', ParseUUIDPipe) id: string) {
+		try {
+			return await this.channelService.getChannel(id);
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
 		}
@@ -40,7 +55,7 @@ class ChannelController {
 		type: ChannelModel,
 	})
 	@ApiNotFoundResponse({ description: 'Failed to create channel' })
-	async createChannel(@Body() channelRequestDto: Dto.Request.Channel): Promise<ChannelModel> {
+	async createChannel(@Body() channelRequestDto: Dto.Request.CreateChannel): Promise<ChannelModel> {
 		try {
 			return await this.channelService.createChannel(channelRequestDto);
 		} catch (error) {
@@ -57,8 +72,8 @@ class ChannelController {
 	@ApiNotFoundResponse({ description: 'Failed to change channel info' })
 	async updateChannel(
 		@Param('id', ParseUUIDPipe) id: string,
-		@Body() updateChannelDto: Partial<Dto.Request.Channel>,
-	) {
+		@Body() updateChannelDto: Dto.Request.UpdateChannel,
+	): Promise<Dto.Response.UpdateChannel> {
 		try {
 			return await this.channelService.updateChannel(id, updateChannelDto);
 		} catch (error) {
