@@ -1,5 +1,7 @@
+import { PrivateChatRoom } from '@/component/chat';
+
 const ChatPrivatePage = () => {
-	return <div>1:1 채팅 페이지</div>;
+	return <PrivateChatRoom />;
 };
 
 export default ChatPrivatePage;

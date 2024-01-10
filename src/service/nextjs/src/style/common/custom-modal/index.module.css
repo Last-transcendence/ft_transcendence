@@ -1,0 +1,32 @@
+.container {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: max(100vw, 360px);
+	height: max(100vh, 640px);
+	background-color: rgba(0, 0, 0, 0.5);
+	z-index: 100;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	container-type: size;
+}
+
+.container > div {
+	width: 50cqh;
+	height: 25cqh;
+	z-index: 101;
+	container-type: size;
+}
+
+.container > div > div {
+	width: 100cqw;
+	height: 100cqh;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	background-color: #fff;
+	transition: transform 0.3s ease-in-out;
+	container-type: size;
+	z-index: 102;
+}

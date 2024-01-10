@@ -2,6 +2,7 @@ import type { AppProps } from 'next/app';
 import '@/style/globals.css';
 import { Global, css } from '@emotion/react';
 import Layout from '@/component/common/Layout';
+import ContextProvider from '@/context';
 
 const globalStyles = css`
 	body {
@@ -24,7 +25,9 @@ export default function App({ Component, pageProps }: AppProps) {
 		<>
 			<Global styles={globalStyles} />
 			<Layout>
-				<Component {...pageProps} />
+				<ContextProvider>
+					<Component {...pageProps} />
+				</ContextProvider>
 			</Layout>
 		</>
 	);

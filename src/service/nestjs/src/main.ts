@@ -1,12 +1,13 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
-import PrismaService from './common/prisma/prisma.service';
 import { ValidationPipe } from '@nestjs/common';
 import { setupSwagger } from 'util/swagger/swagger';
 import * as cookieParser from 'cookie-parser';
 import * as session from 'express-session';
 import * as passport from 'passport';
+
+import AppModule from './app.module';
+import PrismaService from './common/prisma/prisma.service';
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule);

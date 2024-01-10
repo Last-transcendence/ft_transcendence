@@ -19,12 +19,9 @@ class UserService {
 		}
 	}
 
-	async getUserByintraId(intraId: string) {
+	async getUserByIntraId(intraId: string) {
 		try {
 			const user = await this.prismaService.user.findUnique({ where: { intraId } });
-			if (!user) {
-				throw new HttpException('User not found', 404);
-			}
 			return user;
 		} catch (error) {
 			if (error.status === 404) {
@@ -34,33 +31,49 @@ class UserService {
 		}
 	}
 
-	async findByintraId(intraId: string): Promise<User> {
-		const foundUser = await this.prismaService.user.findUnique({ where: { intraId } });
+	async findByIntraId(intraId: string): Promise<User> {
+		const foundUser = await this.prismaService.user.findFirst({ where: { intraId } });
 		if (foundUser) {
 			return foundUser;
 		}
 		return null;
 	}
 
-	CreateByintraId(user: User): Promise<User>{
+	async findByNickName(nickname: string): Promise<User> {
+		const foundNick = await this.prismaService.user.findFirst({ where: { nickname } });
+		if (foundNick) {
+			return foundNick;
+		}
+		return null;
+	}
+
+	async createByIntraId(intraId: string, use2fa: boolean, nickname?: string, profileImageURI?: string): Promise<User>{
 		try {
-			return this.prismaService.user.create({ data: user });
+			return this.prismaService.user.create({ data: { intraId, nickname, profileImageURI, use2fa } });
+		} catch (error) {
+			throw new Error(error.message);
+		}
+	}
+	//partial<Dto.Request.User>
+	async updateUserById(id: string, _user: Partial<User>) {
+		try {
+			await this.prismaService.user.update({ where: { id }, data: _user });
 		} catch (error) {
 			throw new Error(error.message);
 		}
 	}
 
-	async updateUserById(id: string, _user: User) {
+	async setProfileImage(id: string, profileImageURI: string) {
 		try {
-			const user = await this.prismaService.user.findUnique({ where: { id } });
+			await this.prismaService.user.update({ where: { id }, data: { profileImageURI } });
+		} catch (error) {
+			throw new Error(error.message);
+		}
+	}
 
-			if (!user) {
-				throw new HttpException('User not found', 404);
-			}
-			_user.nickname ? user.nickname = user.nickname : user.nickname = _user.nickname;
-			_user.email2fa ? user.email2fa = user.email2fa : user.email2fa = _user.email2fa;
-			_user.profileImageURI ? user.profileImageURI = user.profileImageURI : user.profileImageURI = _user.profileImageURI;
-			_user.use2fa === true ? user.use2fa = true : user.use2fa = false;
+	async updateUserImagebyIntraId(intraId: string, profileImageURI: string) {
+		try {
+			await this.prismaService.user.update({ where: { intraId }, data: { profileImageURI } });
 		} catch (error) {
 			throw new Error(error.message);
 		}

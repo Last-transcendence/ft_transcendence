@@ -3,7 +3,6 @@
 	height: 100cqh;
 	display: flex;
 	flex-direction: column;
-	gap: 8cqh;
+	gap: 4cqh;
 	container-type: size;
-	overflow-y: auto;
 }

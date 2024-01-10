@@ -1,25 +1,23 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
 import style from '../../../../style/friend/list/status/index.module.css';
+import { Typography } from '@mui/material';
+import { UserStatus } from '@/type';
+
+const statusLabel = [
+	{ color: '#1CB119', label: '온라인' },
+	{ color: '#495D49', label: '오프라인' },
+	{ color: '#9C27B0', label: '게임중' },
+];
 
 interface StatusProps {
-	status: '온라인' | '오프라인' | '게임 중';
+	status: UserStatus;
 }
 
 const FriendStatus = ({ status }: StatusProps) => {
-	const spanRef = useRef<HTMLSpanElement>(null);
-
-	useEffect(() => {
-		if (spanRef.current) {
-			spanRef.current.style.color =
-				status === '온라인' ? '#1CB119' : status === '오프라인' ? '#495D49' : '#9C27B0';
-		}
-	}, [status]);
-
 	return (
 		<div className={style.container}>
-			<span ref={spanRef}>{status}</span>
+			<Typography color={statusLabel[status]?.color}>{statusLabel[status]?.label}</Typography>
 		</div>
 	);
 };
