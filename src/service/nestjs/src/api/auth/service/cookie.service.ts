@@ -5,25 +5,24 @@ import { CookieOptions } from 'express';
 
 @Injectable()
 export class CookieService {
-    constructor(
-        private readonly configService: ConfigService,
-        private readonly jwtService: JwtService,
-    ) {}
+	constructor(
+		private readonly configService: ConfigService,
+		private readonly jwtService: JwtService,
+	) {}
 
-    
-    getCookieOption(): CookieOptions {
-        const maxAge = 7 * 24 * 60 * 60 * 1000; // 7days
+	getCookieOption(): CookieOptions {
+		const maxAge = 24 * 60 * 60 * 1000; // 24 hours
 
-        return this.configService.get('cookie') === 'production'
-            ? { secure: true, sameSite: 'none', maxAge }
-            : { maxAge };
-    }
+		return this.configService.get('cookie') === 'production'
+			? { secure: true, sameSite: 'none', maxAge }
+			: { maxAge };
+	}
 
-    createJwt<T extends Record<string, string | number | boolean>>(payload: T): string {
-        return this.jwtService.sign(payload);
-    }
+	createJwt<T extends Record<string, string | number | boolean>>(payload: T): string {
+		return this.jwtService.sign(payload);
+	}
 
-    readJwt<T extends Record<string, string | number | boolean>>(jwt: string): T {
-        return this.jwtService.verify(jwt);
-    }
+	readJwt<T extends Record<string, string | number | boolean>>(jwt: string): T {
+		return this.jwtService.verify(jwt);
+	}
 }
