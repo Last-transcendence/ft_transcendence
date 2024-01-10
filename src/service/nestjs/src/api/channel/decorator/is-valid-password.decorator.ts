@@ -29,6 +29,19 @@ export function IsValidPassword(validationOptions?: ValidationOptions) {
 					}
 					return false;
 				},
+				defaultMessage(args: ValidationArguments) {
+					const object = args.object as any;
+					if (object.visibility === ChannelVisibility.PROTECTED) {
+						return 'Password must be a 6-digit number';
+					} else if (
+						object.visibility === ChannelVisibility.PUBLIC ||
+						object.visibility === ChannelVisibility.PRIVATE
+					) {
+						return 'Password must be empty';
+					} else {
+						return 'When the visibility is set to PROTECTED, a 6-digit numeric password is required. If the visibility is either PUBLIC or PRIVATE, the password must be left empty.';
+					}
+				},
 			},
 		});
 	};

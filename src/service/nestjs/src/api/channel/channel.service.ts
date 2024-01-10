@@ -8,15 +8,44 @@ import * as Dto from './dto';
 class ChannelService {
 	constructor(private readonly prismaService: PrismaService) {}
 
-	async getChannelList(): Promise<ChannelModel[]> {
+	async getChannelList(): Promise<Dto.Response.Channel[]> {
 		try {
-			return await this.prismaService.channel.findMany({});
+			const channelList: Dto.Response.Channel[] = await this.prismaService.channel.findMany({
+				select: {
+					id: true,
+					title: true,
+					visibility: true,
+				},
+			});
+
+			return channelList;
 		} catch (error) {
 			throw new Error(error.message);
 		}
 	}
 
-	async createChannel(channelRequestDto: Dto.Request.Channel): Promise<ChannelModel> {
+	async getChannel(id: string) {
+		try {
+			const channelDetail = await this.prismaService.channel.findUnique({
+				where: {
+					id: id,
+				},
+				select: {
+					id: true,
+					title: true,
+					visibility: true,
+					participant: true,
+					ban: true,
+					mute: true,
+				},
+			});
+			return channelDetail;
+		} catch (error) {
+			throw new Error(error.message);
+		}
+	}
+
+	async createChannel(channelRequestDto: Dto.Request.CreateChannel): Promise<ChannelModel> {
 		try {
 			const title: string = channelRequestDto.title;
 			const visibility: ChannelVisibility = channelRequestDto.visibility;
@@ -30,12 +59,21 @@ class ChannelService {
 		}
 	}
 
-	async updateChannel(id: string, updateChannelDto: Partial<Dto.Request.Channel>) {
+	async updateChannel(
+		id: string,
+		updateChannelDto: Dto.Request.UpdateChannel,
+	): Promise<Dto.Response.UpdateChannel> {
 		try {
-			return await this.prismaService.channel.update({
+			const updateChannel = await this.prismaService.channel.update({
 				where: { id },
 				data: updateChannelDto,
+				select: {
+					id: true,
+					updatedAt: true,
+				},
 			});
+
+			return updateChannel;
 		} catch (error) {
 			throw new Error(error.message);
 		}
