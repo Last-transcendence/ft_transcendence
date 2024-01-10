@@ -45,7 +45,7 @@ class ChannelService {
 		}
 	}
 
-	async createChannel(channelRequestDto: Dto.Request.Channel): Promise<ChannelModel> {
+	async createChannel(channelRequestDto: Dto.Request.CreateChannel): Promise<ChannelModel> {
 		try {
 			const title: string = channelRequestDto.title;
 			const visibility: ChannelVisibility = channelRequestDto.visibility;
