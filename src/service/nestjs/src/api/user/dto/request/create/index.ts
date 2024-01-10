@@ -1,5 +1,5 @@
 import { Trim } from '@miaooo/class-transformer-trim';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { IsBoolean, IsNotEmpty, IsString } from 'class-validator';
 
 class Create {
@@ -26,4 +26,5 @@ class Create {
 	profileImageURI: string;
 }
 
-export default Create;
+export class Update extends PartialType(Create) {}
+

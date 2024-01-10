@@ -24,28 +24,27 @@ class UserController {
 		return user;
 	}
 	
-    // @UseInterceptors(FileInterceptor('profileImage'))
 	@Patch('me')
 	@UseGuards(Auth.Guard.UserJwt)
 	@ApiOperation({ summary: 'Update my information' })
 	@ApiOkResponse({ description: 'Get my info successfully', type: UserModel })
 	@ApiNotFoundResponse({ description: 'User not found' })
 	async meUpdate(
-		// @Param('id', ParseUUIDPipe) id: string,
-		@Body() updateData: User ,
+		@Body() updateData: Dto.Request.Update,
 		@Req() req,
 	): Promise<Dto.Response.User> {
 		try {
-			// if (updateData.profileImageURI) {
-			// 	await this.userService.setProfileImage(req.user.id, updateData.profileImageURI);
-			// }
-			console.log(updateData.nickname);
-
 			return await this.userService.updateUserById(req.user.id, updateData);
 		}
 		catch (error) {
 			throw new HttpException(error.message, error.status);
 		}
+	}
+
+	@Post('upload')
+	@UseGuards(Auth.Guard.UserJwt)
+	@UseInterceptors(FileInterceptor('file', multerOption))
+	async uploadProfileImage(@UploadedFile() file: Express.Multer.File) {
 	}
 
 	@Get(':id')

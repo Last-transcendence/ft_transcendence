@@ -59,7 +59,7 @@ class UserService {
 		}
 	}
 
-	async createUser(intraId: string, registerRequestDto: Dto.Request.Create): Promise<User> {
+	async createUser(intraId: string, registerRequestDto: Dto.Request.Update): Promise<User> {
 		try {
 			const { nickname, profileImageURI, use2fa } = registerRequestDto;
 
@@ -71,9 +71,8 @@ class UserService {
 		}
 	}
 
-	async updateUserById(id: string, _user: User) {
+	async updateUserById(id: string, _user: Dto.Request.Update) {
 		try {
-			// const user = await this.prismaService.user.findUnique({ where: { id } });
 			const updateme = await this.prismaService.user.update({ where: { id }, data: _user,
 				select: {
 					nickname: true,
