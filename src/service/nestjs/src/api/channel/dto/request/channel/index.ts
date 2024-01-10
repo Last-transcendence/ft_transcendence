@@ -8,12 +8,6 @@ export class CreateChannel {
 	@IsString()
 	@IsNotEmpty()
 	@Trim()
-	@ApiProperty({ description: 'Channel id' })
-	channelId: string;
-
-	@IsString()
-	@IsNotEmpty()
-	@Trim()
 	@ApiProperty({ description: 'Channel title' })
 	title: string;
 
