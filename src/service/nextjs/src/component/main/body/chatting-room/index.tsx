@@ -4,19 +4,14 @@ import style from '../../../../style/main/body/chatting-room/index.module.css';
 interface ChattingRoomProps {
 	title: string;
 	visibility: 'public' | 'protected' | 'private';
-	numberOfPeople: number;
 }
 
-const RoomInformation = ({ title, visibility, numberOfPeople }: ChattingRoomProps) => {
+const RoomInformation = ({ title, visibility }: ChattingRoomProps) => {
 	return (
 		<div className={style.roomInformationContainer}>
 			<div>
 				<div>
 					<span>{visibility}</span>
-				</div>
-				<div>
-					<ParticipantIcon width={25} height={16} />
-					<span>{numberOfPeople}</span>
 				</div>
 			</div>
 			<div>
@@ -34,11 +29,11 @@ const IconContainer = () => {
 	);
 };
 
-const ChattingRoom = ({ title, visibility, numberOfPeople }: ChattingRoomProps) => {
+const ChattingRoom = ({ title, visibility }: ChattingRoomProps) => {
 	return (
 		<div className={style.container}>
 			<div>
-				<RoomInformation title={title} visibility={visibility} numberOfPeople={numberOfPeople} />
+				<RoomInformation title={title} visibility={visibility} />
 				<IconContainer />
 			</div>
 		</div>

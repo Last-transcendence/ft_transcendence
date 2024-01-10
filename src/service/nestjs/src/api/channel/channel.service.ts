@@ -59,12 +59,21 @@ class ChannelService {
 		}
 	}
 
-	async updateChannel(id: string, updateChannelDto: Partial<Dto.Request.Channel>) {
+	async updateChannel(
+		id: string,
+		updateChannelDto: Dto.Request.UpdateChannel,
+	): Promise<Dto.Response.UpdateChannel> {
 		try {
-			return await this.prismaService.channel.update({
+			const updateChannel = await this.prismaService.channel.update({
 				where: { id },
 				data: updateChannelDto,
+				select: {
+					id: true,
+					updatedAt: true,
+				},
 			});
+
+			return updateChannel;
 		} catch (error) {
 			throw new Error(error.message);
 		}

@@ -55,7 +55,7 @@ class ChannelController {
 		type: ChannelModel,
 	})
 	@ApiNotFoundResponse({ description: 'Failed to create channel' })
-	async createChannel(@Body() channelRequestDto: Dto.Request.Channel): Promise<ChannelModel> {
+	async createChannel(@Body() channelRequestDto: Dto.Request.CreateChannel): Promise<ChannelModel> {
 		try {
 			return await this.channelService.createChannel(channelRequestDto);
 		} catch (error) {
@@ -72,8 +72,8 @@ class ChannelController {
 	@ApiNotFoundResponse({ description: 'Failed to change channel info' })
 	async updateChannel(
 		@Param('id', ParseUUIDPipe) id: string,
-		@Body() updateChannelDto: Partial<Dto.Request.Channel>,
-	) {
+		@Body() updateChannelDto: Dto.Request.UpdateChannel,
+	): Promise<Dto.Response.UpdateChannel> {
 		try {
 			return await this.channelService.updateChannel(id, updateChannelDto);
 		} catch (error) {
