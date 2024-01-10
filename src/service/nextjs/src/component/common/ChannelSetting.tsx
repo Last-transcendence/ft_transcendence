@@ -7,8 +7,8 @@ import CreateChatPassword from '@/component/chat/create/password';
 import { BottomButton } from '@/component/common/ButtomButton';
 import { Channel, ChannelVisibility } from '@/type/channel.type';
 import { Dispatch, SetStateAction, useState } from 'react';
-import { patchFetcher, postFetcher } from '../../../service/api';
 import CustomSnackbar from '@/component/profile/modifyProfile/customSnackbar';
+import { patchFetcher, postFetcher } from '@/service/api';
 
 interface ChannelSettingProps {
 	isCreate: boolean;
