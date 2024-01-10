@@ -7,7 +7,7 @@ import { useState } from 'react';
 // import { getFetcher } from '@/component/api/getFetcher';
 // import Friend from '@/type/friend.type';
 import CustomSnackbar from '@/component/profile/modifyProfile/customSnackbar';
-import { postFetcher } from '../../../../service/api';
+import { postFetcher } from '@/service/api';
 
 const Title = () => {
 	return (

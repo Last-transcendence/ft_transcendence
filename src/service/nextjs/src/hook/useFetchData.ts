@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import getFetcher from '../../service/api/getFetcher';
 import { AxiosError } from 'axios';
+import { getFetcher } from '@/service/api';
 
 const useFetchData = <T>(
 	url: string | null,

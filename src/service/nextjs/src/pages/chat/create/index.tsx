@@ -11,7 +11,7 @@ import { Stack } from '@mui/material';
 import { ChannelVisibility } from '@/type/channel.type';
 import axios from 'axios';
 import CustomSnackbar from '@/component/profile/modifyProfile/customSnackbar';
-import { postFetcher } from '../../../../service/api';
+import { postFetcher } from '@/service/api';
 
 const ChatCreatePage = () => {
 	const [visibility, setVisibility] = useState<ChannelVisibility>(ChannelVisibility.PUBLIC);
