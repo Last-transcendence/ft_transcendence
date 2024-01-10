@@ -24,7 +24,28 @@ class ChannelService {
 		}
 	}
 
-	async createChannel(channelRequestDto: Dto.Request.CreateChannel): Promise<ChannelModel> {
+	async getChannel(id: string) {
+		try {
+			const channelDetail = await this.prismaService.channel.findUnique({
+				where: {
+					id: id,
+				},
+				select: {
+					id: true,
+					title: true,
+					visibility: true,
+					participant: true,
+					ban: true,
+					mute: true,
+				},
+			});
+			return channelDetail;
+		} catch (error) {
+			throw new Error(error.message);
+		}
+	}
+
+	async createChannel(channelRequestDto: Dto.Request.Channel): Promise<ChannelModel> {
 		try {
 			const title: string = channelRequestDto.title;
 			const visibility: ChannelVisibility = channelRequestDto.visibility;
