@@ -45,6 +45,7 @@ class UserController {
 	@UseGuards(Auth.Guard.UserJwt)
 	@UseInterceptors(FileInterceptor('file', multerOption))
 	async uploadProfileImage(@UploadedFile() file: Express.Multer.File) {
+		return `${file.originalname} File Upload ${file.filename}`;
 	}
 
 	@Get(':id')
