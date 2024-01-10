@@ -15,7 +15,6 @@ import { JwtAuthGuard } from './jwt-auth.guard';
 import { CookieService } from './service/cookie.service';
 import { LoginService } from './service/login.service';
 import { RegisterService } from './service/register.service';
-import { AuthGuard } from '@nestjs/passport';
 @Controller('auth')
 export class AuthController {
     constructor(

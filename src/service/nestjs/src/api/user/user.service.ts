@@ -55,18 +55,25 @@ class UserService {
 		}
 	}
 	//partial<Dto.Request.User>
-	async updateUserById(id: string, _user: User) {
+	async updateUserById(id: string, _user: Partial<User>) {
 		try {
-			// const user = await this.prismaService.user.findUnique({ where: { id } });
-
-			// if (!user) {
-			// 	throw new HttpException('User not found', 404);
-			// }
-			// _user.nickname ? user.nickname = user.nickname : user.nickname = _user.nickname;
-			// _user.email2fa ? user.email2fa = user.email2fa : user.email2fa = _user.email2fa;
-			// _user.profileImageURI ? user.profileImageURI = user.profileImageURI : user.profileImageURI = _user.profileImageURI;
-			// _user.use2fa === true ? user.use2fa = true : user.use2fa = false;
 			await this.prismaService.user.update({ where: { id }, data: _user });
+		} catch (error) {
+			throw new Error(error.message);
+		}
+	}
+
+	async setProfileImage(id: string, profileImageURI: string) {
+		try {
+			await this.prismaService.user.update({ where: { id }, data: { profileImageURI } });
+		} catch (error) {
+			throw new Error(error.message);
+		}
+	}
+
+	async updateUserImagebyIntraId(intraId: string, profileImageURI: string) {
+		try {
+			await this.prismaService.user.update({ where: { intraId }, data: { profileImageURI } });
 		} catch (error) {
 			throw new Error(error.message);
 		}
