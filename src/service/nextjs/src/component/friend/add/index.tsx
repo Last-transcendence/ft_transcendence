@@ -7,7 +7,8 @@ import { useState } from 'react';
 // import { getFetcher } from '@/component/api/getFetcher';
 // import Friend from '@/type/friend.type';
 import CustomSnackbar from '@/component/profile/modifyProfile/customSnackbar';
-import { postFetcher } from '@/service/api';
+import { deleteFetcher, postFetcher } from '@/service/api';
+import Friend from '@/type/friend.type';
 
 const Title = () => {
 	return (
@@ -32,11 +33,7 @@ const dummyUsers: User[] = [
 	},
 ];
 
-// const removeFriend = () => {
-// 	alert('친구 삭제');
-// };
-
-const AddFriend = () => {
+const AddFriend = ({ friendList }: { friendList: Friend[] | undefined }) => {
 	const [searchData, setSearchData] = useState<User[]>([]);
 	const [isLoading, setLoading] = useState(false);
 	const [showSuccessSnackbar, setShowSuccessSnackbar] = useState(false);
@@ -44,6 +41,7 @@ const AddFriend = () => {
 		title: '',
 		success: true,
 	});
+
 	const onSearch = (name: string) => {
 		if (isLoading) return;
 		if (name.length === 0) setSearchData([]);
@@ -63,21 +61,29 @@ const AddFriend = () => {
 	if (isLoading) return <Skeleton />;
 	if (!searchData) return <div>유저가 없습니다.</div>;
 
-	const addFriend = async (id: string) => {
+	const setFriend = async (id: string, mode: 'add' | 'delete') => {
+		const title = mode === 'add' ? '친구 추가' : '친구 삭제';
+
 		try {
-			await postFetcher('/friend', { friendId: id });
+			await (mode === 'add'
+				? postFetcher('/friend', { friendId: id })
+				: deleteFetcher(`/friend/${id}`));
 			setMessage({
-				title: '친구 추가 성공',
+				title: title + ' 성공',
 				success: true,
 			});
 			setShowSuccessSnackbar(true);
 		} catch (error) {
 			setMessage({
-				title: '친구 추가 실패',
+				title: title + ' 실패',
 				success: false,
 			});
 			setShowSuccessSnackbar(true);
 		}
+	};
+
+	const isFriend = (id: string) => {
+		return friendList?.some(friend => friend.friendId === id);
 	};
 
 	return (
@@ -102,20 +108,15 @@ const AddFriend = () => {
 					{searchData?.map(user => (
 						<div key={user.id}>
 							<UserBriefInformation
-								profileImageSrc={user?.profileImageURI}
 								nickname={user?.nickname}
 								className={style['user-brief-information']}
+								userId={user.id}
 							/>
-							<button onClick={() => addFriend(user.id)}>추가</button>
-							{/*{v?.condition === '친구' ? (*/}
-							{/*	<Button variant={'contained'} size={'small'} onClick={() => removeFriend()}>*/}
-							{/*		삭제*/}
-							{/*	</Button>*/}
-							{/*) : (*/}
-							{/*	<Button variant={'contained'} size={'small'} onClick={() => addFriend()}>*/}
-							{/*		추가*/}
-							{/*	</Button>*/}
-							{/*)}*/}
+							{isFriend(user.id) ? (
+								<button onClick={() => setFriend(user.id, 'add')}>삭제</button>
+							) : (
+								<button onClick={() => setFriend(user.id, 'delete')}>추가</button>
+							)}
 						</div>
 					))}
 				</div>
