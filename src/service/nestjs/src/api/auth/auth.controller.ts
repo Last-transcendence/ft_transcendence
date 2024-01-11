@@ -41,7 +41,7 @@ export class AuthController {
 			const cookieOption = this.cookieService.getCookieOption();
 
 			res.cookie('ft-token', jwt, cookieOption);
-			res.redirect(`${this.configService.get('NESTJS_URL')}/auth/login`);
+			res.redirect(`${this.configService.getOrThrow('NESTJS_URL')}/auth/login`);
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
 		}
