@@ -49,7 +49,7 @@ export class AuthController {
 
 	@Get('login')
 	@UseGuards(Auth.Guard.FtJwt)
-	async login(@Request() req, @Response({ passthrough: true }) res): Promise<User> {
+	async login(@Request() req, @Response({ passthrough: true }) res) {
 		delete req.user.iat;
 		delete req.user.exp;
 
@@ -62,8 +62,7 @@ export class AuthController {
 		const cookieOption = this.cookieService.getCookieOption();
 
 		res.cookie('accessToken', jwt, cookieOption);
-
-		return user;
+		res.redirect(`${this.configService.getOrThrow('NEXTJS_URL')}/auth/login/callback`);
 	}
 
 	@Post('register')

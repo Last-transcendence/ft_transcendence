@@ -7,12 +7,12 @@ import {
 	useEffect,
 	useState,
 } from 'react';
-import User from '@/type/user.type';
 import axios from 'axios';
+import Me from '@/type/me.type';
 
 const AuthContext = createContext<{
-	me: User | null;
-	setMe: Dispatch<SetStateAction<User | null>>;
+	me: Me | null;
+	setMe: Dispatch<SetStateAction<Me | null>>;
 }>({
 	me: null,
 	setMe: () => {},
@@ -20,7 +20,7 @@ const AuthContext = createContext<{
 
 export const AuthProvider = (props: { children: ReactNode }) => {
 	const { children } = props;
-	const [me, setMe] = useState<User | null>(null);
+	const [me, setMe] = useState<Me | null>(null);
 
 	useEffect(() => {
 		if (!me) {

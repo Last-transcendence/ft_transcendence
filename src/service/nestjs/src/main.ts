@@ -12,6 +12,11 @@ async function bootstrap() {
 	const app = await NestFactory.create(AppModule);
 	const configService = app.get(ConfigService);
 	const prismaService = app.get(PrismaService);
+	const originList = [
+		configService.get('NEXTJS_URL'),
+		configService.get('FT_API_URL'),
+		'https://signin.intra.42.fr',
+	];
 
 	app.useGlobalPipes(
 		new ValidationPipe({
@@ -22,7 +27,7 @@ async function bootstrap() {
 	);
 
 	app.enableCors({
-		origin: configService.get('NEXTJS_URL'),
+		origin: originList,
 		credentials: true,
 	});
 	app.use(cookieParser());
