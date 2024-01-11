@@ -27,7 +27,6 @@ async function bootstrap() {
 	});
 	app.use(cookieParser());
 	app.use(passport.initialize());
-	app.use(passport.session());
 
 	await prismaService.enableShutdownHooks(app);
 

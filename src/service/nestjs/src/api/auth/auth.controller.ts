@@ -29,7 +29,7 @@ export class AuthController {
 
 	@Get('ft')
 	@UseGuards(Auth.Guard.Ft)
-	async ftAuth(): Promise<any> {
+	async ftAuth(): Promise<void> {
 		return;
 	}
 
