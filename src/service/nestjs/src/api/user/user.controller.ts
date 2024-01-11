@@ -15,9 +15,7 @@ class UserController {
 	@ApiOkResponse({ description: 'Get my info successfully', type: Dto.Response.User })
 	@ApiNotFoundResponse({ description: 'User not found' })
 	async me(@Req() req): Promise<Dto.Response.User> {
-		const { user } = req;
-
-		return user;
+		return req.user;
 	}
 
 	@Get(':id')

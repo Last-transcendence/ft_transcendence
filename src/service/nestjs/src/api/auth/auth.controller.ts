@@ -29,7 +29,7 @@ export class AuthController {
 
 	@Get('ft')
 	@UseGuards(Auth.Guard.Ft)
-	async ftAuth(): Promise<any> {
+	async ftAuth(): Promise<void> {
 		return;
 	}
 
@@ -41,7 +41,7 @@ export class AuthController {
 			const cookieOption = this.cookieService.getCookieOption();
 
 			res.cookie('ft-token', jwt, cookieOption);
-			res.redirect(`${this.configService.get('NESTJS_URL')}/auth/login`);
+			res.redirect(`${this.configService.getOrThrow('NESTJS_URL')}/auth/login`);
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
 		}
@@ -49,7 +49,7 @@ export class AuthController {
 
 	@Get('login')
 	@UseGuards(Auth.Guard.FtJwt)
-	async login(@Request() req, @Response({ passthrough: true }) res): Promise<User> {
+	async login(@Request() req, @Response({ passthrough: true }) res) {
 		delete req.user.iat;
 		delete req.user.exp;
 
@@ -62,8 +62,7 @@ export class AuthController {
 		const cookieOption = this.cookieService.getCookieOption();
 
 		res.cookie('accessToken', jwt, cookieOption);
-
-		return user;
+		res.redirect(`${this.configService.getOrThrow('NEXTJS_URL')}/auth/login/callback`);
 	}
 
 	@Post('register')
