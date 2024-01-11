@@ -9,12 +9,13 @@ export interface avatarStyle {
 }
 
 export interface newAvatarProps extends myImageProps, avatarImgStyle {
+	onClick?: () => void;
 	sxStyle?: avatarStyle;
 }
 
-const NewAvatar = ({ sxStyle, avatarImgStyle, ...userImageData }: newAvatarProps) => (
+const NewAvatar = ({ sxStyle, avatarImgStyle, onClick, ...userImageData }: newAvatarProps) => (
 	<Box>
-		<Avatar sx={sxStyle}>
+		<Avatar sx={sxStyle} onClick={onClick}>
 			<MyImage avatarImgStyle={avatarImgStyle} {...userImageData} />
 		</Avatar>
 	</Box>
