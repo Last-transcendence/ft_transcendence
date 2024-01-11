@@ -4,5 +4,6 @@ import BlockModel from './block.model';
 import ChatRoomModel from './chatroom.model';
 import ChatModel from './chat.model';
 import ChannelModel from './channel.model';
+import MuteModel from './mute.model';
 
-export { UserModel, FriendModel, BlockModel, ChatRoomModel, ChatModel, ChannelModel};
+export { UserModel, FriendModel, BlockModel, ChatRoomModel, ChatModel, ChannelModel, MuteModel };

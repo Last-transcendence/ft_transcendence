@@ -152,8 +152,8 @@ enum ParticipantRole {
 model Participant {
     // Attributes
     id        String          @id @default(uuid()) @db.Uuid
-    channelId String          @db.Uuid
-    userId    String          @db.Uuid
+    channelId String          @unique @db.Uuid
+    userId    String          @unique @db.Uuid
     role      ParticipantRole @default(USER)
 
     // Timestamps
@@ -163,8 +163,6 @@ model Participant {
     // Refer to
     channel Channel @relation("channel", fields: [channelId], references: [id])
     user    User    @relation("user", fields: [userId], references: [id])
-
-    @@unique([channelId, userId], name: "channelId_userId")
 }
 
 model Ban {
@@ -187,8 +185,8 @@ model Ban {
 model Mute {
     // Attributes
     id        String @id @default(uuid()) @db.Uuid
-    channelId String @db.Uuid
-    userId    String @db.Uuid
+    channelId String @unique @db.Uuid
+    userId    String @unique @db.Uuid
 
     // Timestamps
     createdAt DateTime @default(now())
@@ -197,8 +195,6 @@ model Mute {
     // Refer to
     channel Channel @relation("channel", fields: [channelId], references: [id])
     user    User    @relation("user", fields: [userId], references: [id])
-
-    @@unique([channelId, userId], name: "channelId_userId")
 }
 
 model ChatRoom {
