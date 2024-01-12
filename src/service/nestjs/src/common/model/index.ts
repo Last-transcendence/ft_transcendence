@@ -1,3 +1,4 @@
+import BanModel from './ban.model';
 import BlockModel from './block.model';
 import ChannelModel from './channel.model';
 import ChatModel from './chat.model';
@@ -8,6 +9,7 @@ import MuteModel from './mute.model';
 import UserModel from './user.model';
 
 export {
+	BanModel,
 	BlockModel,
 	ChannelModel,
 	ChatModel,

@@ -4,7 +4,7 @@ import { $Enums, ChannelVisibility } from '@prisma/client';
 import { IsValidPassword } from 'api/channel/decorator/is-valid-password.decorator';
 import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
 
-export class Create {
+class Create {
 	@IsString()
 	@IsNotEmpty()
 	@Trim()
@@ -22,3 +22,5 @@ export class Create {
 	@ApiProperty({ description: 'Channel password', required: false })
 	password: string | null;
 }
+
+export default Create;

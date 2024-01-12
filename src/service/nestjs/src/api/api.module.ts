@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import PrismaModule from 'common/prisma/prisma.module';
 import AuthModule from './auth/auth.module';
+import BanModule from './ban/ban.module';
 import BlockModule from './block/block.module';
 import ChannelModule from './channel/channel.module';
 import ChatModule from './chat/chat.module';
@@ -15,6 +16,7 @@ import UserModule from './user/user.module';
 	imports: [
 		PrismaModule,
 		AuthModule,
+		BanModule,
 		BlockModule,
 		ChannelModule,
 		ChatModule,

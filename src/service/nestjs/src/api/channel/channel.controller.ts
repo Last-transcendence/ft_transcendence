@@ -96,7 +96,7 @@ class ChannelController {
 	async updateChannel(
 		@Req() req,
 		@Param('id', new ParseUUIDPipe()) id: string,
-		@Body() updateChannelDto: Dto.Request.UpdateChannel,
+		@Body() updateChannelDto: Dto.Request.Update,
 	): Promise<Dto.Response.UpdateChannel> {
 		try {
 			if (!(await this.participantService.isAuthorized(req.user.id))) {

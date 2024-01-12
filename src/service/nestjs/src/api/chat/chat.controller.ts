@@ -7,11 +7,11 @@ import * as Dto from './dto';
 
 @Controller('chat')
 @ApiTags('chat')
+@UseGuards(Auth.Guard.UserJwt)
 class ChatController {
 	constructor(private readonly chatRoomService: ChatService) {}
 
 	@Get()
-	@UseGuards(Auth.Guard.UserJwt)
 	@ApiOperation({ summary: 'Get chat' })
 	@ApiOkResponse({ description: 'Get chat successfully', type: ChatModel })
 	@ApiBadRequestResponse({ description: 'Bad request' })
@@ -24,7 +24,6 @@ class ChatController {
 	}
 
 	@Post()
-	@UseGuards(Auth.Guard.UserJwt)
 	@ApiOperation({ summary: 'Create chat' })
 	@ApiOkResponse({ description: 'Create chat successfully', type: ChatModel })
 	@ApiBadRequestResponse({ description: 'Bad request' })
