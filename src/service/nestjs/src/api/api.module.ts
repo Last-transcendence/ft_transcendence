@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
-import AuthModule from './auth/auth.module';
-import MuteModule from './mute/mute.module';
 import PrismaModule from 'common/prisma/prisma.module';
+import AuthModule from './auth/auth.module';
+import ChatModule from './chat/chat.module';
+import MuteModule from './mute/mute.module';
 import ParticipantModule from './participant/participant.module';
 import UserModule from './user/user.module';
 import ChatroomModule from './chatroom/chatroom.module';
@@ -20,6 +21,7 @@ import ChannelModule from './channel/channel.module';
 		AuthModule,
 		ParticipantModule,
 		MuteModule,
+		ChatModule,
 	],
 })
 class ApiModule {}

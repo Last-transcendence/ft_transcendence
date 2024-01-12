@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import PrismaService from 'common/prisma/prisma.service';
 import { User } from '@prisma/client';
 import * as Dto from './dto';
@@ -7,27 +7,9 @@ import * as Dto from './dto';
 class UserService {
 	constructor(private readonly prismaService: PrismaService) {}
 
-	async getUserById(id: string) {
+	async get(id: string) {
 		try {
-			const user = await this.prismaService.user.findUnique({ where: { id } });
-			if (!user) {
-				throw new NotFoundException('해당 유저가 없습니다.');
-			}
-
-			return user;
-		} catch (error) {
-			throw new Error(error.message);
-		}
-	}
-
-	async getUserByIntraId(intraId: string) {
-		try {
-			const user = await this.prismaService.user.findUnique({ where: { intraId } });
-			if (!user) {
-				throw new NotFoundException('해당 유저가 없습니다.');
-			}
-
-			return user;
+			return await this.prismaService.user.findUnique({ where: { id } });
 		} catch (error) {
 			throw new Error(error.message);
 		}
@@ -35,12 +17,7 @@ class UserService {
 
 	async findByIntraId(intraId: string): Promise<User> {
 		try {
-			const user = await this.prismaService.user.findFirst({ where: { intraId } });
-			if (!user) {
-				return null;
-			}
-
-			return user;
+			return await this.prismaService.user.findUnique({ where: { intraId } });
 		} catch (error) {
 			throw new Error(error.message);
 		}
@@ -48,42 +25,25 @@ class UserService {
 
 	async findByNickname(nickname: string): Promise<User> {
 		try {
-			const user = await this.prismaService.user.findFirst({ where: { nickname } });
-			if (!user) {
-				return null;
-			}
-
-			return user;
+			return await this.prismaService.user.findFirst({ where: { nickname } });
 		} catch (error) {
 			throw new Error(error.message);
 		}
 	}
 
-	async createUser(intraId: string, registerRequestDto: Dto.Request.Create): Promise<User> {
+	async create(intraId: string, registerRequestDto: Dto.Request.Create): Promise<User> {
 		try {
-			const { nickname, profileImageURI, use2fa } = registerRequestDto;
-
-			return this.prismaService.user.create({
-				data: { intraId, nickname, profileImageURI, use2fa },
+			return await this.prismaService.user.create({
+				data: { intraId, ...registerRequestDto },
 			});
 		} catch (error) {
 			throw new Error(error.message);
 		}
 	}
 
-	//partial<Dto.Request.User>
-	async updateUserById(id: string, _user: User) {
+	async updateUserById(id: string, updateRequestDto: Dto.Request.Update): Promise<User> {
 		try {
-			// const user = await this.prismaService.user.findUnique({ where: { id } });
-
-			// if (!user) {
-			// 	throw new HttpException('User not found', 404);
-			// }
-			// _user.nickname ? user.nickname = user.nickname : user.nickname = _user.nickname;
-			// _user.email2fa ? user.email2fa = user.email2fa : user.email2fa = _user.email2fa;
-			// _user.profileImageURI ? user.profileImageURI = user.profileImageURI : user.profileImageURI = _user.profileImageURI;
-			// _user.use2fa === true ? user.use2fa = true : user.use2fa = false;
-			await this.prismaService.user.update({ where: { id }, data: _user });
+			return await this.prismaService.user.update({ where: { id }, data: { ...updateRequestDto } });
 		} catch (error) {
 			throw new Error(error.message);
 		}

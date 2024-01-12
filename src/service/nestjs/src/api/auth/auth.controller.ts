@@ -12,11 +12,17 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './service/auth.service';
 import { CookieService } from './service/cookie.service';
-import { ApiTags } from '@nestjs/swagger';
+import {
+	ApiOkResponse,
+	ApiOperation,
+	ApiResponse,
+	ApiTags,
+	ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
+import { ConfigService } from '@nestjs/config';
 import * as Auth from '../../common/auth';
 import * as Dto from './dto';
-import { User } from '@prisma/client';
-import { ConfigService } from '@nestjs/config';
+import { User } from 'api/user/dto/response';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -29,12 +35,14 @@ export class AuthController {
 
 	@Get('ft')
 	@UseGuards(Auth.Guard.Ft)
+	@ApiOperation({ summary: 'ft authentication' })
 	async ftAuth(): Promise<void> {
 		return;
 	}
 
 	@Get('ft/callback')
 	@UseGuards(Auth.Guard.Ft)
+	@ApiOperation({ summary: 'ft authentication callback' })
 	async ftAuthCallback(@Request() req, @Response({ passthrough: true }) res): Promise<void> {
 		try {
 			const jwt = this.cookieService.createJwt(req.user);
@@ -49,6 +57,9 @@ export class AuthController {
 
 	@Get('login')
 	@UseGuards(Auth.Guard.FtJwt)
+	@ApiOperation({ summary: 'login' })
+	@ApiResponse({ status: 302, description: 'Redirect to login callback page' })
+	@ApiUnauthorizedResponse({ description: 'Unauthorized' })
 	async login(@Request() req, @Response({ passthrough: true }) res) {
 		delete req.user.iat;
 		delete req.user.exp;
@@ -67,6 +78,8 @@ export class AuthController {
 
 	@Post('register')
 	@UseGuards(Auth.Guard.FtJwt)
+	@ApiOperation({ summary: 'register' })
+	@ApiOkResponse({ description: 'Register successfully', type: User })
 	async register(@Body() registerRequestDto: Dto.Request.Register, @Req() req): Promise<User> {
 		return this.authService.register(req.user.intraId, registerRequestDto);
 	}
