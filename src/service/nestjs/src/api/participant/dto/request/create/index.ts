@@ -1,10 +1,10 @@
 import { Trim } from '@miaooo/class-transformer-trim';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString } from 'class-validator';
+import { IsString, IsUUID } from 'class-validator';
 import { IsValidPassword } from 'api/channel/decorator/is-valid-password.decorator';
 
-export class Create {
-	@IsString()
+class Create {
+	@IsUUID()
 	@Trim()
 	@ApiProperty({ description: 'Channel id' })
 	channelId: string;
@@ -15,3 +15,5 @@ export class Create {
 	@ApiProperty({ description: 'Channel password' })
 	password: string;
 }
+
+export default Create;
