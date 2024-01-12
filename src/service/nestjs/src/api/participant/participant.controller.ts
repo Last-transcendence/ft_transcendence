@@ -4,12 +4,14 @@ import {
 	Controller,
 	Get,
 	HttpException,
+	Inject,
 	Param,
 	Patch,
 	Post,
 	Req,
 	UnauthorizedException,
 	UseGuards,
+	forwardRef,
 } from '@nestjs/common';
 import {
 	ApiBadRequestResponse,
@@ -29,8 +31,8 @@ import * as Auth from '../../common/auth';
 class ParticipantController {
 	constructor(
 		private readonly participantService: ParticipantService,
-		private readonly channelService: ChannelService,
-		private readonly banService: BanService,
+		@Inject(forwardRef(() => ChannelService)) private readonly channelService: ChannelService,
+		@Inject(forwardRef(() => BanService)) private readonly banService: BanService,
 	) {}
 
 	@Get()

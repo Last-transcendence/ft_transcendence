@@ -1,4 +1,14 @@
-import { Body, Controller, Get, HttpException, Post, Req, UseGuards } from '@nestjs/common';
+import {
+	Body,
+	Controller,
+	Get,
+	HttpException,
+	Inject,
+	Post,
+	Req,
+	UseGuards,
+	forwardRef,
+} from '@nestjs/common';
 import { ApiBadRequestResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { BanModel } from 'common/model';
 import BanService from './ban.service';
@@ -12,6 +22,7 @@ import * as Dto from './dto';
 class BanController {
 	constructor(
 		private readonly banService: BanService,
+		@Inject(forwardRef(() => ParticipantService))
 		private readonly participantService: ParticipantService,
 	) {}
 
