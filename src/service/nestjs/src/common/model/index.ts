@@ -4,16 +4,18 @@ import ChannelModel from './channel.model';
 import ChatModel from './chat.model';
 import ChatRoomModel from './chatroom.model';
 import FriendModel from './friend.model';
+import GameModel from './game.model';
 import MuteModel from './mute.model';
 import UserModel from './user.model';
 
 export {
 	BanModel,
-	UserModel,
-	FriendModel,
 	BlockModel,
-	ChatRoomModel,
-	ChatModel,
 	ChannelModel,
+	ChatModel,
+	ChatRoomModel,
+	FriendModel,
+	GameModel,
 	MuteModel,
+	UserModel,
 };
