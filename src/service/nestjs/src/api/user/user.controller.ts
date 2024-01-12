@@ -1,12 +1,10 @@
-import { Controller, Get, HttpException, Param, Post, Query, Req, UseGuards, UploadedFile, UseInterceptors, Patch,ParseUUIDPipe, Body } from '@nestjs/common';
+import { Controller, Get, HttpException, Param, Post, Query, Req, UseGuards, UploadedFile, UseInterceptors, Patch, Body } from '@nestjs/common';
 import { ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import UserService from './user.service';
-import { User } from '@prisma/client';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { multerOption } from '../user/multer.options';
 import * as Dto from './dto';
 import { UserModel } from 'common/model';
 import * as Auth from '../../common/auth';
+import { ApiFile } from './apifile.decorator';
 
 @Controller('user')
 @ApiTags('user')
@@ -42,8 +40,9 @@ class UserController {
 	}
 
 	@Post('upload')
-	@UseGuards(Auth.Guard.UserJwt)
-	@UseInterceptors(FileInterceptor('file', multerOption))
+	@ApiOperation({ summary: 'Uploads a file' })
+	@ApiFile('file')
+	@ApiOkResponse({ description: 'Get my image successfully' })
 	async uploadProfileImage(@UploadedFile() file: Express.Multer.File) {
 		return `${file.originalname} File Upload ${file.filename}`;
 	}
