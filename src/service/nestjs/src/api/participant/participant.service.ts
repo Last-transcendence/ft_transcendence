@@ -36,6 +36,16 @@ class ParticipantService {
 		}
 	}
 
+	async get(userId: string): Promise<Dto.Response.Participant> {
+		try {
+			return await this.prismaService.participant.findUnique({
+				where: { userId },
+			});
+		} catch (error) {
+			throw new Error(error.message);
+		}
+	}
+
 	async getList(channelId: string): Promise<Dto.Response.Participant[]> {
 		try {
 			return await this.prismaService.participant.findMany({

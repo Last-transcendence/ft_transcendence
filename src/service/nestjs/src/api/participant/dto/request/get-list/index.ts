@@ -1,9 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsUUID } from 'class-validator';
 
-export class GetList {
-	@IsString()
+class GetList {
+	@IsUUID()
 	@IsNotEmpty()
 	@ApiProperty({ description: 'Channel ID' })
 	channelId: string;
 }
+
+export default GetList;
