@@ -4,12 +4,14 @@ import {
 	Controller,
 	Get,
 	HttpException,
+	Inject,
 	Param,
 	ParseUUIDPipe,
 	Patch,
 	Post,
 	Req,
 	UseGuards,
+	forwardRef,
 } from '@nestjs/common';
 import { ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import * as Dto from './dto';
@@ -23,6 +25,7 @@ import ParticipantService from 'api/participant/participant.service';
 class ChannelController {
 	constructor(
 		private readonly channelService: ChannelService,
+		@Inject(forwardRef(() => ParticipantService))
 		private readonly participantService: ParticipantService,
 	) {}
 
