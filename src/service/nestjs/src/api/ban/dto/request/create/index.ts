@@ -2,7 +2,7 @@ import { Trim } from '@miaooo/class-transformer-trim';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsUUID } from 'class-validator';
 
-export class Create {
+class Create {
 	@IsUUID()
 	@IsNotEmpty()
 	@Trim()
@@ -15,3 +15,5 @@ export class Create {
 	@ApiProperty({ description: 'User id' })
 	userId: string;
 }
+
+export default Create;

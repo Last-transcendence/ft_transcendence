@@ -55,7 +55,7 @@ class ChannelService {
 
 	async updateChannel(
 		id: string,
-		updateChannelDto: Dto.Request.UpdateChannel,
+		updateChannelDto: Dto.Request.Update,
 	): Promise<Dto.Response.UpdateChannel> {
 		try {
 			return await this.prismaService.channel.update({
