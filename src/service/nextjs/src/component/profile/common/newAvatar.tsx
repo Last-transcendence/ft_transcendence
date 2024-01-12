@@ -6,6 +6,7 @@ export interface avatarStyle {
 	width?: number;
 	height?: number;
 	backgroundColor?: string;
+	position?: 'relative';
 }
 
 export interface newAvatarProps extends myImageProps, avatarImgStyle {
@@ -15,7 +16,19 @@ export interface newAvatarProps extends myImageProps, avatarImgStyle {
 
 const NewAvatar = ({ sxStyle, avatarImgStyle, onClick, ...userImageData }: newAvatarProps) => (
 	<Box>
-		<Avatar sx={sxStyle} onClick={onClick}>
+		<Avatar sx={{
+    ...(sxStyle?.position === undefined
+      ? {}
+      : {
+          ':hover': {
+            cursor: 'pointer',
+            transform: 'scale(1.05)',
+            border: '2px solid black',
+          },
+        }),
+    ...sxStyle,
+  }}
+ onClick={onClick}>
 			<MyImage avatarImgStyle={avatarImgStyle} {...userImageData} />
 		</Avatar>
 	</Box>
