@@ -1,7 +1,7 @@
-import { Body, Controller, Get, HttpException, Post, Query, Req } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, Post, Req } from '@nestjs/common';
 import ChatRoomService from './chatroom.service';
 import { ApiBadRequestResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { ChatModel, ChatRoomModel } from 'common/model';
+import { ChatRoomModel } from 'common/model';
 import * as Dto from './dto';
 
 @Controller('chatroom')
@@ -15,7 +15,7 @@ class ChatRoomController {
 	@ApiBadRequestResponse({ description: 'Bad request' })
 	async getChatRoom(@Req() req): Promise<ChatRoomModel[]> {
 		try {
-			return await this.chatRoomService.getChatRoom(req.user.id);
+			return await this.chatRoomService.get(req.user.id);
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
 		}
@@ -26,39 +26,16 @@ class ChatRoomController {
 	@ApiOkResponse({ description: 'Create chat room successfully', type: ChatRoomModel })
 	@ApiBadRequestResponse({ description: 'Bad request' })
 	async createChatRoom(
-		@Body() chatRoomRequestDto: Dto.Request.ChatRoom,
 		@Req() req,
+		@Body() chatRoomRequestDto: Dto.Request.Create,
 	): Promise<ChatRoomModel> {
 		try {
-			return await this.chatRoomService.createChatRoom(req.user.id, chatRoomRequestDto.destId);
-		} catch (error) {
-			throw new HttpException(error.message, error.status);
-		}
-	}
+			const chatRoom = await this.chatRoomService.get(req.user.id);
+			if (chatRoom.find(room => room.destId === chatRoomRequestDto.destId)) {
+				throw new Error('Chat room already exists');
+			}
 
-	@Get('chat')
-	@ApiOperation({ summary: 'Get chat' })
-	@ApiOkResponse({ description: 'Get chat successfully', type: ChatModel })
-	@ApiBadRequestResponse({ description: 'Bad request' })
-	async getChat(@Query('destId') destId: string, @Req() req): Promise<ChatModel[]> {
-		try {
-			return await this.chatRoomService.getChat(req.user.id, destId);
-		} catch (error) {
-			throw new HttpException(error.message, error.status);
-		}
-	}
-
-	@Post('chat')
-	@ApiOperation({ summary: 'Create chat' })
-	@ApiOkResponse({ description: 'Create chat successfully', type: ChatModel })
-	@ApiBadRequestResponse({ description: 'Bad request' })
-	async createChat(@Body() chatRequestDto: Dto.Request.Chat, @Req() req): Promise<ChatModel> {
-		try {
-			return await this.chatRoomService.createChat(
-				req.user.id,
-				chatRequestDto.destId,
-				chatRequestDto.content,
-			);
+			return await this.chatRoomService.create(req.user.id, chatRoomRequestDto.destId);
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
 		}

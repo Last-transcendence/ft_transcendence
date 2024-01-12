@@ -10,7 +10,7 @@ export class AuthService {
 		try {
 			const user = await this.userSerivice.findByIntraId(intraId);
 			if (!user) {
-				throw new NotFoundException('해당 유저가 없습니다.');
+				throw new NotFoundException('User is not found');
 			}
 
 			return user;
@@ -21,17 +21,21 @@ export class AuthService {
 
 	async register(intraId: string, registerRequestDto: Dto.Request.Register) {
 		try {
-			const user = await this.userSerivice.findByIntraId(intraId);
+			let user = await this.userSerivice.findByIntraId(intraId);
 			if (user) {
-				throw new BadRequestException('이미 가입된 유저입니다.');
+				throw new BadRequestException('User is already registered');
 			}
 
-			const nickname = await this.userSerivice.findByNickname(registerRequestDto.nickname);
-			if (nickname) {
-				throw new BadRequestException('이미 사용중인 닉네임입니다.');
+			user = await this.userSerivice.findByNickname(registerRequestDto.nickname);
+			if (user) {
+				throw new BadRequestException('Nickname is already taken');
 			}
 
-			return await this.userSerivice.createUser(intraId, registerRequestDto);
+			if (registerRequestDto.use2fa && !registerRequestDto.email2fa) {
+				throw new BadRequestException('Email used in 2fa is empty');
+			}
+
+			return await this.userSerivice.create(intraId, registerRequestDto);
 		} catch (error) {
 			throw new Error(error.message);
 		}

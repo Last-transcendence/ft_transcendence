@@ -24,7 +24,7 @@ class UserController {
 	@ApiNotFoundResponse({ description: 'User not found' })
 	async getUserById(@Param('id') id: string): Promise<Dto.Response.User> {
 		try {
-			return await this.userService.getUserById(id);
+			return await this.userService.get(id);
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
 		}

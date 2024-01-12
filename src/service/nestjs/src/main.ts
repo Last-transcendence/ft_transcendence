@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
-import { setupSwagger } from 'util/swagger/swagger';
+import setupSwagger from 'util/swagger';
 import * as cookieParser from 'cookie-parser';
 import * as passport from 'passport';
 
