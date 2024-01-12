@@ -8,13 +8,15 @@ import axios from 'axios';
 class FtStrategy extends PassportStrategy(Strategy, 'ft') {
 	constructor(private readonly configService: ConfigService) {
 		super({
-			authorizationURL: `https://api.intra.42.fr/oauth/authorize?client_id=${configService.getOrThrow(
+			authorizationURL: `${configService.getOrThrow(
+				'FT_API_URL',
+			)}/oauth/authorize?client_id=${configService.getOrThrow(
 				'CLIENT_ID',
-			)}&redirect_uri=https://dev.transcendence.42seoul.kr&response_type=code`,
-			tokenURL: 'https://api.intra.42.fr/oauth/token',
+			)}&redirect_uri=${configService.getOrThrow('NESTJS_URL')}&response_type=code`,
+			tokenURL: `${configService.getOrThrow('FT_API_URL')}/oauth/token`,
 			clientID: configService.getOrThrow('CLIENT_ID'),
 			clientSecret: configService.getOrThrow('CLIENT_SECRET'),
-			callbackURL: 'https://dev.transcendence.42seoul.kr/auth/ft/callback',
+			callbackURL: `${configService.getOrThrow('NESTJS_URL')}/auth/ft/callback`,
 		});
 	}
 
@@ -26,7 +28,7 @@ class FtStrategy extends PassportStrategy(Strategy, 'ft') {
 	) {
 		try {
 			const user = await axios
-				.get('https://api.intra.42.fr/v2/me', {
+				.get(`${this.configService.getOrThrow('FT_API_URL')}/v2/me`, {
 					headers: { Authorization: `Bearer ${accessToken}` },
 				})
 				.then(response => {

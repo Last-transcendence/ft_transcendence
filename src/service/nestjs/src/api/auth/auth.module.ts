@@ -23,4 +23,6 @@ import * as Jwt from './jwt';
 	providers: [AuthService, CookieService, Ft.FtStrategy, Jwt.FtStrategy, Jwt.UserStrategy],
 	controllers: [AuthController],
 })
-export class AuthModule {}
+class AuthModule {}
+
+export default AuthModule;

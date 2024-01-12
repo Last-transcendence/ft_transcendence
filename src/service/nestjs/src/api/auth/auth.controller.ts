@@ -12,11 +12,17 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './service/auth.service';
 import { CookieService } from './service/cookie.service';
-import { ApiTags } from '@nestjs/swagger';
+import {
+	ApiOkResponse,
+	ApiOperation,
+	ApiResponse,
+	ApiTags,
+	ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
+import { ConfigService } from '@nestjs/config';
 import * as Auth from '../../common/auth';
 import * as Dto from './dto';
-import { User } from '@prisma/client';
-import { ConfigService } from '@nestjs/config';
+import { User } from 'api/user/dto/response';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -29,19 +35,21 @@ export class AuthController {
 
 	@Get('ft')
 	@UseGuards(Auth.Guard.Ft)
-	async ftAuth(): Promise<any> {
+	@ApiOperation({ summary: 'ft authentication' })
+	async ftAuth(): Promise<void> {
 		return;
 	}
 
 	@Get('ft/callback')
 	@UseGuards(Auth.Guard.Ft)
+	@ApiOperation({ summary: 'ft authentication callback' })
 	async ftAuthCallback(@Request() req, @Response({ passthrough: true }) res): Promise<void> {
 		try {
 			const jwt = this.cookieService.createJwt(req.user);
 			const cookieOption = this.cookieService.getCookieOption();
 
 			res.cookie('ft-token', jwt, cookieOption);
-			res.redirect(`${this.configService.get('NESTJS_URL')}/auth/login`);
+			res.redirect(`${this.configService.getOrThrow('NESTJS_URL')}/auth/login`);
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
 		}
@@ -49,7 +57,10 @@ export class AuthController {
 
 	@Get('login')
 	@UseGuards(Auth.Guard.FtJwt)
-	async login(@Request() req, @Response({ passthrough: true }) res): Promise<User> {
+	@ApiOperation({ summary: 'login' })
+	@ApiResponse({ status: 302, description: 'Redirect to login callback page' })
+	@ApiUnauthorizedResponse({ description: 'Unauthorized' })
+	async login(@Request() req, @Response({ passthrough: true }) res) {
 		delete req.user.iat;
 		delete req.user.exp;
 
@@ -62,12 +73,13 @@ export class AuthController {
 		const cookieOption = this.cookieService.getCookieOption();
 
 		res.cookie('accessToken', jwt, cookieOption);
-
-		return user;
+		res.redirect(`${this.configService.getOrThrow('NEXTJS_URL')}/auth/login/callback`);
 	}
 
 	@Post('register')
 	@UseGuards(Auth.Guard.FtJwt)
+	@ApiOperation({ summary: 'register' })
+	@ApiOkResponse({ description: 'Register successfully', type: User })
 	async register(@Body() registerRequestDto: Dto.Request.Register, @Req() req): Promise<User> {
 		return this.authService.register(req.user.intraId, registerRequestDto);
 	}

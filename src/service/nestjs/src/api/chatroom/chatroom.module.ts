@@ -5,6 +5,7 @@ import ChatRoomService from './chatroom.service';
 @Module({
 	controllers: [ChatRoomController],
 	providers: [ChatRoomService],
+	exports: [ChatRoomService],
 })
 class ChatRoomModule {}
 
