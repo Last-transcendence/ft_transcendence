@@ -21,6 +21,7 @@ import * as Dto from './dto';
 
 @Controller('mute')
 @ApiTags('mute')
+@UseGuards(Auth.Guard.UserJwt)
 class MuteController {
 	constructor(
 		private readonly muteService: MuteService,
@@ -28,7 +29,6 @@ class MuteController {
 	) {}
 
 	@Get()
-	@UseGuards(Auth.Guard.UserJwt)
 	@ApiOperation({ summary: 'Get the channel mute list' })
 	@ApiOkResponse({
 		description: 'Get channel mute list successfully',
@@ -51,7 +51,6 @@ class MuteController {
 	}
 
 	@Post()
-	@UseGuards(Auth.Guard.UserJwt)
 	@ApiOperation({ summary: 'Mute user in channel' })
 	@ApiOkResponse({
 		description: 'User muted successfully',
@@ -71,7 +70,6 @@ class MuteController {
 	}
 
 	@Delete(':id')
-	@UseGuards(Auth.Guard.UserJwt)
 	@ApiOperation({ summary: 'Unmute user in channel' })
 	@ApiOkResponse({
 		description: 'User unmuted successfully',
