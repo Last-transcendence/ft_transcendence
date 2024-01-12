@@ -22,19 +22,14 @@ class ChannelService {
 		}
 	}
 
-	async getChannel(id: string) {
+	async getChannel(id: string): Promise<Dto.Response.Channel> {
 		try {
 			const channelDetail = await this.prismaService.channel.findUnique({
-				where: {
-					id: id,
-				},
+				where: { id },
 				select: {
 					id: true,
 					title: true,
 					visibility: true,
-					participant: true,
-					ban: true,
-					mute: true,
 				},
 			});
 			return channelDetail;
@@ -66,6 +61,18 @@ class ChannelService {
 					updatedAt: true,
 				},
 			});
+		} catch (error) {
+			throw new Error(error.message);
+		}
+	}
+
+	async validatePassword(id: string, password: string): Promise<boolean> {
+		try {
+			const channel = await this.prismaService.channel.findUnique({
+				where: { id },
+			});
+
+			return channel.password === password;
 		} catch (error) {
 			throw new Error(error.message);
 		}

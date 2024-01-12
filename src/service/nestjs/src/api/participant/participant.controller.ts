@@ -19,13 +19,19 @@ import {
 	ApiTags,
 } from '@nestjs/swagger';
 import ParticipantService from './participant.service';
+import ChannelService from 'api/channel/channel.service';
+import BanService from 'api/ban/ban.service';
 import * as Dto from './dto';
 import * as Auth from '../../common/auth';
 
 @Controller('participant')
 @ApiTags('participant')
 class ParticipantController {
-	constructor(private readonly participantService: ParticipantService) {}
+	constructor(
+		private readonly participantService: ParticipantService,
+		private readonly channelService: ChannelService,
+		private readonly banService: BanService,
+	) {}
 
 	@Get()
 	@UseGuards(Auth.Guard.UserJwt)
@@ -66,8 +72,24 @@ class ParticipantController {
 			if (await this.participantService.isParticipated(req.user.id)) {
 				throw new BadRequestException('User is already participated');
 			}
-			// channel not found
-			// invalid password
+
+			const channel = await this.channelService.getChannel(createParticipantRequestDto.channelId);
+			if (!channel) {
+				throw new BadRequestException('Channel not found');
+			}
+			if (
+				channel.visibility === 'PROTECTED' &&
+				!(await this.channelService.validatePassword(
+					createParticipantRequestDto.channelId,
+					createParticipantRequestDto.password,
+				))
+			) {
+				throw new BadRequestException('Wrong password');
+			}
+			if (await this.banService.isBanned(req.user.id, createParticipantRequestDto.channelId)) {
+				throw new BadRequestException('User is banned');
+			}
+
 			return await this.participantService.create(
 				createParticipantRequestDto.channelId,
 				req.user.id,

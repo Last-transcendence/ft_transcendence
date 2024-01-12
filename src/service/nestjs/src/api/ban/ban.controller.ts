@@ -37,6 +37,9 @@ class BanController {
 				throw new Error('Unauthorized');
 			}
 
+			const participant = await this.participantService.get(createRequestDto.userId);
+			await this.participantService.kick(participant.id);
+
 			return await this.banService.create(createRequestDto.channelId, createRequestDto.userId);
 		} catch (error) {
 			throw new HttpException(error.message, error.status);

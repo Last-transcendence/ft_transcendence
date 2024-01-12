@@ -30,6 +30,26 @@ class BanService {
 			throw new Error(error.message);
 		}
 	}
+
+	async isBanned(channelId: string, userId: string): Promise<boolean> {
+		try {
+			const ban = await this.prismaService.ban.findUnique({
+				where: {
+					channelId_userId: {
+						channelId,
+						userId,
+					},
+				},
+			});
+
+			if (!ban) {
+				return false;
+			}
+			return true;
+		} catch (error) {
+			throw new Error(error.message);
+		}
+	}
 }
 
 export default BanService;
