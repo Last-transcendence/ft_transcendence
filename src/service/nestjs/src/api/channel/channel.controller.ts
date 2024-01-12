@@ -1,24 +1,36 @@
 import {
+	BadRequestException,
 	Body,
 	Controller,
 	Get,
 	HttpException,
+	Inject,
 	Param,
 	ParseUUIDPipe,
 	Patch,
 	Post,
+	Req,
+	UseGuards,
+	forwardRef,
 } from '@nestjs/common';
 import { ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import ChannelModel from 'common/model/channel.model';
-import ChannelService from './channel.service';
 import * as Dto from './dto';
+import * as Auth from '../../common/auth';
+import { ChannelModel } from 'common/model';
+import ChannelService from './channel.service';
+import ParticipantService from 'api/participant/participant.service';
 
 @Controller('channel')
 @ApiTags('channel')
 class ChannelController {
-	constructor(private readonly channelService: ChannelService) {}
+	constructor(
+		private readonly channelService: ChannelService,
+		@Inject(forwardRef(() => ParticipantService))
+		private readonly participantService: ParticipantService,
+	) {}
 
 	@Get()
+	@UseGuards(Auth.Guard.UserJwt)
 	@ApiOperation({ summary: 'Get channel list' })
 	@ApiOkResponse({
 		description: 'Get channel list successfully',
@@ -34,14 +46,19 @@ class ChannelController {
 	}
 
 	@Get(':id')
+	@UseGuards(Auth.Guard.UserJwt)
 	@ApiOperation({ summary: 'Get the channel info' })
 	@ApiOkResponse({
 		description: 'Get the channel info successfully',
 		type: ChannelModel,
 	})
 	@ApiNotFoundResponse({ description: 'Failed to get the channel info' })
-	async getChannel(@Param('id', ParseUUIDPipe) id: string) {
+	async getChannel(@Req() req, @Param('id', new ParseUUIDPipe()) id: string) {
 		try {
+			if (!(await this.participantService.isParticipated(req.user.id))) {
+				throw new BadRequestException('User is not participated');
+			}
+
 			return await this.channelService.getChannel(id);
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
@@ -49,21 +66,30 @@ class ChannelController {
 	}
 
 	@Post()
+	@UseGuards(Auth.Guard.UserJwt)
 	@ApiOperation({ summary: 'Create channel' })
 	@ApiOkResponse({
 		description: 'Channel created successfully',
 		type: ChannelModel,
 	})
 	@ApiNotFoundResponse({ description: 'Failed to create channel' })
-	async createChannel(@Body() channelRequestDto: Dto.Request.CreateChannel): Promise<ChannelModel> {
+	async createChannel(
+		@Req() req,
+		@Body() channelRequestDto: Dto.Request.Create,
+	): Promise<Dto.Response.Channel> {
 		try {
-			return await this.channelService.createChannel(channelRequestDto);
+			const channel = await this.channelService.createChannel(channelRequestDto);
+			const user = await this.participantService.create(channel.id, req.user.id);
+
+			await this.participantService.update(user.id, { role: 'OWNER' });
+			return channel;
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
 		}
 	}
 
 	@Patch(':id')
+	@UseGuards(Auth.Guard.UserJwt)
 	@ApiOperation({ summary: 'Change channel info' })
 	@ApiOkResponse({
 		description: 'Channel info changed successfully',
@@ -71,28 +97,16 @@ class ChannelController {
 	})
 	@ApiNotFoundResponse({ description: 'Failed to change channel info' })
 	async updateChannel(
-		@Param('id', ParseUUIDPipe) id: string,
-		@Body() updateChannelDto: Dto.Request.UpdateChannel,
+		@Req() req,
+		@Param('id', new ParseUUIDPipe()) id: string,
+		@Body() updateChannelDto: Dto.Request.Update,
 	): Promise<Dto.Response.UpdateChannel> {
 		try {
-			return await this.channelService.updateChannel(id, updateChannelDto);
-		} catch (error) {
-			throw new HttpException(error.message, error.status);
-		}
-	}
+			if (!(await this.participantService.isAuthorized(req.user.id))) {
+				throw new BadRequestException('User is not authorized');
+			}
 
-	@Get(':channel_id/participant')
-	@ApiOperation({ summary: 'Get the channel participant list' })
-	@ApiOkResponse({
-		description: 'Channel participant list successfully obtained',
-		type: ChannelModel,
-	})
-	@ApiNotFoundResponse({ description: 'Failed to get channel participant list' })
-	async getChannelParticipantList(
-		@Param('channel_id') channelId: string,
-	): Promise<Dto.Response.Participant[]> {
-		try {
-			return await this.channelService.getChannelParticipantList(channelId);
+			return await this.channelService.updateChannel(id, updateChannelDto);
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
 		}

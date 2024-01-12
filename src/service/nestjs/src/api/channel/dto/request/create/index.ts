@@ -1,16 +1,10 @@
 import { Trim } from '@miaooo/class-transformer-trim';
-import { ApiProperty, PartialType } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 import { $Enums, ChannelVisibility } from '@prisma/client';
 import { IsValidPassword } from 'api/channel/decorator/is-valid-password.decorator';
 import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
 
-export class CreateChannel {
-	@IsString()
-	@IsNotEmpty()
-	@Trim()
-	@ApiProperty({ description: 'Channel id' })
-	channelId: string;
-
+class Create {
 	@IsString()
 	@IsNotEmpty()
 	@Trim()
@@ -29,4 +23,4 @@ export class CreateChannel {
 	password: string | null;
 }
 
-export class UpdateChannel extends PartialType(CreateChannel) {}
+export default Create;

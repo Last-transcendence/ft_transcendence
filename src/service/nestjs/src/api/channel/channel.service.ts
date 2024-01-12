@@ -1,6 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { ChannelVisibility } from '@prisma/client';
-import ChannelModel from 'common/model/channel.model';
 import PrismaService from 'common/prisma/prisma.service';
 import * as Dto from './dto';
 
@@ -24,19 +22,14 @@ class ChannelService {
 		}
 	}
 
-	async getChannel(id: string) {
+	async getChannel(id: string): Promise<Dto.Response.Channel> {
 		try {
 			const channelDetail = await this.prismaService.channel.findUnique({
-				where: {
-					id: id,
-				},
+				where: { id },
 				select: {
 					id: true,
 					title: true,
 					visibility: true,
-					participant: true,
-					ban: true,
-					mute: true,
 				},
 			});
 			return channelDetail;
@@ -45,14 +38,10 @@ class ChannelService {
 		}
 	}
 
-	async createChannel(channelRequestDto: Dto.Request.CreateChannel): Promise<ChannelModel> {
+	async createChannel(createRequestDto: Dto.Request.Create): Promise<Dto.Response.Channel> {
 		try {
-			const title: string = channelRequestDto.title;
-			const visibility: ChannelVisibility = channelRequestDto.visibility;
-			const password: string = channelRequestDto.password;
-
 			return await this.prismaService.channel.create({
-				data: { title, visibility, password },
+				data: { ...createRequestDto },
 			});
 		} catch (error) {
 			throw new Error(error.message);
@@ -61,10 +50,10 @@ class ChannelService {
 
 	async updateChannel(
 		id: string,
-		updateChannelDto: Dto.Request.UpdateChannel,
+		updateChannelDto: Dto.Request.Update,
 	): Promise<Dto.Response.UpdateChannel> {
 		try {
-			const updateChannel = await this.prismaService.channel.update({
+			return await this.prismaService.channel.update({
 				where: { id },
 				data: updateChannelDto,
 				select: {
@@ -78,13 +67,13 @@ class ChannelService {
 		}
 	}
 
-	async getChannelParticipantList(channelId: string): Promise<Dto.Response.Participant[]> {
+	async validatePassword(id: string, password: string): Promise<boolean> {
 		try {
-			const participant = this.prismaService.participant.findMany({
-				where: { channelId },
+			const channel = await this.prismaService.channel.findUnique({
+				where: { id },
 			});
 
-			return participant;
+			return channel.password === password;
 		} catch (error) {
 			throw new Error(error.message);
 		}

@@ -1,6 +1,6 @@
 import { Trim } from '@miaooo/class-transformer-trim';
 import { ApiProperty, PartialType } from '@nestjs/swagger';
-import { IsBoolean, IsNotEmpty, IsString } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 class Create {
 	@IsString()
@@ -9,21 +9,22 @@ class Create {
 	@ApiProperty({ description: 'Nickname' })
 	nickname: string;
 
-	@IsBoolean()
-	@IsNotEmpty()
+	@IsOptional()
 	@Trim()
 	@ApiProperty({ description: 'Use 2FA' })
 	use2fa: boolean;
 
-	@IsBoolean()
+	@IsOptional()
+	@IsEmail()
 	@Trim()
-	@ApiProperty({ description: 'Email used to 2fa' })
-	email2fa: string;
+	@ApiProperty({ description: 'Email used to 2fa', required: false })
+	email2fa?: string;
 
+	@IsOptional()
 	@IsString()
 	@Trim()
-	@ApiProperty({ description: 'Profile image URI' })
-	profileImageURI: string;
+	@ApiProperty({ description: 'Profile image URI', required: false })
+	profileImageURI?: string;
 }
 
 export class Update extends PartialType(Create) {}

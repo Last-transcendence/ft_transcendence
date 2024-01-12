@@ -2,12 +2,11 @@
 	height: 12cqh;
 	display: flex;
 	flex-direction: column;
-	justify-content: space-between;
+	justify-content: space-around;
 }
 
 .container > input {
 	height: 5cqh;
 	border: 1px solid #000;
 	text-indent: 2cqw;
-	font-size: 2cqh;
 }

@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
-export function setupSwagger(app: INestApplication) {
+function setupSwagger(app: INestApplication) {
 	const title = 'ft_transcendence NestJS API docs';
 	const description = `
 	This API documentation contains a detailed description of the backend services of ft_transcendence
@@ -48,3 +48,5 @@ export function setupSwagger(app: INestApplication) {
 
 	SwaggerModule.setup('api', app, document);
 }
+
+export default setupSwagger;
