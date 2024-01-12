@@ -14,7 +14,7 @@
 
 .container > div {
 	width: 50cqh;
-	height: 25cqh;
+	height: 50cqh;
 	z-index: 101;
 	container-type: size;
 }
