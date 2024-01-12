@@ -1,6 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { ChannelVisibility } from '@prisma/client';
-import ChannelModel from 'common/model/channel.model';
 import PrismaService from 'common/prisma/prisma.service';
 import * as Dto from './dto';
 
@@ -45,14 +43,10 @@ class ChannelService {
 		}
 	}
 
-	async createChannel(channelRequestDto: Dto.Request.CreateChannel): Promise<ChannelModel> {
+	async createChannel(createRequestDto: Dto.Request.Create): Promise<Dto.Response.Channel> {
 		try {
-			const title: string = channelRequestDto.title;
-			const visibility: ChannelVisibility = channelRequestDto.visibility;
-			const password: string = channelRequestDto.password;
-
 			return await this.prismaService.channel.create({
-				data: { title, visibility, password },
+				data: { ...createRequestDto },
 			});
 		} catch (error) {
 			throw new Error(error.message);
@@ -64,7 +58,7 @@ class ChannelService {
 		updateChannelDto: Dto.Request.UpdateChannel,
 	): Promise<Dto.Response.UpdateChannel> {
 		try {
-			const updateChannel = await this.prismaService.channel.update({
+			return await this.prismaService.channel.update({
 				where: { id },
 				data: updateChannelDto,
 				select: {
@@ -72,20 +66,6 @@ class ChannelService {
 					updatedAt: true,
 				},
 			});
-
-			return updateChannel;
-		} catch (error) {
-			throw new Error(error.message);
-		}
-	}
-
-	async getChannelParticipantList(channelId: string): Promise<Dto.Response.Participant[]> {
-		try {
-			const participant = this.prismaService.participant.findMany({
-				where: { channelId },
-			});
-
-			return participant;
 		} catch (error) {
 			throw new Error(error.message);
 		}

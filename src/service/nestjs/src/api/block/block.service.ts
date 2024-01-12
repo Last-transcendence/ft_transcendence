@@ -6,7 +6,7 @@ import PrismaService from 'common/prisma/prisma.service';
 class BlockService {
 	constructor(private readonly prismaService: PrismaService) {}
 
-	async getBlock(userId: string): Promise<BlockModel[]> {
+	async get(userId: string): Promise<BlockModel[]> {
 		try {
 			return await this.prismaService.block.findMany({ where: { userId } });
 		} catch (error) {
@@ -14,7 +14,7 @@ class BlockService {
 		}
 	}
 
-	async blockUser(userId: string, blockedId: string): Promise<BlockModel> {
+	async create(userId: string, blockedId: string): Promise<BlockModel> {
 		try {
 			return await this.prismaService.block.create({ data: { userId, blockedId } });
 		} catch (error) {

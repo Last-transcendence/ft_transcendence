@@ -11,7 +11,7 @@ class ChannelModel implements Channel {
 	@ApiProperty({ description: 'Channel visibility' })
 	visibility: $Enums.ChannelVisibility;
 
-	@ApiProperty({ description: 'Channel password' })
+	@ApiProperty({ description: 'Channel password', required: false })
 	password: string | null;
 
 	@ApiProperty({ required: false })
