@@ -2,6 +2,7 @@ import { Avatar, Box, Stack, Typography } from '@mui/material';
 import React from 'react';
 import { AdminNickMenu, NickMenu } from '@/component/chat/NickMenu';
 import { ParticipantRole } from '@/type/channel.type';
+import OpenProfileAvatar from '@/component/common/detailProfile/openProfileAvatar';
 
 interface ChatMsgProps {
 	userId: string;
@@ -16,7 +17,7 @@ export const ChatMsg = ({ userId, channelId, nickname, myRole }: ChatMsgProps) =
 	return (
 		<Stack flexDirection={'row'} alignItems={'center'} gap={1}>
 			<Stack flexDirection={'row'} gap={1} alignItems={'center'} width={'100%'}>
-				<Avatar alt="avatar" src="/static/images/avatar/2.jpg" />
+				<OpenProfileAvatar otherUserId={userId} />
 				{myRole && myRole !== ParticipantRole.USER ? (
 					//@todo ''는 타입스크립트 오류때문에 넣었습니다. 추후 지우겠습니다
 					<AdminNickMenu
