@@ -12,7 +12,7 @@ const sxStyle: avatarStyle = {
 	width: 50,
 	height: 50,
 	backgroundColor: '#DDDD99',
-	position: 'relative',
+	isHover: true,
 };
 
 const imageStyle: imgStyle = {

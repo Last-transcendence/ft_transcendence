@@ -10,14 +10,14 @@ const LoginBody = () => {
 
 	const handleLogin = async () => {
 		// try {
-			// setLoading(true);
-			window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/ft`
-			// const response = await getFetcher('auth/ft');
-			// console.log(response);
-	// 		if (response) {
-	// 			return router.push('/');
-			// } else {
-			// 	router.push('/auth/creatUser');
+		// setLoading(true);
+		window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/ft`;
+		// const response = await getFetcher('auth/ft');
+		// console.log(response);
+		// 		if (response) {
+		// 			return router.push('/');
+		// } else {
+		// 	router.push('/auth/creatUser');
 		// 	// }
 		// } catch (error: any) {
 		// 	console.log(error);
@@ -53,7 +53,3 @@ const LoginBody = () => {
 };
 
 export default LoginBody;
-
-
-
-
