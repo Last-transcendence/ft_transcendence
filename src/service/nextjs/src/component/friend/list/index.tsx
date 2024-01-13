@@ -1,9 +1,10 @@
 import UserBriefInformation from '@/component/common/user/bried-information';
 import style from '../../../style/friend/list/index.module.css';
 import FriendStatus from './status';
-import User from '@/type/user.type';
+import User, { UserStatus } from '@/type/user.type';
 import useFetchData from '@/hook/useFetchData';
 import { Skeleton } from '@mui/material';
+import Friend from '@/type/friend.type';
 
 const Title = () => {
 	return (
@@ -13,21 +14,18 @@ const Title = () => {
 	);
 };
 
-const FriendList = () => {
-	const { data, isLoading } = useFetchData<User[]>('/friend');
-
-	if (isLoading) return <Skeleton />;
-
+const FriendList = ({ data }: { data: Friend[] }) => {
 	return (
 		<div className={style.container}>
 			<Title />
 			{data && data?.length ? (
-				data.map((user: User) => {
+				data.map((user: Friend) => {
 					return (
 						<div key={user.id}>
+							{/*@todo 문자제거.*/}
 							<UserBriefInformation
-								nickname={user?.nickname}
-								condition={<FriendStatus status={user?.status} />}
+								nickname={'친구'}
+								condition={<FriendStatus status={UserStatus.ONLINE} />}
 								className={style['user-brief-information']}
 								userId={user.id}
 							/>
