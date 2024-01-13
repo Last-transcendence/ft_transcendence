@@ -8,6 +8,7 @@ import {
 	Param,
 	ParseUUIDPipe,
 	Post,
+	Query,
 	Req,
 	UnauthorizedException,
 	UseGuards,
@@ -37,14 +38,14 @@ class MuteController {
 	@ApiBadRequestResponse({ description: 'Failed to get channel mute list' })
 	async getChannelMuteList(
 		@Req() req,
-		@Body() getListRequestDto: Dto.Request.GetList,
+		@Query('channelId', ParseUUIDPipe) channelId: string,
 	): Promise<MuteModel[]> {
 		try {
 			if (!(await this.participantService.isParticipated(req.user.id))) {
 				throw new BadRequestException('User is not participated');
 			}
 
-			return await this.muteService.getMuteList(getListRequestDto.channelId);
+			return await this.muteService.getMuteList(channelId);
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
 		}
