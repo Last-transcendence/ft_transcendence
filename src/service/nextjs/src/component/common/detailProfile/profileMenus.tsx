@@ -53,7 +53,6 @@ const ProfileMenus = () => {
 							<ClickAwayListener onClickAway={handleClose}>
 								<MenuList autoFocusItem={open} onKeyDown={handleListKeyDown}>
 									<MenuItem onClick={handleClose}>유저차단</MenuItem>
-									<MenuItem onClick={handleClose}>상세정보</MenuItem>
 								</MenuList>
 							</ClickAwayListener>
 						</Paper>
