@@ -14,7 +14,7 @@ const Title = () => {
 	);
 };
 
-const FriendList = ({ data }: { data: Friend[] }) => {
+const FriendList = ({ data }: { data: Friend[] | undefined }) => {
 	return (
 		<div className={style.container}>
 			<Title />
