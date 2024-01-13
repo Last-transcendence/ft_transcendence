@@ -1,14 +1,12 @@
 'use client';
 
-import { useCallback, useContext, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import style from '../../../style/main/body/index.module.css';
 import ChattingRoom from './chatting-room';
 import ChattingModeToggle from './chatting-mode';
-import Link from 'next/link';
 import { Box, Skeleton } from '@mui/material';
 import { useRouter } from 'next/router';
 import CustomSnackbar from '@/component/profile/modifyProfile/customSnackbar';
-// import AuthContext from '@/context/auth.context';
 import Chatroom from '@/type/chatroom.type';
 import { Channel, ChannelVisibility } from '@/type/channel.type';
 import useFetchData from '@/hook/useFetchData';

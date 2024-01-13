@@ -1,7 +1,7 @@
 import { IconButton, Input, Stack } from '@mui/material';
 import { EnterKey } from '@/component/chat/icon';
 import React, { ChangeEvent, useState } from 'react';
-import { CommandType } from '@/component/chat/index';
+import { CommandType } from '@/component/chat/ChatRoomLayout';
 
 interface SendChatProps {
 	sendAction: (message: string) => void;

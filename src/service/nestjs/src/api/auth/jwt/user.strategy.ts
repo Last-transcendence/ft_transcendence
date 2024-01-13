@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Request } from 'express';
 import { ExtractJwt, Strategy } from 'passport-jwt';
@@ -24,9 +24,9 @@ class UserStrategy extends PassportStrategy(Strategy, 'user-jwt') {
 	}
 
 	async validate(payload: any, done: (err: Error, data: User) => void) {
-		const user = await this.userService.getUserByIntraId(payload.intraId);
+		const user = await this.userService.findByIntraId(payload.intraId);
 		if (!user) {
-			throw new UnauthorizedException();
+			throw new NotFoundException();
 		}
 
 		done(null, user);

@@ -1,9 +1,9 @@
 import { Trim } from '@miaooo/class-transformer-trim';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsUUID } from 'class-validator';
 
 export class Friend {
-	@IsString()
+	@IsUUID()
 	@IsNotEmpty()
 	@Trim()
 	@ApiProperty({ description: 'Friend id' })
