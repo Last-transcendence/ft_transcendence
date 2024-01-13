@@ -64,10 +64,9 @@ export class AuthController {
 		delete req.user.iat;
 		delete req.user.exp;
 
-		const user = await this.authService.login(req.user.intraId);
-		if (user.use2fa) {
-			throw new UnauthorizedException('2FA 인증이 필요합니다.');
-		}
+		/* 다만 여기 코드 부분이 유저가 없을 경우 에러를 throw하는 부분인데 이부분을 안 지우면 /auth/login/callback까지 
+        진행되지 않아 주석 처리했습니다 */
+		// const user = await this.authService.login(req.user.intraId);
 
 		const jwt = this.cookieService.createJwt(req.user);
 		const cookieOption = this.cookieService.getCookieOption();
