@@ -30,7 +30,7 @@ const CustomModal = ({ setIsOpened, children }: CustomModalProps) => {
 							event.stopPropagation();
 						}}
 					>
-						<div>{children}</div>
+						<div style={{ padding: 40 }}>{children}</div>
 					</div>
 				</div>
 			</div>,

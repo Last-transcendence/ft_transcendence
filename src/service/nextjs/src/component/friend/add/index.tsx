@@ -42,24 +42,22 @@ const AddFriend = ({ friendList }: { friendList: Friend[] | undefined }) => {
 		success: true,
 	});
 
-	const onSearch = (name: string) => {
+	const onSearch = async (name: string) => {
 		if (isLoading) return;
 		if (name.length === 0) setSearchData([]);
-		setSearchData(dummyUsers);
 		//@todo api test
-		// try {
-		// 	setLoading(true);
-		// 	const res = await api.post(`/user/search?queryString=${name}`);
-		// 	setSearchData(res.data);
-		// 	setLoading(false);
-		// } catch (error) {
-		// 	console.error('Error fetching data:', error);
-		// 	setLoading(false);
-		// }
+		try {
+			setLoading(true);
+			const res = await postFetcher(`/user/search?queryString=${name}`);
+			setSearchData(res as any);
+			setLoading(false);
+		} catch (error) {
+			console.error('Error fetching data:', error);
+			setLoading(false);
+		}
 	};
 
 	if (isLoading) return <Skeleton />;
-	if (!searchData) return <div>유저가 없습니다.</div>;
 
 	const setFriend = async (id: string, mode: 'add' | 'delete') => {
 		const title = mode === 'add' ? '친구 추가' : '친구 삭제';
@@ -101,11 +99,11 @@ const AddFriend = ({ friendList }: { friendList: Friend[] | undefined }) => {
 			</div>
 			{isLoading ? (
 				<Skeleton />
-			) : !searchData ? (
-				<>데이터가 없습니다</>
+			) : !searchData || !searchData.length ? (
+				<div>유저가 없습니다.</div>
 			) : (
 				<div className={style['user-container']}>
-					{searchData?.map(user => (
+					{searchData.map(user => (
 						<div key={user.id}>
 							<UserBriefInformation
 								nickname={user?.nickname}
