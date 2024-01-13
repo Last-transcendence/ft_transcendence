@@ -138,7 +138,7 @@ const MainPageBody = () => {
 	const getView = (
 		isLoading: boolean,
 		datas: Channel[] | Chatroom[] | undefined,
-		error: AxiosError | null,
+		error: AxiosError | null | undefined,
 	) => {
 		if (isLoading) return <Skeleton />;
 		if (error) return <div>데이터를 불러오지 못했습니다.</div>;

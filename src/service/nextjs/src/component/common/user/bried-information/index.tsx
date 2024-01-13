@@ -1,27 +1,24 @@
 import { ReactNode } from 'react';
 import { DefaultProfileImageIcon } from './icon';
 import Avatar from '@mui/material/Avatar';
+import OpenProfileAvatar from '@/component/common/detailProfile/openProfileAvatar';
 
 interface UserBriefInformationProps {
-	profileImageSrc: string | null | undefined;
 	nickname: ReactNode;
 	condition?: ReactNode;
 	className?: string;
+	userId: string;
 }
 
 const UserBriefInformation = ({
-	profileImageSrc,
 	nickname,
 	condition,
 	className,
+	userId,
 }: UserBriefInformationProps) => {
 	return (
 		<div className={className}>
-			{profileImageSrc ? (
-				<Avatar src={profileImageSrc} alt="profile" />
-			) : (
-				<DefaultProfileImageIcon width={32} height={32} />
-			)}
+			<OpenProfileAvatar otherUserId={userId} />
 			<div>{nickname}</div>
 			{condition && <div>{condition}</div>}
 		</div>

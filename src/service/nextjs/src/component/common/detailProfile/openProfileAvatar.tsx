@@ -1,5 +1,5 @@
 import Avatar from '@mui/material/Avatar';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import ProfileModar from '@/component/common/detailProfile/profileModar';
 import ProfileMenus from '@/component/common/detailProfile/profileMenus';
 import ProfilePageBody from '@/component/common/detailProfile/profilePageBody';
@@ -7,12 +7,11 @@ import Block from '@/type/block.type';
 import User from '@/type/user.type';
 import { useRouter } from 'next/router';
 import { getFetcher } from '@/service/api';
-import CustomSnackbar from '@/component/common/customSnackbar';
+import AuthContext from '@/context/auth.context';
+import getFriend from '@/service/getFriend';
 
 interface OpenProfileAvatarProps {
-	isMe: boolean;
 	otherUserId: string;
-	friendList: string[];
 }
 
 export interface otherUser {
@@ -22,8 +21,11 @@ export interface otherUser {
 	isFriend: boolean;
 }
 
-const OpenProfileAvatar = ({ isMe, otherUserId, friendList }: OpenProfileAvatarProps) => {
+const OpenProfileAvatar = ({ otherUserId }: OpenProfileAvatarProps) => {
 	const router = useRouter();
+	const { me } = useContext(AuthContext);
+	const isMe = me?.id ? me.id === otherUserId : false;
+	const friendList = getFriend();
 
 	const [otherUserData, setOtherUserData] = useState<otherUser>({
 		img: '',
@@ -57,7 +59,7 @@ const OpenProfileAvatar = ({ isMe, otherUserId, friendList }: OpenProfileAvatarP
 	const [click, setClick] = useState(false);
 
 	const handleAvatarOpen = () => {
-		if (isMe === true) {
+		if (isMe) {
 			router.push('/profile/testDetailProfile');
 		} else {
 			setClick(true);
@@ -71,10 +73,7 @@ const OpenProfileAvatar = ({ isMe, otherUserId, friendList }: OpenProfileAvatarP
 
 	return (
 		<>
-			<CustomSnackbar open={errorMessage !== '' ? true : false} onClose={handleSnackbarClose} success={false}>
-				{errorMessage}
-			</CustomSnackbar>
-			<Avatar alt="User Avatar" onClick={handleAvatarOpen} />
+			<Avatar alt="User Avatar" onClick={handleAvatarOpen} sx={{ cursor: 'pointer' }} />
 			{click && (
 				<ProfileModar setClick={setClick} childMenu={<ProfileMenus/>}>
 					<ProfilePageBody otherUserId={otherUserId} {...otherUserData} />
