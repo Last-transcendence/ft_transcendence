@@ -1,14 +1,22 @@
 import { createContext, Dispatch, ReactNode, SetStateAction, useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 
+const connect = () => {
+	alert('Connected');
+};
+
+const disconnect = () => {
+	alert('Disconnected');
+};
+
 const initSocket = (namespace: string) => {
 	const socket = io(`${process.env.NEXT_PUBLIC_API_URL}/socket/${namespace}`);
 
 	socket.on('connect', () => {
-		alert('Connected');
+		connect();
 	});
 	socket.on('disconnect', () => {
-		alert('Disconnected');
+		disconnect();
 	});
 	return socket;
 };
@@ -40,31 +48,14 @@ export const SocketProvider = (props: { children: ReactNode }) => {
 	});
 
 	useEffect(() => {
-		const connect = () => {
-			alert('Connected');
-		};
-
-		const disconnect = () => {
-			alert('Disconnected');
-		};
-
 		if (!sockets.chatSocket) {
 			sockets.chatSocket = initSocket('chat');
-			return () => {
-				sockets.chatSocket?.disconnect();
-			};
 		}
 		if (!sockets.channelSocket) {
 			sockets.channelSocket = initSocket('channel');
-			return () => {
-				sockets.channelSocket?.disconnect();
-			};
 		}
 		if (!sockets.gameSocket) {
 			sockets.gameSocket = initSocket('game');
-			return () => {
-				sockets.gameSocket?.disconnect();
-			};
 		}
 	}, [sockets]);
 
