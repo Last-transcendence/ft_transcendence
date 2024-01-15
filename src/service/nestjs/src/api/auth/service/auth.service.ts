@@ -1,12 +1,13 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import UserService from 'api/user/user.service';
 import * as Dto from '../dto';
+import { UserModel } from 'common/model';
 
 @Injectable()
 export class AuthService {
 	constructor(private userSerivice: UserService) {}
 
-	async login(intraId: string) {
+	async login(intraId: string): Promise<UserModel> {
 		try {
 			const user = await this.userSerivice.findByIntraId(intraId);
 			if (!user) {
