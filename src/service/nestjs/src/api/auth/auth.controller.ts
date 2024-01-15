@@ -73,7 +73,11 @@ export class AuthController {
 			res.cookie('accessToken', jwt, cookieOption);
 			res.redirect(`${this.configService.getOrThrow('NEXTJS_URL')}/auth/login/callback`);
 		} catch (error) {
-			res.redirect(`${this.configService.getOrThrow('NEXTJS_URL')}/auth/register`);
+			res.redirect(
+				`${this.configService.getOrThrow('NEXTJS_URL')}/auth/register?nickname=${
+					req.user.nickname
+				}`,
+			);
 		}
 	}
 
