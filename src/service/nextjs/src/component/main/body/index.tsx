@@ -5,7 +5,7 @@ import style from '../../../style/main/body/index.module.css';
 import ChattingRoom from './chatting-room';
 import ChattingModeToggle from './chatting-mode';
 import { Box, Skeleton } from '@mui/material';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import CustomSnackbar from '@/component/profile/modifyProfile/customSnackbar';
 import Chatroom from '@/type/chatroom.type';
 import { Channel, ChannelVisibility } from '@/type/channel.type';
@@ -138,7 +138,7 @@ const MainPageBody = () => {
 	const getView = (
 		isLoading: boolean,
 		datas: Channel[] | Chatroom[] | undefined,
-		error: AxiosError | null,
+		error: AxiosError | null | undefined,
 	) => {
 		if (isLoading) return <Skeleton />;
 		if (error) return <div>데이터를 불러오지 못했습니다.</div>;

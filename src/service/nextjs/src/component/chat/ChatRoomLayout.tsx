@@ -57,10 +57,10 @@ const ChatRoomLayout = ({ type, children, myRole, chatRoomData }: ChatRoomLayout
 				{chatLiveData?.map((data: any, index: number) =>
 					data.type === 'chat' ? (
 						<ChatMsg
-							userId={''}
-							nickname={'닉네임'}
+							userId={data?.id}
+							nickname={data?.nickname}
 							key={index}
-							myRole={type === 'chat' ? ParticipantRole.ADMIN : undefined}
+							myRole={type === 'chat' ? myRole : undefined}
 							channelId={params?.id}
 						/>
 					) : data.type === 'help' ? (

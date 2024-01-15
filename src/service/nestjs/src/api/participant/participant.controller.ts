@@ -6,8 +6,10 @@ import {
 	HttpException,
 	Inject,
 	Param,
+	ParseUUIDPipe,
 	Patch,
 	Post,
+	Query,
 	Req,
 	UnauthorizedException,
 	UseGuards,
@@ -45,14 +47,14 @@ class ParticipantController {
 	@ApiNotFoundResponse({ description: 'Failed to get channel participant list' })
 	async getChannelParticipantList(
 		@Req() req,
-		@Body() getParticipantListDto: Dto.Request.GetList,
+		@Query('channelId', ParseUUIDPipe) channelId: string,
 	): Promise<Dto.Response.Participant[]> {
 		try {
 			if (!(await this.participantService.isParticipated(req.user.id))) {
 				throw new BadRequestException('User is not participated');
 			}
 
-			return await this.participantService.getList(getParticipantListDto.channelId);
+			return await this.participantService.getList(channelId);
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
 		}
