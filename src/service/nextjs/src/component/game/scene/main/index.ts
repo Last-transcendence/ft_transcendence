@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { Socket } from 'socket.io-client';
 
 class MainScene extends Phaser.Scene {
 	private ball!: Phaser.Physics.Arcade.Image;
@@ -13,9 +14,35 @@ class MainScene extends Phaser.Scene {
 
 	private isPlaying: boolean = false;
 
-	constructor() {
+	private socket!: Socket;
+
+	private room: string = '';
+
+	constructor(socket: Socket) {
 		super({ key: 'MainScene', active: true });
 		this.events = new Phaser.Events.EventEmitter();
+		this.socket = socket;
+		this.socket.on('queue', response => {
+			this.room = response.room;
+		});
+		this.socket.on(`${this.room}/start`, () => {
+			const normal = 0.5;
+			const hard = 0.75;
+
+			this.isPlaying = true;
+
+			this.ball.setVelocity(
+				Phaser.Math.Between(-this.game.canvas.width * hard, this.game.canvas.width * hard),
+				this.game.canvas.height * hard,
+			);
+		});
+		this.socket.on(`${this.room}/score`, response => {
+			this.enemyScore.setText(parseInt(response.score, 10).toString());
+			this.reset();
+		});
+		this.socket.on(`${this.room}/move`, response => {
+			this.enemyPaddle.x = response.x;
+		});
 	}
 
 	reset() {
@@ -27,21 +54,20 @@ class MainScene extends Phaser.Scene {
 		this.myPaddle.setVelocity(0, 0);
 		this.enemyPaddle.setVelocity(0, 0);
 
+		// Add text "press space to ready"
+
 		this.isPlaying = false;
 	}
 
 	score() {
-		if (10 < this.ball.y && this.ball.y < 630) {
+		if (10 < this.ball.y) {
 			return;
 		}
 
-		if (this.ball.y <= 10) {
-			this.myScore.setText((parseInt(this.myScore.text, 10) + 1).toString());
-			this.events.emit('score', 'my');
-		} else if (630 <= this.ball.y) {
-			this.enemyScore.setText((parseInt(this.enemyScore.text, 10) + 1).toString());
-			this.events.emit('score', 'enemy');
-		}
+		this.myScore.setText((parseInt(this.myScore.text, 10) + 1).toString());
+		this.socket.emit(`${this.room}/score`, {
+			score: this.myScore.text,
+		});
 
 		this.reset();
 	}
@@ -104,18 +130,10 @@ class MainScene extends Phaser.Scene {
 
 	update(time: number, delta: number) {
 		if (!this.isPlaying) {
-			if (!this.keys.space?.isDown) {
+			if (this.room === '' || !this.keys.space?.isDown) {
 				return;
 			}
-			const normal = 0.5;
-			const hard = 0.75;
-
-			this.isPlaying = true;
-
-			this.ball.setVelocity(
-				Phaser.Math.Between(-this.game.canvas.width * hard, this.game.canvas.width * hard),
-				this.game.canvas.height * hard,
-			);
+			this.socket.emit(`${this.room}/ready`);
 		}
 
 		if (!this.keys || !this.myPaddle || !this.enemyPaddle) {
@@ -135,11 +153,10 @@ class MainScene extends Phaser.Scene {
 			this.myPaddle.width / 2,
 			this.game.canvas.width - this.myPaddle.width / 2,
 		);
-		this.enemyPaddle.x = Phaser.Math.Clamp(
-			this.enemyPaddle.x,
-			this.enemyPaddle.width / 2,
-			this.game.canvas.width - this.enemyPaddle.width / 2,
-		);
+
+		this.socket.emit(`${this.room}/move`, {
+			x: this.myPaddle.x,
+		});
 
 		this.score();
 	}
