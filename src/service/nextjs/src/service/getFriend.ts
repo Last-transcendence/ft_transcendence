@@ -83,8 +83,7 @@ const DummyFriend: User[] = [
 ];
 
 async function getFriend(): Promise<User[]> {
-	return await getFetcher<User[]>('/api/friend').then(response => {
-		return DummyFriend;
+	return await getFetcher<User[]>('/friend').then(response => {
 		return response;
 	});
 }

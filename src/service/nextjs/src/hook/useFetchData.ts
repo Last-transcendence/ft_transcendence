@@ -4,29 +4,38 @@ import { getFetcher } from '@/service/api';
 
 const useFetchData = <T>(
 	url: string | null,
-): { isLoading: boolean; data: T | undefined; error: AxiosError | undefined } => {
+): {
+	isLoading: boolean;
+	data: T | undefined;
+	error: AxiosError | undefined;
+	refetch: () => void;
+} => {
 	const [data, setData] = useState<T | undefined>(undefined);
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState<AxiosError | undefined>(undefined);
 
-	useEffect(() => {
+	const fetchData = async () => {
 		if (!url) return;
+		try {
+			setIsLoading(true);
+			const res = await getFetcher<T>(url);
+			setData(res);
+		} catch (err) {
+			setError(err as AxiosError);
+		} finally {
+			setIsLoading(false);
+		}
+	};
 
-		const fetchData = async () => {
-			try {
-				setIsLoading(true);
-				const res = await getFetcher<T>(url);
-				setData(res);
-			} catch (err) {
-				setError(err as AxiosError);
-			} finally {
-				setIsLoading(false);
-			}
-		};
+	useEffect(() => {
 		fetchData();
 	}, [url]);
 
-	return { data, isLoading, error };
+	const refetch = () => {
+		fetchData();
+	};
+
+	return { data, isLoading, error, refetch };
 };
 
 export default useFetchData;
