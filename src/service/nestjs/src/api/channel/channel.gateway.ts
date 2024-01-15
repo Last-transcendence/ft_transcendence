@@ -71,6 +71,8 @@ class ChannelGateway {
 				throw new BadRequestException('User is banned');
 			}
 
+			socket.join(joinDto.channelId);
+
 			return { join: true };
 		} catch (error) {
 			console.error("An error occurred channel.gateway 'join':", error);
