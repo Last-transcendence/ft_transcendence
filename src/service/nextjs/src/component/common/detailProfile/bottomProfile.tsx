@@ -5,7 +5,7 @@ import { imgStyle } from '../../profile/common/myImage';
 import { useState } from 'react';
 import { postFetcher, getFetcher, deleteFetcher } from '@/service/api';
 import Chatroom from '@/type/chatroom.type';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import CustomSnackbar from '../customSnackbar';
 
 const sxStyle: avatarStyle = {
