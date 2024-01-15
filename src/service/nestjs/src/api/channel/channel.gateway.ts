@@ -29,7 +29,7 @@ class ChannelGateway {
 
 	@SubscribeMessage('create')
 	@UseGuards(Auth.Guard.UserJwtWs)
-	async handleCreate(
+	async handleMessage(
 		@MessageBody() createChannelDto: Dto.Request.Create,
 		@ConnectedSocket() socket: Socket,
 	) {
