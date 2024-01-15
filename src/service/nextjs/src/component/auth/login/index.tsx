@@ -1,38 +1,50 @@
-// import { useRouter } from "next/router";
 import { Box, Container, Typography } from '@mui/material';
 import CustomButton from './customButton';
 import styles from '@/style/auth/login/index.module.css';
-import { axiosInstance } from '@/service/api';
-
-const handleLogin = () => {
-	axiosInstance.get('/auth/ft').catch(err => {
-		console.log(err);
-	});
-};
+import { useState } from 'react';
+import CustomSnackbar from '@/component/common/customSnackbar';
 
 const LoginBody = () => {
-	// 아직 oauth 시 어떻게 할지 안정했음.
-	// const router = useRouter();
+	const [loading, setLoading] = useState<boolean>(false);
+	const [errorMessage, setErrorMessage] = useState<string>('');
 
-	// const handleLogin = () => {
-	//   const clientID = process.env.NEXT_PUBLIC_42INTRA_CLIENT_ID;
-	//   const redirectURI = process.env.NEXT_PUBLIC_42INTRA_REDIRECT_URL;
-	//   const scope = "";
-	//   const state = "";
-	//   const responseType = "code";
+	const handleLogin = async () => {
+		// try {
+		// setLoading(true);
+		window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/ft`;
+		// const response = await getFetcher('auth/ft');
+		// console.log(response);
+		// 		if (response) {
+		// 			return router.push('/');
+		// } else {
+		// 	router.push('/auth/creatUser');
+		// 	// }
+		// } catch (error: any) {
+		// 	console.log(error);
+		// 	const message: string = error.message;
+		// 	setErrorMessage(message);
+		// }
+	};
 
-	//   window.location.href = `https://api.intra.42.fr/oauth/authorize?client_id=${clientID}&redirect_uri=${redirectURI}&scope=${scope}&state=${state}&response_type=${responseType}`;
-	// };
+	const handleSnackbarClose = () => {
+		setErrorMessage('');
+		setLoading(false);
+	};
 
 	return (
 		<Container maxWidth="xs">
+			<CustomSnackbar
+				open={errorMessage.length !== 0 ? true : false}
+				onClose={handleSnackbarClose}
+				success={false}
+			>
+				로그인 error : {errorMessage}
+			</CustomSnackbar>
 			<Box className={styles.boxContainer}>
 				<Typography className={styles.typographyStyle} variant="h4" component="h2">
 					ft_transcendence
 				</Typography>
-				{/* <CustomButton onClick={handleLogin} fullWidth size="large"> */}
-				<a href={`${process.env.NEXT_PUBLIC_API_URL}/auth/ft`}>42로 로그인</a>
-				<CustomButton fullWidth size="large" onClick={handleLogin}>
+				<CustomButton onClick={handleLogin} fullWidth size="large" disabled={loading}>
 					42로 로그인
 				</CustomButton>
 			</Box>

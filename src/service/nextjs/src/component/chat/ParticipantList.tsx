@@ -10,7 +10,7 @@ import Chatroom from '@/type/chatroom.type';
 
 interface PrivateParticipantListProps {
 	isLoading: boolean;
-	data: Chatroom[] | null;
+	data: Chatroom[] | undefined;
 }
 
 export const PrivateParticipantList = ({ isLoading, data }: PrivateParticipantListProps) => {
@@ -26,16 +26,16 @@ export const PrivateParticipantList = ({ isLoading, data }: PrivateParticipantLi
 						) : (
 							<div>
 								<UserBriefInformation
-									profileImageSrc={null}
 									nickname={null}
 									condition={undefined}
 									className={style['user-brief-information']}
+									userId={''}
 								/>
 								<UserBriefInformation
-									profileImageSrc={null}
 									nickname={null}
 									condition={undefined}
 									className={style['user-brief-information']}
+									userId={''}
 								/>
 							</div>
 						)}
@@ -107,7 +107,6 @@ const ParticipantList = ({
 							datas?.map((data, index) => (
 								<UserBriefInformation
 									key={index}
-									profileImageSrc={data?.profileImageURI}
 									nickname={
 										myRole !== ParticipantRole.USER ? (
 											<AdminNickMenu
@@ -122,6 +121,7 @@ const ParticipantList = ({
 									}
 									condition={<ChatStatus status={data?.role} />}
 									className={style['user-brief-information']}
+									userId={data?.id}
 								/>
 							))
 						)}

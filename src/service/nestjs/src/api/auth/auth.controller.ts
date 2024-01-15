@@ -7,7 +7,6 @@ import {
 	Req,
 	Request,
 	Response,
-	UnauthorizedException,
 	UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './service/auth.service';
@@ -63,19 +62,25 @@ export class AuthController {
 	@ApiResponse({ status: 302, description: 'Redirect to login callback page' })
 	@ApiUnauthorizedResponse({ description: 'Unauthorized' })
 	async login(@Request() req, @Response({ passthrough: true }) res) {
-		delete req.user.iat;
-		delete req.user.exp;
+		try {
+			const user = await this.authService.login(req.user.intraId);
+			const jwt = this.cookieService.createJwt({
+				id: user.id,
+				intraId: user.intraId,
+				nickname: user.nickname,
+				profileImageURI: user.profileImageURI,
+			});
+			const cookieOption = this.cookieService.getCookieOption();
 
-		const user = await this.authService.login(req.user.intraId);
-		if (user.use2fa) {
-			throw new UnauthorizedException('2FA 인증이 필요합니다.');
+			res.cookie('accessToken', jwt, cookieOption);
+			res.redirect(`${this.configService.getOrThrow('NEXTJS_URL')}/auth/login/callback`);
+		} catch (error) {
+			res.redirect(
+				`${this.configService.getOrThrow('NEXTJS_URL')}/auth/register?nickname=${
+					req.user.nickname
+				}`,
+			);
 		}
-
-		const jwt = this.cookieService.createJwt(req.user);
-		const cookieOption = this.cookieService.getCookieOption();
-
-		res.cookie('accessToken', jwt, cookieOption);
-		res.redirect(`${this.configService.getOrThrow('NEXTJS_URL')}/auth/login/callback`);
 	}
 
 	@Post('register')
@@ -83,7 +88,11 @@ export class AuthController {
 	@ApiOperation({ summary: 'register' })
 	@ApiOkResponse({ description: 'Register successfully', type: User })
 	async register(@Body() registerRequestDto: Dto.Request.Register, @Req() req): Promise<User> {
-		return this.authService.register(req.user.intraId, registerRequestDto);
+		try {
+			return this.authService.register(req.user.intraId, registerRequestDto);
+		} catch (error) {
+			throw new HttpException(error.message, error.status);
+		}
 	}
 
 	@Get('2fa')
