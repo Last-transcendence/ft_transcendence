@@ -18,13 +18,11 @@ class MainScene extends Phaser.Scene {
 
 	private room: string = '';
 
-	constructor(socket: Socket) {
+	constructor(socket: Socket, room: string) {
 		super({ key: 'MainScene', active: true });
 		this.events = new Phaser.Events.EventEmitter();
 		this.socket = socket;
-		this.socket.on('queue', response => {
-			this.room = response.room;
-		});
+		this.room = room;
 		this.socket.on(`${this.room}/start`, () => {
 			const normal = 0.5;
 			const hard = 0.75;
