@@ -9,7 +9,7 @@ const disconnect = () => {
 	alert('Disconnected');
 };
 
-const initSocket = (namespace: string) => {
+const initSocket = (namespace: string): Socket => {
 	const socket = io(`${process.env.NEXT_PUBLIC_API_URL}/socket/${namespace}`);
 
 	socket.on('connect', () => {

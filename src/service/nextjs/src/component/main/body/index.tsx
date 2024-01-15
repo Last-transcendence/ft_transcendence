@@ -4,6 +4,7 @@ import { useCallback, useState } from 'react';
 import style from '../../../style/main/body/index.module.css';
 import ChattingRoom from './chatting-room';
 import ChattingModeToggle from './chatting-mode';
+
 import { Box, Button, Skeleton, Stack, TextField, Typography } from '@mui/material';
 import { useRouter } from 'next/router';
 import CustomSnackbar from '@/component/profile/modifyProfile/customSnackbar';
