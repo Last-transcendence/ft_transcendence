@@ -14,11 +14,11 @@ import {
 	forwardRef,
 } from '@nestjs/common';
 import { ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import * as Dto from './dto';
-import * as Auth from '../../common/auth';
-import { ChannelModel } from 'common/model';
-import ChannelService from './channel.service';
 import ParticipantService from 'api/participant/participant.service';
+import { ChannelModel } from 'common/model';
+import * as Auth from '../../common/auth';
+import ChannelService from './channel.service';
+import * as Dto from './dto';
 
 @Controller('channel')
 @ApiTags('channel')

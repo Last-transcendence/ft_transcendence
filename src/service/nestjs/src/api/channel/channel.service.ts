@@ -40,9 +40,10 @@ class ChannelService {
 
 	async createChannel(createRequestDto: Dto.Request.Create): Promise<Dto.Response.Channel> {
 		try {
-			return await this.prismaService.channel.create({
+			const newChannel = await this.prismaService.channel.create({
 				data: { ...createRequestDto },
 			});
+			return newChannel;
 		} catch (error) {
 			throw new Error(error.message);
 		}
