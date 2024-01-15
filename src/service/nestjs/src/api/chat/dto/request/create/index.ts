@@ -12,7 +12,7 @@ class Create {
 	@IsString()
 	@IsNotEmpty()
 	@Trim()
-	@ApiProperty({ description: 'Message' })
+	@ApiProperty({ description: 'MessageType' })
 	content: string;
 }
 

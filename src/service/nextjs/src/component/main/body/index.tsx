@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import style from '../../../style/main/body/index.module.css';
 import ChattingRoom from './chatting-room';
 import ChattingModeToggle from './chatting-mode';
@@ -11,6 +11,8 @@ import Chatroom from '@/type/chatroom.type';
 import { Channel, ChannelVisibility } from '@/type/channel.type';
 import useFetchData from '@/hook/useFetchData';
 import { AxiosError } from 'axios';
+import SocketContext from '@/context/socket.context';
+import useListeningChannelEvent from '@/hook/useListeningChannelEvent';
 
 export type ChattingMode = 'normal' | 'private';
 
@@ -97,7 +99,8 @@ const MainPageBody = () => {
 	const router = useRouter();
 	const [showSnackbar, setShowSnackbar] = useState(false);
 	const [message, setMessage] = useState<string>('');
-	// const { me } = useContext(AuthContext);
+	const { sockets } = useContext(SocketContext);
+	const { channelSocket } = sockets;
 
 	//@todo api test
 	/** channel api*/
@@ -105,34 +108,27 @@ const MainPageBody = () => {
 		data: chatDatas,
 		isLoading: isChatLoading,
 		error: chatError,
-		// } = useFetchData<Channel[]>('/channel');
-	} = useFetchData<Channel[]>(null);
+	} = useFetchData<Channel[]>('/channel');
 
 	/** chatroom api **/
 	const {
 		data: dmDatas,
 		isLoading: isDmLoading,
 		error: dmError,
-		// } = useFetchData<Chatroom[]>('/chatroom');
-	} = useFetchData<Chatroom[]>(null);
+	} = useFetchData<Chatroom[]>('/chatroom');
 
 	const navigateChannel = useCallback(
-		async (channelId: string) => {
-			try {
-				// const banList: Ban[] = await getFetcher(`/channel/${channelId}/ban`);
-				// const isBan = banList.some(ban => ban.user.id === me?.id);
-				// if (isBan) {
-				// 	setMessage('해당 채널은 차단되었습니다.');
-				// 	setShowSnackbar(true);
-				// 	return;
-				// }
-				await router.push(`/chat/${channelId}/common`);
-			} catch (e) {
-				setMessage('채널 입장에 실패했습니다.');
-				setShowSnackbar(true);
-			}
+		(channelId: string) => {
+			channelSocket?.emit('join', { channelId }, (res: any) => {
+				console.log(res);
+				if (res.enter) router.push(`/chat/${channelId}/common`);
+				else {
+					setMessage('채널 입장에 실패했습니다.');
+					setShowSnackbar(true);
+				}
+			});
 		},
-		[router],
+		[channelSocket],
 	);
 
 	const getView = (

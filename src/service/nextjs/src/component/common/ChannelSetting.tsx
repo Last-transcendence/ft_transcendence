@@ -6,9 +6,12 @@ import CreateChatTitle from '@/component/chat/create/title';
 import CreateChatPassword from '@/component/chat/create/password';
 import { BottomButton } from '@/component/common/ButtomButton';
 import { Channel, ChannelVisibility } from '@/type/channel.type';
-import { Dispatch, SetStateAction, useState } from 'react';
+import { Dispatch, SetStateAction, useCallback, useContext, useEffect, useState } from 'react';
 import CustomSnackbar from '@/component/profile/modifyProfile/customSnackbar';
 import { patchFetcher, postFetcher } from '@/service/api';
+import SocketContext from '@/context/socket.context';
+import { useRouter } from 'next/navigation';
+import useListeningChannelEvent from '@/hook/useListeningChannelEvent';
 
 interface ChannelSettingProps {
 	isCreate: boolean;
@@ -17,6 +20,8 @@ interface ChannelSettingProps {
 }
 
 const ChannelSetting = ({ isCreate, setOpen, channelData }: ChannelSettingProps) => {
+	const { sockets } = useContext(SocketContext);
+	const { channelSocket } = sockets;
 	const label = isCreate ? '채널 생성' : '채널 수정';
 	const [visibility, setVisibility] = useState<ChannelVisibility>(
 		channelData?.visibility ?? ChannelVisibility.PUBLIC,
@@ -28,33 +33,50 @@ const ChannelSetting = ({ isCreate, setOpen, channelData }: ChannelSettingProps)
 		title: '',
 		success: true,
 	});
+	const router = useRouter();
 
-	const handleSubmit = async () => {
+	//채널 create 시 채널 정보 리슨.
+	useListeningChannelEvent('create', res => {
+		console.log('res', res);
+		res.channelId && router.push(`/chat/${res.channelId}`);
+	});
+
+	// 채널 생성
+	const handleSubmit = useCallback(() => {
 		const req = {
 			visibility,
 			title,
 			password,
 		};
 
-		try {
-			isCreate
-				? await postFetcher('/channel', req)
-				: await patchFetcher(`/channel/${channelData?.id}`, req);
-
-			setMessage({
-				title: label + ' 성공',
-				success: true,
+		//채널은 생성되면 아이디 받고 이동하기
+		if (isCreate) {
+			channelSocket?.emit('create', req, (res: any) => {
+				console.log(res);
 			});
-		} catch (e) {
-			setMessage({
-				title: label + ' 실패',
-				success: false,
+			//navigate
+		} else {
+			channelSocket?.emit('edit', { ...req, channelId: channelData?.id }, (res: any) => {
+				console.log(res);
 			});
-			console.error(e);
-		} finally {
-			setShowSnackbar(true);
 		}
-	};
+
+		//@todo 소켓 에러처리 공부
+		// setMessage({
+		// 	title: label + ' 성공',
+		// 	success: true,
+		// });
+		// try {
+		// } catch (e) {
+		// 	setMessage({
+		// 		title: label + ' 실패',
+		// 		success: false,
+		// 	});
+		// 	console.error(e);
+		// } finally {
+		// 	setShowSnackbar(true);
+		// }
+	}, [channelData?.id, channelSocket, isCreate, password, title, visibility]);
 
 	return (
 		<div>

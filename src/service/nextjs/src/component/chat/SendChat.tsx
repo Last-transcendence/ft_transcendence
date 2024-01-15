@@ -25,9 +25,9 @@ const SendChat = ({ sendAction, commandAction }: SendChatProps) => {
 				case '/w':
 					commandAction('DM', nickname, message);
 					break;
-				case '/i':
-					commandAction('INVITE', nickname);
-					break;
+				// case '/i':
+				// 	commandAction('INVITE', nickname);
+				// 	break;
 				case '/g':
 					commandAction('GAME', nickname);
 					break;

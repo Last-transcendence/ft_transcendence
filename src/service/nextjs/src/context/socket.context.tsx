@@ -52,7 +52,7 @@ export const SocketProvider = (props: { children: ReactNode }) => {
 			sockets.chatSocket = initSocket('chat');
 		}
 		if (!sockets.channelSocket) {
-			sockets.channelSocket = initSocket('channel');
+			sockets.channelSocket = initSocket('/socket/channel');
 		}
 		if (!sockets.gameSocket) {
 			sockets.gameSocket = initSocket('game');

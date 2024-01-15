@@ -9,11 +9,20 @@ interface ChatMsgProps {
 	channelId?: string;
 	nickname?: string;
 	myRole?: ParticipantRole;
+	ownerId: string | undefined;
+	message: string;
 }
 
 //@todo props drilling 해결
 //@todo 닉네임 정책 있는지 확인 (닉네임 글자수)
-export const ChatMsg = ({ userId, channelId, nickname, myRole }: ChatMsgProps) => {
+export const ChatMsg = ({
+	userId,
+	channelId,
+	nickname,
+	myRole,
+	ownerId,
+	message,
+}: ChatMsgProps) => {
 	return (
 		<Stack flexDirection={'row'} alignItems={'center'} gap={1}>
 			<Stack flexDirection={'row'} gap={1} alignItems={'center'} width={'100%'}>
@@ -24,16 +33,13 @@ export const ChatMsg = ({ userId, channelId, nickname, myRole }: ChatMsgProps) =
 						nickname={nickname || ''}
 						userId={userId}
 						channelId={channelId || ''}
-						isOwner={myRole === ParticipantRole.OWNER}
+						ownerId={ownerId}
 					/>
 				) : (
-					<NickMenu nickname={nickname || ''} userId={userId} />
+					<NickMenu nickname={nickname || ''} />
 				)}
 			</Stack>
-			<Typography>
-				프로필 이미지는 안 보이는 게 낫나? 프로필 이미지는 안 보이는 게 낫나? 프로필 이미지는 안
-				보이는 게 낫나? 프로필 이미지는 안 보이는 게 낫나?
-			</Typography>
+			<Typography>{message}</Typography>
 		</Stack>
 	);
 };
@@ -53,10 +59,6 @@ export const HelpMsg = () => {
 			<Typography fontSize={'small'}>
 				<span style={helpTextStyle}>/w &lt;닉네임&gt; &lt;메세지&gt;: </span>
 				&lt;닉네임&gt;에게 &lt;메세지&gt;를 보냅니다
-			</Typography>
-			<Typography fontSize={'small'}>
-				<span style={helpTextStyle}>/i &lt;닉네임&gt;:</span> &lt;닉네임&gt;을 해당 채팅방에
-				초대합니다
 			</Typography>
 			<Typography fontSize={'small'}>
 				<span style={helpTextStyle}>/g &lt;닉네임&gt;:</span> &lt;닉네임&gt;에게 1:1 게임 매칭을
