@@ -8,7 +8,6 @@ import {
 	Param,
 	ParseUUIDPipe,
 	Patch,
-	Post,
 	Req,
 	UseGuards,
 	forwardRef,
@@ -60,29 +59,6 @@ class ChannelController {
 			}
 
 			return await this.channelService.getChannel(id);
-		} catch (error) {
-			throw new HttpException(error.message, error.status);
-		}
-	}
-
-	@Post()
-	@UseGuards(Auth.Guard.UserJwt)
-	@ApiOperation({ summary: 'Create channel' })
-	@ApiOkResponse({
-		description: 'Channel created successfully',
-		type: ChannelModel,
-	})
-	@ApiNotFoundResponse({ description: 'Failed to create channel' })
-	async createChannel(
-		@Req() req,
-		@Body() channelRequestDto: Dto.Request.Create,
-	): Promise<Dto.Response.Channel> {
-		try {
-			const channel = await this.channelService.createChannel(channelRequestDto);
-			const user = await this.participantService.create(channel.id, req.user.id);
-
-			await this.participantService.update(user.id, { role: 'OWNER' });
-			return channel;
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
 		}
