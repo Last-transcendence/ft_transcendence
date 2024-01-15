@@ -109,8 +109,21 @@ export class AuthController {
 	@UseGuards(Auth.Guard.FtJwt)
 	@ApiOperation({ summary: '2차 인증 로그인' })
 	@ApiOkResponse({ description: '2차 인증 코드 인증 성공' })
-	async confirmCode(@Req() req, @Body() verificationCode: Dto.Request.TwoFaCode) {
-		const user = await this.authService.login(req.user.intraId);
-		return this.twoFactorService.confirmVerificationCode(user, verificationCode.twoFaCode);
+	async confirmCode(@Req() req, @Response({ passthrough: true }) res, @Body() verificationCode: Dto.Request.TwoFaCode) {
+		try {
+			const user = await this.authService.login(req.user.intraId);
+			this.twoFactorService.confirmVerificationCode(user, verificationCode.twoFaCode);
+			const cookieOption = this.cookieService.getCookieOption();
+			const jwt = this.cookieService.createJwt({
+				id: user.id,
+				intraId: user.intraId,
+				nickname: user.nickname,
+				profileImageURI: user.profileImageURI,
+			});
+			res.cookie('accessToken', jwt, cookieOption);
+			res.redirect(`${this.configService.getOrThrow('NEXTJS_URL')}/auth/login/callback`);
+		} catch (error) {
+			throw new HttpException(error.message, error.status);
+		}
 	}
 }
