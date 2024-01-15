@@ -3,11 +3,11 @@ import { diskStorage } from 'multer';
 import { extname, join } from 'path';
 import { existsSync, mkdirSync } from 'fs';
 
-export const multerOption = {
+export const multerOptions = {
     storage: diskStorage({
         destination: (req, file, callback) => {
-            // const uploadPath = join(__dirname, '..', `uploads`);
-            const uploadPath = `../uploads`;
+            const uploadPath = join(__dirname, '..', `public`);
+            // const uploadPath = 'public';
 
             if (!existsSync(uploadPath)) {
                 mkdirSync(uploadPath, { recursive: true });
@@ -21,4 +21,3 @@ export const multerOption = {
         },
     }),
 };
-
