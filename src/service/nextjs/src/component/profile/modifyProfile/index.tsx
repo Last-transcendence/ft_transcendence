@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import { Stack, Box } from '@mui/material';
 import ModifyID from './modifyID';
 import Modify2FA from './modify2FA';

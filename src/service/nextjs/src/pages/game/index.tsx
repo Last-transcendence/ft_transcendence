@@ -1,10 +1,16 @@
-// /game/{gameId} 에서 게임 진행할 것 같아서 /game route에 페이지를 만들어야할 지 모르겠네요,,,
-// Phaser 공부용으로 해당 경로 사용하겠습니다.
-
 import { GameInstance, IonPhaser } from '@ion-phaser/react';
-import { Dispatch, RefObject, SetStateAction, useEffect, useRef, useState } from 'react';
+import {
+	Dispatch,
+	RefObject,
+	SetStateAction,
+	useContext,
+	useEffect,
+	useRef,
+	useState,
+} from 'react';
 import Config from '@/component/game/config';
 import style from '@/style/game/index.module.css';
+import SocketContext from '@/context/socket.context';
 
 const destroy = (props: {
 	gameRef: RefObject<HTMLIonPhaserElement>;
@@ -25,19 +31,23 @@ const GamePage = () => {
 	const [game, setGame] = useState<GameInstance>();
 	const [initialized, setInitialized] = useState(true);
 	const [isClient, setIsClient] = useState(false);
+	const { sockets } = useContext(SocketContext);
+	const socket = sockets.gameSocket;
 
 	useEffect(() => {
-		setIsClient(true);
+		if (socket) {
+			setIsClient(true);
 
-		import('@/component/game/scene/main').then(({ default: MainScene }) => {
-			setGame({
-				...Config,
-				scene: new MainScene(),
+			import('@/component/game/scene').then(({ MainScene }) => {
+				setGame({
+					...Config,
+					scene: new MainScene(socket),
+				});
 			});
-		});
 
-		return () => destroy({ gameRef, setGame, setInitialized });
-	}, []);
+			return () => destroy({ gameRef, setGame, setInitialized });
+		}
+	}, [socket]);
 
 	return (
 		isClient && (
