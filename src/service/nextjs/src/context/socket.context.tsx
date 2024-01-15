@@ -1,48 +1,65 @@
-import { createContext, ReactNode, useEffect, useState } from 'react';
+import { createContext, Dispatch, ReactNode, SetStateAction, useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 
+const connect = () => {
+	alert('Connected');
+};
+
+const disconnect = () => {
+	alert('Disconnected');
+};
+
+const initSocket = (namespace: string): Socket => {
+	const socket = io(`${process.env.NEXT_PUBLIC_API_URL}/socket/${namespace}`);
+
+	socket.on('connect', () => {
+		connect();
+	});
+	socket.on('disconnect', () => {
+		disconnect();
+	});
+	return socket;
+};
+
+type Sockets = {
+	chatSocket: Socket | null;
+	channelSocket: Socket | null;
+	gameSocket: Socket | null;
+};
+
 const SocketContext = createContext<{
-	socket: Socket | null;
-	setSocket: React.Dispatch<React.SetStateAction<Socket | null>>;
+	sockets: Sockets;
+	setSocket: Dispatch<SetStateAction<Sockets>>;
 }>({
-	socket: null,
+	sockets: {
+		chatSocket: null,
+		channelSocket: null,
+		gameSocket: null,
+	},
 	setSocket: () => {},
 });
 
 export const SocketProvider = (props: { children: ReactNode }) => {
 	const { children } = props;
-	const [socket, setSocket] = useState<Socket | null>(null);
+	const [sockets, setSocket] = useState<Sockets>({
+		chatSocket: null,
+		channelSocket: null,
+		gameSocket: null,
+	});
 
 	useEffect(() => {
-		const connect = () => {
-			alert('Connected');
-		};
-
-		const disconnect = () => {
-			alert('Disconnected');
-		};
-
-		if (!socket) {
-			const newSocket = io('http://localhost:4000');
-			setSocket(newSocket);
-
-			newSocket.on('connect', connect);
-			newSocket.on('disconnect', disconnect);
-
-			return () => {
-				newSocket.off('connect', connect);
-				newSocket.off('disconnect', disconnect);
-			};
-		} else {
-			socket.on('connect', connect);
-			socket.on('disconnect', disconnect);
-
-			return () => {
-				socket.off('connect', connect);
-				socket.off('disconnect', disconnect);
-			};
+		if (!sockets.chatSocket) {
+			sockets.chatSocket = initSocket('chat');
 		}
-	}, [socket]);
+		if (!sockets.channelSocket) {
+			sockets.channelSocket = initSocket('channel');
+		}
+		if (!sockets.gameSocket) {
+			sockets.gameSocket = initSocket('game');
+		}
+	}, [sockets]);
 
-	return <SocketContext.Provider value={{ socket, setSocket }}>{children}</SocketContext.Provider>;
+	return <SocketContext.Provider value={{ sockets, setSocket }}>{children}</SocketContext.Provider>;
 };
+
+export default SocketContext;
