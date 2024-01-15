@@ -100,19 +100,23 @@ export class AuthController {
 	@ApiOperation({ summary: '2차 인증 메일' })
 	@ApiOkResponse({ description: '2차 인증 이메일 전송 성공' })
 	async send2faEmail(@Req() req) {
-		const user = await this.authService.login(req.user.intraId);
-		console.log(user, req.user)
-		return this.twoFactorService.send2faEmail(user);
+		try {
+			const code = await this.twoFactorService.createCode();
+			const user = await this.authService.login(req.user.intraId);
+			return await this.twoFactorService.send2faEmail(user, code);
+		} catch (error) {
+			throw new HttpException(error.message, error.status);
+		}
 	}
 
-	@Post('code')
+	@Post('2fa')
 	@UseGuards(Auth.Guard.FtJwt)
 	@ApiOperation({ summary: '2차 인증 로그인' })
 	@ApiOkResponse({ description: '2차 인증 코드 인증 성공' })
 	async confirmCode(@Req() req, @Response({ passthrough: true }) res, @Body() verificationCode: Dto.Request.TwoFaCode) {
 		try {
 			const user = await this.authService.login(req.user.intraId);
-			this.twoFactorService.confirmVerificationCode(user, verificationCode.twoFaCode);
+			await this.twoFactorService.confirmVerificationCode(user, verificationCode.twoFaCode);
 			const cookieOption = this.cookieService.getCookieOption();
 			const jwt = this.cookieService.createJwt({
 				id: user.id,

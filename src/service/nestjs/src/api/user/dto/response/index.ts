@@ -10,9 +10,6 @@ export class User {
 
 	@ApiProperty({ description: 'Profile image URI', nullable: true })
 	profileImageURI: string;
-	
-	@ApiProperty({ description: 'email', nullable: true })
-	email2fa: string;
 
 	@ApiProperty({
 		description: 'Status of user',

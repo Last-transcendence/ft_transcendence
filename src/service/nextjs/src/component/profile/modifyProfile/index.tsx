@@ -39,7 +39,7 @@ const ModifyMyProfile = ({ UserName, TwoFAtureFalse, TwoFactorEmail }: EditProfi
 			if (response.status === 200 || response.status === 201) {
 				setShowSuccessSnackbar(true);
 				setTimeout(() => {
-					router.reload();
+					// router.reload();
 				}, 1000);
 				router.push('/profile/testDetailProfile');
 			} else {
@@ -48,7 +48,7 @@ const ModifyMyProfile = ({ UserName, TwoFAtureFalse, TwoFactorEmail }: EditProfi
 		} catch (error) {
 			setShowFailSnackbar(true);
 			setTimeout(() => {
-				router.reload();
+				// router.reload();
 			}, 1000);
 			// 타임아웃 에러
 		}

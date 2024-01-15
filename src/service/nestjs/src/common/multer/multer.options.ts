@@ -7,7 +7,7 @@ export const multerOption = {
     storage: diskStorage({
         destination: (req, file, callback) => {
             // const uploadPath = join(__dirname, '..', `uploads`);
-            const uploadPath = `./uploads`;
+            const uploadPath = `../uploads`;
 
             if (!existsSync(uploadPath)) {
                 mkdirSync(uploadPath, { recursive: true });

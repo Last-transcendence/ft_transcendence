@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { Create } from 'api/user/dto/request';
-import MailService from 'api/mail/mail.service';
+import MailService from 'api/auth/service/mail.service';
 import { Cache } from 'cache-manager';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Inject } from '@nestjs/common';
@@ -9,26 +9,22 @@ import { Inject } from '@nestjs/common';
 export class TwoFactorService {
     constructor(private readonly mailService: MailService,
                 @Inject(CACHE_MANAGER) private cacheManager: Cache) {}
-    async send2faEmail(user: Create) {
+
+    async send2faEmail(user: Create, code: string) {
         if (!user.email2fa) {
             throw new BadRequestException('Email 정보가 없습니다.');
         }
-        const code = this.createCode();
         await this.cacheManager.set(user.email2fa, code);
-        const cachedCode = await this.cacheManager.get(user.email2fa);
-        console.log('send',cachedCode);
         await this.mailService.send(user.email2fa, user.nickname, code);
     }
 
-    private createCode() {
+    async createCode() {
         return Math.floor(10000 + Math.random() * 900000).toString();
     }
 
     async confirmVerificationCode( user: Create, verificationCode: string) {
         try {
-            console.log('user', user);
             const cachedCode = await this.cacheManager.get(user.email2fa);
-            console.log('con', cachedCode);
             if (!cachedCode) {
                 throw new NotFoundException('인증번호가 없습니다.');
             }

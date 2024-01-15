@@ -1,10 +1,10 @@
 import { Controller, Get, HttpException, Param, Post, Query, Req, UseGuards, UploadedFile, UseInterceptors, Patch, Body } from '@nestjs/common';
-import { ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiTags, ApiBody } from '@nestjs/swagger';
 import UserService from './user.service';
 import * as Dto from './dto';
 import { UserModel } from 'common/model';
 import * as Auth from '../../common/auth';
-import { ApiFile } from './apifile.decorator';
+import { ApiFile } from '../../common/multer/apifile.decorator';
 
 @Controller('user')
 @ApiTags('user')
@@ -16,7 +16,7 @@ class UserController {
 	@ApiOperation({ summary: 'Get my information' })
 	@ApiOkResponse({ description: 'Get my info successfully', type: Dto.Response.User })
 	@ApiNotFoundResponse({ description: 'User not found' })
-	async me(@Req() req): Promise<Dto.Response.User> {
+	async me(@Req() req): Promise<UserModel> {
 		return req.user;
 	}
 	
@@ -28,7 +28,7 @@ class UserController {
 	async meUpdate(
 		@Body() updateData: Dto.Request.Update,
 		@Req() req,
-	): Promise<Dto.Response.User> {
+	): Promise<UserModel> {
 		try {
 			return await this.userService.updateUserById(req.user.id, updateData);
 		}
@@ -37,10 +37,10 @@ class UserController {
 		}
 	}
 
-	@Post('upload')
 	@ApiOperation({ summary: 'Uploads a file' })
-	@ApiFile('file')
 	@ApiOkResponse({ description: 'Get my image successfully' })
+	@ApiFile('file')
+	@Post('upload')
 	async uploadProfileImage(@UploadedFile() file: Express.Multer.File) {
 		return `${file.originalname} File Upload ${file.filename}`;
 	}
