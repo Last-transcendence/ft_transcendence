@@ -7,7 +7,9 @@ import { JwtModule } from '@nestjs/jwt';
 import { CookieService } from './service/cookie.service';
 import * as Ft from './ft';
 import * as Jwt from './jwt';
-
+import MailService from 'api/mail/mail.service';
+import { TwoFactorService } from './service/twofactor.service';
+import { CacheModule } from '@nestjs/cache-manager';
 @Module({
 	imports: [
 		UserModule,
@@ -19,8 +21,13 @@ import * as Jwt from './jwt';
 				signOptions: { expiresIn: '1d' },
 			}),
 		}),
+		CacheModule.register({
+			ttl: 300000,
+			max: 2,
+			isGlobal: true,
+		}),
 	],
-	providers: [AuthService, CookieService, Ft.FtStrategy, Jwt.FtStrategy, Jwt.UserStrategy],
+	providers: [AuthService, CookieService, Ft.FtStrategy, Jwt.FtStrategy, Jwt.UserStrategy, MailService, TwoFactorService],
 	controllers: [AuthController],
 })
 class AuthModule {}

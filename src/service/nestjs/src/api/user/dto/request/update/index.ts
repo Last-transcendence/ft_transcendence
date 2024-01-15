@@ -1,5 +1,5 @@
 import { PartialType } from '@nestjs/swagger';
-import Create from '../create';
+import { Create } from '../../request';
 
 class Update extends PartialType(Create) {}
 

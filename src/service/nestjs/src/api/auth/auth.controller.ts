@@ -12,6 +12,7 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './service/auth.service';
 import { CookieService } from './service/cookie.service';
+import { TwoFactorService } from './service/twofactor.service';
 import {
 	ApiOkResponse,
 	ApiOperation,
@@ -31,6 +32,7 @@ export class AuthController {
 		private readonly configService: ConfigService,
 		private readonly authService: AuthService,
 		private readonly cookieService: CookieService,
+		private readonly twoFactorService: TwoFactorService,
 	) {}
 
 	@Get('ft')
@@ -82,5 +84,24 @@ export class AuthController {
 	@ApiOkResponse({ description: 'Register successfully', type: User })
 	async register(@Body() registerRequestDto: Dto.Request.Register, @Req() req): Promise<User> {
 		return this.authService.register(req.user.intraId, registerRequestDto);
+	}
+
+	@Get('2fa')
+	@UseGuards(Auth.Guard.FtJwt)
+	@ApiOperation({ summary: '2차 인증 메일' })
+	@ApiOkResponse({ description: '2차 인증 이메일 전송 성공' })
+	async send2faEmail(@Req() req) {
+		const user = await this.authService.login(req.user.intraId);
+		console.log(user, req.user)
+		return this.twoFactorService.send2faEmail(user);
+	}
+
+	@Post('code')
+	@UseGuards(Auth.Guard.FtJwt)
+	@ApiOperation({ summary: '2차 인증 로그인' })
+	@ApiOkResponse({ description: '2차 인증 코드 인증 성공' })
+	async confirmCode(@Req() req, @Body() verificationCode: Dto.Request.TwoFaCode) {
+		const user = await this.authService.login(req.user.intraId);
+		return this.twoFactorService.confirmVerificationCode(user, verificationCode.twoFaCode);
 	}
 }
