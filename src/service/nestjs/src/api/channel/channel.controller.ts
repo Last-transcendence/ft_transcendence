@@ -8,17 +8,16 @@ import {
 	Param,
 	ParseUUIDPipe,
 	Patch,
-	Post,
 	Req,
 	UseGuards,
 	forwardRef,
 } from '@nestjs/common';
 import { ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import * as Dto from './dto';
-import * as Auth from '../../common/auth';
-import { ChannelModel } from 'common/model';
-import ChannelService from './channel.service';
 import ParticipantService from 'api/participant/participant.service';
+import { ChannelModel } from 'common/model';
+import * as Auth from '../../common/auth';
+import ChannelService from './channel.service';
+import * as Dto from './dto';
 
 @Controller('channel')
 @ApiTags('channel')
@@ -60,29 +59,6 @@ class ChannelController {
 			}
 
 			return await this.channelService.getChannel(id);
-		} catch (error) {
-			throw new HttpException(error.message, error.status);
-		}
-	}
-
-	@Post()
-	@UseGuards(Auth.Guard.UserJwt)
-	@ApiOperation({ summary: 'Create channel' })
-	@ApiOkResponse({
-		description: 'Channel created successfully',
-		type: ChannelModel,
-	})
-	@ApiNotFoundResponse({ description: 'Failed to create channel' })
-	async createChannel(
-		@Req() req,
-		@Body() channelRequestDto: Dto.Request.Create,
-	): Promise<Dto.Response.Channel> {
-		try {
-			const channel = await this.channelService.createChannel(channelRequestDto);
-			const user = await this.participantService.create(channel.id, req.user.id);
-
-			await this.participantService.update(user.id, { role: 'OWNER' });
-			return channel;
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
 		}
