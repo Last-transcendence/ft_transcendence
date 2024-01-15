@@ -4,6 +4,7 @@ import FriendStatus from './status';
 // import { useEffect, useState } from 'react';
 // import { getFetcher } from '@/component/api/getFetcher';
 import User, { UserStatus } from '@/type/user.type';
+import Friend from '@/type/friend.type';
 // import Friend from '@/type/friend.type';
 // import { Skeleton } from '@mui/material';
 
@@ -30,7 +31,12 @@ const dummyUsers: User[] = [
 	},
 ];
 
-const FriendList = () => {
+interface FriendListProps {
+	data: Friend[] | undefined;
+	isLoading: boolean;
+}
+
+const FriendList = ({ data, isLoading }: FriendListProps) => {
 	//@todo api test
 	// const [data, setData] = useState<User[]>([]);
 	// const [isLoading, setLoading] = useState(false);
@@ -65,10 +71,10 @@ const FriendList = () => {
 				return (
 					<div key={user.id}>
 						<UserBriefInformation
-							profileImageSrc={user?.profileImageURI}
 							nickname={user?.nickname}
 							condition={<FriendStatus status={user?.status} />}
 							className={style['user-brief-information']}
+							userId={user.id}
 						/>
 					</div>
 				);

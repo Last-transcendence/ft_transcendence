@@ -4,9 +4,7 @@ import { Avatar } from '@mui/material';
 const BigAvatar = styled(Avatar)(({ theme }) => ({
 	width: 150,
 	height: 150,
-	margin: 0,
-	border: `2px solid ${theme.palette.background.paper}`,
-	marginTop: '10%',
+	border: `1px solid black`,
 }));
 
 export default BigAvatar;
