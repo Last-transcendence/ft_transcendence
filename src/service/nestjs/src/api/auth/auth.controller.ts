@@ -8,11 +8,13 @@ import {
 	Request,
 	Response,
 	UseGuards,
+	Delete,
 } from '@nestjs/common';
 import { AuthService } from './service/auth.service';
 import { CookieService } from './service/cookie.service';
 import { TwoFactorService } from './service/twofactor.service';
 import {
+	ApiBadRequestResponse,
 	ApiOkResponse,
 	ApiOperation,
 	ApiResponse,
@@ -126,6 +128,21 @@ export class AuthController {
 			});
 			res.cookie('accessToken', jwt, cookieOption);
 			res.redirect(`${this.configService.getOrThrow('NEXTJS_URL')}/auth/login/callback`);
+		} catch (error) {
+			throw new HttpException(error.message, error.status);
+		}
+	}
+
+	@Delete('logout')
+	@UseGuards(Auth.Guard.FtJwt)
+	@ApiOperation({ summary: 'logout' })
+	@ApiOkResponse({ description: 'Logout successfully' })
+	@ApiBadRequestResponse({ description: 'Bad request' })
+	async logout(@Req() req, @Response({ passthrough: true }) res) {
+		try {
+			const cookieOption = this.cookieService.getCookieOption();
+			res.clearcookie('accessToken', cookieOption);
+			return { message: 'Logout successfully' };
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
 		}
