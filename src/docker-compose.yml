@@ -92,7 +92,7 @@ volumes:
       o: bind
       device: ./service/nestjs/prisma
   nestjs_upload_volume:
-    name: nestjs_prisma_volume
+    name: nestjs_upload_volume
     driver: local
     driver_opts:
       type: none

@@ -6,8 +6,7 @@ import { existsSync, mkdirSync } from 'fs';
 export const multerOptions = {
     storage: diskStorage({
         destination: (req, file, callback) => {
-            const uploadPath = join(__dirname, '..', `public`);
-            // const uploadPath = 'public';
+            const uploadPath = join(process.cwd(), `upload`);
 
             if (!existsSync(uploadPath)) {
                 mkdirSync(uploadPath, { recursive: true });

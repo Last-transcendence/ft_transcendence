@@ -1,4 +1,4 @@
-import { Controller, Get, HttpException, Param, Post, Query, Req, UseGuards, UploadedFile, UseInterceptors, Patch, Body } from '@nestjs/common';
+import { Controller, Get, HttpException, Param, Post, Query, Req, UseGuards, UploadedFile, UseInterceptors, Patch, Body, Response } from '@nestjs/common';
 import { ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiTags, ApiConsumes } from '@nestjs/swagger';
 import UserService from './user.service';
 import * as Dto from './dto';
@@ -6,7 +6,8 @@ import { UserModel } from 'common/model';
 import * as Auth from '../../common/auth';
 import { ApiFile } from '../../common/multer/apifile.decorator';
 import { FileInterceptor } from '@nestjs/platform-express';
-
+import * as fs from 'fs';
+import { join } from 'path';
 @Controller('user')
 @ApiTags('user')
 class UserController {
@@ -19,6 +20,19 @@ class UserController {
 	@ApiNotFoundResponse({ description: 'User not found' })
 	async me(@Req() req): Promise<UserModel> {
 		return req.user;
+	}
+
+	@Get('image')
+	@UseGuards(Auth.Guard.UserJwt)
+	@ApiOperation({ summary: 'Get image' })
+	@ApiOkResponse({ description: 'Get image info successfully', type: Dto.Response.User })
+	@ApiNotFoundResponse({ description: 'image not found' })
+	async getImage(@Req() req, @Response() res) {
+		const filePath = join(process.cwd(), `upload/`) + req.user.profileImageURI;
+		if (!fs.existsSync(filePath)) {
+			throw new HttpException('File not found', 404);
+		}		
+		res.sendFile(filePath);
 	}
 	
 	@Patch('me')
