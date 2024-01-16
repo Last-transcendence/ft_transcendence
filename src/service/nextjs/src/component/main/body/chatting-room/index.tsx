@@ -3,7 +3,7 @@ import style from '../../../../style/main/body/chatting-room/index.module.css';
 
 interface ChattingRoomProps {
 	title: string;
-	visibility: 'public' | 'protected' | 'private';
+	visibility: 'PUBLIC' | 'PROTECTED' | 'PRIVATE';
 }
 
 const RoomInformation = ({ title, visibility }: ChattingRoomProps) => {
