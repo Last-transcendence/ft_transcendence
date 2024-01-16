@@ -8,11 +8,21 @@ import {
 } from '@nestjs/websockets';
 import ParticipantService from 'api/participant/participant.service';
 import { Server, Socket } from 'socket.io';
-import * as Auth from '../../common/auth';
 import ChannelService from './channel.service';
 import * as Dto from './dto';
+import * as Auth from '../../common/auth';
+import { ConfigService } from '@nestjs/config';
 
-@WebSocketGateway({ namespace: 'socket/channel' })
+const getCorsOrigin = () => {
+	const configService = new ConfigService();
+
+	return configService.getOrThrow('NEXTJS_URL');
+};
+
+@WebSocketGateway({
+	namespace: '/socket/channel',
+	cors: { origin: getCorsOrigin(), credentials: true },
+})
 class ChannelGateway {
 	constructor(
 		private readonly channelService: ChannelService,
@@ -24,11 +34,11 @@ class ChannelGateway {
 	server: Server;
 
 	handleConnection() {
-		console.log('Client connected to room namespace');
+		console.log('Client connected to channel namespace');
 	}
 
 	@SubscribeMessage('create')
-	@UseGuards(Auth.Guard.UserJwtWs)
+	@UseGuards(Auth.Guard.UserWsJwt)
 	async handleMessage(
 		@MessageBody() createChannelDto: Dto.Request.Create,
 		@ConnectedSocket() socket: Socket,

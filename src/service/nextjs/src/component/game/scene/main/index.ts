@@ -23,24 +23,6 @@ class MainScene extends Phaser.Scene {
 		this.events = new Phaser.Events.EventEmitter();
 		this.socket = socket;
 		this.room = room;
-		this.socket.on(`${this.room}/start`, () => {
-			const normal = 0.5;
-			const hard = 0.75;
-
-			this.isPlaying = true;
-
-			this.ball.setVelocity(
-				Phaser.Math.Between(-this.game.canvas.width * hard, this.game.canvas.width * hard),
-				this.game.canvas.height * hard,
-			);
-		});
-		this.socket.on(`${this.room}/score`, response => {
-			this.enemyScore.setText(parseInt(response.score, 10).toString());
-			this.reset();
-		});
-		this.socket.on(`${this.room}/move`, response => {
-			this.enemyPaddle.x = response.x;
-		});
 	}
 
 	reset() {
@@ -63,7 +45,8 @@ class MainScene extends Phaser.Scene {
 		}
 
 		this.myScore.setText((parseInt(this.myScore.text, 10) + 1).toString());
-		this.socket.emit(`${this.room}/score`, {
+		this.socket.emit(`score`, {
+			room: this.room,
 			score: this.myScore.text,
 		});
 
@@ -75,7 +58,7 @@ class MainScene extends Phaser.Scene {
 		this.load.image('paddle', '/paddle.png');
 	}
 
-	create() {
+	initBall() {
 		this.ball = this.physics.add.image(
 			this.game.canvas.width / 2,
 			this.game.canvas.height / 2,
@@ -84,13 +67,16 @@ class MainScene extends Phaser.Scene {
 		this.ball.setCollideWorldBounds(true);
 		this.ball.setBounce(1, 1);
 		this.ball.setVelocity(0, 0);
+	}
 
+	initPaddle() {
 		this.myPaddle = this.physics.add.image(this.game.canvas.width / 2, 610, 'paddle');
 		this.myPaddle.setImmovable(true);
-
 		this.enemyPaddle = this.physics.add.image(this.game.canvas.width / 2, 30, 'paddle');
 		this.enemyPaddle.setImmovable(true);
+	}
 
+	initScore() {
 		this.myScore = this.add
 			.text(this.game.canvas.width / 2, (this.game.canvas.height / 4) * 3, '0', {
 				fontSize: '32px',
@@ -105,6 +91,35 @@ class MainScene extends Phaser.Scene {
 				color: '#FFFFFF',
 			})
 			.setOrigin(0.5, 0.5);
+	}
+
+	initSocket() {
+		this.socket.on(`start`, response => {
+			const normal = 0.5;
+			const hard = 0.75;
+			const ballX = response.ball.x * hard;
+			const ballY = response.ball.y * hard;
+
+			this.isPlaying = true;
+
+			console.log(this.ball);
+			this.ball.setVelocity(ballX, ballY);
+		});
+		this.socket.on(`move`, response => {
+			this.enemyPaddle.x = response.x;
+		});
+		this.socket.on(`score`, response => {
+			this.enemyScore.setText(parseInt(response.score, 10).toString());
+			this.reset();
+		});
+	}
+
+	create() {
+		this.initBall();
+		this.initPaddle();
+		this.physics.add.collider(this.ball, this.myPaddle);
+		this.physics.add.collider(this.ball, this.enemyPaddle);
+		this.initScore();
 
 		this.add
 			.rectangle(
@@ -116,13 +131,11 @@ class MainScene extends Phaser.Scene {
 			)
 			.setOrigin(0.5, 0.5);
 
-		this.physics.add.collider(this.ball, this.myPaddle);
-		this.physics.add.collider(this.ball, this.enemyPaddle);
-
 		if (this.input.keyboard) {
 			this.keys = this.input.keyboard.createCursorKeys();
 		}
 
+		this.initSocket();
 		this.reset();
 	}
 
@@ -131,7 +144,10 @@ class MainScene extends Phaser.Scene {
 			if (this.room === '' || !this.keys.space?.isDown) {
 				return;
 			}
-			this.socket.emit(`${this.room}/ready`);
+
+			return this.socket.emit('ready', {
+				room: this.room,
+			});
 		}
 
 		if (!this.keys || !this.myPaddle || !this.enemyPaddle) {
@@ -152,7 +168,8 @@ class MainScene extends Phaser.Scene {
 			this.game.canvas.width - this.myPaddle.width / 2,
 		);
 
-		this.socket.emit(`${this.room}/move`, {
+		this.socket.emit(`move`, {
+			room: this.room,
 			x: this.myPaddle.x,
 		});
 

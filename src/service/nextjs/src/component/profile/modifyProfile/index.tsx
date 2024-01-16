@@ -17,6 +17,12 @@ interface EditProfileProps {
 	TwoFactorEmail: string;
 }
 
+const a = (props: { a: string; b: string; c: string }) => {
+	const a = props.a;
+	const b = props.b;
+	const c = props.c;
+};
+
 const ModifyMyProfile = ({ UserName, TwoFAtureFalse, TwoFactorEmail }: EditProfileProps) => {
 	const router = useRouter();
 	const [userName, setUsername] = useState(UserName);
@@ -38,18 +44,12 @@ const ModifyMyProfile = ({ UserName, TwoFAtureFalse, TwoFactorEmail }: EditProfi
 
 			if (response.status === 200 || response.status === 201) {
 				setShowSuccessSnackbar(true);
-				setTimeout(() => {
-					router.reload();
-				}, 1000);
 				router.push('/profile/testDetailProfile');
 			} else {
 				console.error('프로필 업데이트 에러:', response.status);
 			}
 		} catch (error) {
 			setShowFailSnackbar(true);
-			setTimeout(() => {
-				router.reload();
-			}, 1000);
 			// 타임아웃 에러
 		}
 	};
