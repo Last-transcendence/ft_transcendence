@@ -3,7 +3,7 @@ import { Container, Box, Stack } from '@mui/material';
 import UserPhoto from './userPhoto';
 import { ChangeEvent, useState, useEffect, useContext } from 'react';
 import Modify2FA, { ModifyTwoFactorProps } from '@/component/common/modify2FA';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import { Dispatch, SetStateAction } from 'react';
 import CustomSnackbar from '@/component/common/customSnackbar';
 import CustomTextField, { customTextFieldProps } from '@/component/common/customInputField';

@@ -2,7 +2,7 @@ import { Avatar, Box, IconButton, Stack, Typography } from '@mui/material';
 import { Menu, ArrowBackIosNew } from '@mui/icons-material';
 import HambergurMenu from '@/component/common/hambergur-menu';
 import React, { ReactNode, useState } from 'react';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 
 interface MenuHeaderProps {
 	type?: 'friend' | 'chat';

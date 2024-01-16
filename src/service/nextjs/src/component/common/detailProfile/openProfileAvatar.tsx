@@ -5,7 +5,7 @@ import ProfileMenus from '@/component/common/detailProfile/profileMenus';
 import ProfilePageBody from '@/component/common/detailProfile/profilePageBody';
 import Block from '@/type/block.type';
 import User from '@/type/user.type';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import { getFetcher } from '@/service/api';
 import AuthContext from '@/context/auth.context';
 import getFriend from '@/service/getFriend';
