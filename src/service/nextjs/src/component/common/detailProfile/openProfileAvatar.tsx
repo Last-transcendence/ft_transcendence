@@ -35,6 +35,7 @@ const OpenProfileAvatar = ({ otherUserId }: OpenProfileAvatarProps) => {
 	});
 	const [isBlockUser, setIsBlockUser] = useState<Boolean>(false);
 	const [errorMessage, setErrorMessage] = useState<string>('');
+	const [click, setClick] = useState(false);
 
 	// useEffect(() => {
 	// 	const fetchData = async () => {
@@ -47,16 +48,15 @@ const OpenProfileAvatar = ({ otherUserId }: OpenProfileAvatarProps) => {
 	// 				state: data.status,
 	// 				isFriend: friendList.includes(data.nickname),
 	// 			});
-	// 			setIsBlockUser(blockList.some((blockedUser) => blockedUser.id === otherUserId));
+	// 			setIsBlockUser(blockList.some(blockedUser => blockedUser.id === otherUserId));
 	// 		} catch (error) {
 	// 			setErrorMessage(error.message);
 	// 		}
 	// 	};
-
-	// 	fetchData();
-	// }, [otherUserId, friendList]);
-
-	const [click, setClick] = useState(false);
+	// 	if (click === true) {
+	// 		fetchData();
+	// 	}
+	// }, [otherUserId, friendList, click]);
 
 	const handleAvatarOpen = () => {
 		if (isMe) {
@@ -66,16 +66,15 @@ const OpenProfileAvatar = ({ otherUserId }: OpenProfileAvatarProps) => {
 		}
 	};
 
-
 	const handleSnackbarClose = () => {
 		setErrorMessage('');
-	}
+	};
 
 	return (
 		<>
 			<Avatar alt="User Avatar" onClick={handleAvatarOpen} sx={{ cursor: 'pointer' }} />
 			{click && (
-				<ProfileModar setClick={setClick} childMenu={<ProfileMenus/>}>
+				<ProfileModar setClick={setClick} childMenu={<ProfileMenus />}>
 					<ProfilePageBody otherUserId={otherUserId} {...otherUserData} />
 				</ProfileModar>
 			)}
