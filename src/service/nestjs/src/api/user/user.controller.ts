@@ -31,10 +31,10 @@ class UserController {
 		const filePath = join(process.cwd(), `upload/`) + req.user.profileImageURI;
 		if (!fs.existsSync(filePath)) {
 			throw new HttpException('File not found', 404);
-		}		
+		}
 		res.sendFile(filePath);
 	}
-	
+
 	@Patch('me')
 	@UseGuards(Auth.Guard.UserJwt)
 	@ApiOperation({ summary: 'Update my information' })
@@ -78,6 +78,20 @@ class UserController {
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
 		}
+	}
+
+	@Get('image/:id')
+	@ApiOperation({ summary: 'Get User image by id' })
+	@ApiOkResponse({ description: 'Get user image by id successfully', type: Dto.Response.User })
+	@ApiNotFoundResponse({ description: 'image not found' })
+	async getUserImage(@Param('id') id: string, @Response() res) {
+		console.log(id);
+		const user = await this.userService.get(id);
+		const filePath = join(process.cwd(), `upload/`) + user.profileImageURI;
+		if (!fs.existsSync(filePath)) {
+			throw new HttpException('File not found', 404);
+		}		
+		res.sendFile(filePath);
 	}
 
 	@Post('search')
