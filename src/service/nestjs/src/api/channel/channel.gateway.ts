@@ -73,11 +73,11 @@ class ChannelGateway {
 
 			socket.join(joinDto.channelId);
 
-			return { join: true };
+			return { res: true };
 		} catch (error) {
 			console.error("An error occurred channel.gateway 'join':", error);
 			socket.emit('error', { message: 'An error occurred' });
-			return { join: false };
+			return { res: false };
 		}
 	}
 }
