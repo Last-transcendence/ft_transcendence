@@ -10,7 +10,7 @@ interface UserBriefInformationProps {
 	className?: string;
 	userId: string;
 	isMute?: boolean;
-	imgUrl: string | undefined;
+	imgUrl: string | undefined | null;
 }
 
 const UserBriefInformation = ({

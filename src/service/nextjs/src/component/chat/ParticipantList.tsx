@@ -98,6 +98,7 @@ const ParticipantList = ({
 	const handleLeave = useCallback(() => {
 		channelSocket!.emit('leave', { channelId, userId: me?.id }, (res: any) => {
 			if (res) {
+				//루트로 네비게이션
 			}
 			console.log(res);
 		});

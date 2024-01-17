@@ -76,9 +76,9 @@ const ChannelSetting = ({ isCreate, setOpen, channelData }: ChannelSettingProps)
 		}
 
 		const req = {
-			visibility,
+			visibility: visibility,
 			title,
-			password: visibility === ChannelVisibility.PROTECTED ? password : undefined,
+			password: visibility === ChannelVisibility.PROTECTED ? password : '',
 		};
 
 		//채널은 생성되면 아이디 받고 이동하기

@@ -12,7 +12,7 @@ import getFriend from '@/service/getFriend';
 
 interface OpenProfileAvatarProps {
 	otherUserId: string;
-	imgUrl: string | undefined;
+	imgUrl: string | undefined | null;
 }
 
 export interface otherUser {
@@ -77,7 +77,7 @@ const OpenProfileAvatar = ({ otherUserId, imgUrl }: OpenProfileAvatarProps) => {
 				alt="User Avatar"
 				onClick={handleAvatarOpen}
 				sx={{ cursor: 'pointer' }}
-				src={imgUrl}
+				src={imgUrl ? imgUrl : undefined}
 			/>
 			{click && (
 				<ProfileModar setClick={setClick} childMenu={<ProfileMenus />}>
