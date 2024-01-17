@@ -9,7 +9,7 @@ interface MailerOptions {
 }
 
 @Injectable()
-class MailService {
+export class MailService {
     private transporter: nodemailer.Transporter;
     constructor() {
         this.transporter = nodemailer.createTransport({
@@ -26,11 +26,9 @@ class MailService {
             from: process.env.EMAILADDRESS,
             to,
             subject: '가입 인증 메일',
-            html: `<h1> 인증 코드를 입력하면 가입 인증이 완료됩니다.</h1><br/>${code}`,
+            html: `<h1> 인증 코드를 입력하면<br/> 가입 인증이 완료됩니다.</h1><br/>${nickname}: ${code}`,
         };
 
         await this.transporter.sendMail(emailOptions);
     }
 }
-
-export default MailService;
