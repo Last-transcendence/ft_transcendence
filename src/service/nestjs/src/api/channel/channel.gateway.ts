@@ -90,6 +90,20 @@ class ChannelGateway {
 			return { res: false };
 		}
 	}
+
+	@SubscribeMessage('edit')
+	@UseGuards(Auth.Guard.UserJwtWs)
+	async handleEdit(@MessageBody() data, @ConnectedSocket() socket: Socket) {
+		try {
+			this.channelService.editChannel(data);
+			return { res: true };
+		} catch (error) {
+
+			console.error("An error occurred in channel.gateway 'edit':", error);
+			socket.emit('error', { message: "An error occurred in channel.gateway 'edit'" });
+			return { res: false };
+		}
+	}
 }
 
 export default ChannelGateway;
