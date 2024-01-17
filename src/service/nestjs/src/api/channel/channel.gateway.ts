@@ -1,4 +1,5 @@
 import { BadRequestException, Inject, UseGuards, forwardRef } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import {
 	ConnectedSocket,
 	MessageBody,
@@ -9,11 +10,10 @@ import {
 import BanService from 'api/ban/ban.service';
 import ParticipantService from 'api/participant/participant.service';
 import { Server, Socket } from 'socket.io';
-import { ConfigService } from '@nestjs/config';
-import ChannelService from './channel.service';
 import * as Auth from '../../common/auth';
-import * as ChannelDto from './dto';
 import * as ParticipantDto from '../participant/dto';
+import ChannelService from './channel.service';
+import * as ChannelDto from './dto';
 
 const getCorsOrigin = () => {
 	const configService = new ConfigService();
@@ -112,6 +112,12 @@ class ChannelGateway {
 			socket.emit('error', { message: "An error occurred in channel.gateway 'edit'" });
 			return { res: false };
 		}
+	}
+
+	@SubscribeMessage('info')
+	@UseGuards(Auth.Guard.UserWsJwt)
+	async handleInfo(@MessageBody() data, @ConnectedSocket() socket: Socket) {
+		return this.channelService.getChannel(data.channelId);
 	}
 }
 
