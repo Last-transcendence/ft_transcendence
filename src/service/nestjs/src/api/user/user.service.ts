@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import PrismaService from 'common/prisma/prisma.service';
 import { User } from '@prisma/client';
 import * as Dto from './dto';
-
 @Injectable()
 class UserService {
 	constructor(private readonly prismaService: PrismaService) {}
@@ -41,9 +40,10 @@ class UserService {
 		}
 	}
 
-	async updateUserById(id: string, updateRequestDto: Dto.Request.Update): Promise<User> {
+	async updateUserById(id: string, updateRequestDto: Dto.Request.Update, filename: string): Promise<User> {
 		try {
-			return await this.prismaService.user.update({ where: { id }, data: { ...updateRequestDto } });
+			delete updateRequestDto.file;
+			return await this.prismaService.user.update({ where: { id }, data: { ...updateRequestDto, profileImageURI: filename} });
 		} catch (error) {
 			throw new Error(error.message);
 		}
