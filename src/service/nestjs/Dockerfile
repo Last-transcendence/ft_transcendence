@@ -10,8 +10,6 @@ ENV HOME /app
 
 WORKDIR $HOME
 
-RUN  mkdir -p ./upload
-
 COPY . .
 
 COPY ./tool/docker-entrypoint.sh /usr/local/bin/

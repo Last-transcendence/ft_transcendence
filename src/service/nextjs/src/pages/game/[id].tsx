@@ -11,7 +11,7 @@ import {
 import Config from '@/component/game/config';
 import style from '@/style/game/index.module.css';
 import SocketContext from '@/context/socket.context';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 
 const destroy = (props: {
 	gameRef: RefObject<HTMLIonPhaserElement>;
@@ -28,6 +28,7 @@ const destroy = (props: {
 };
 
 const GamePage = () => {
+	const navigate = useRouter();
 	const params = useParams<{ id: string }>();
 	const gameRef = useRef<HTMLIonPhaserElement>(null);
 	const [game, setGame] = useState<GameInstance | undefined>(undefined);
@@ -36,19 +37,19 @@ const GamePage = () => {
 	const socket = sockets.gameSocket;
 
 	useEffect(() => {
-		if (socket && params?.id) {
+		if (navigate && socket && params?.id) {
 			setIsInitialized(true);
 
 			import('@/component/game/scene').then(({ MainScene }) => {
 				setGame({
 					...Config,
-					scene: new MainScene(socket, params.id),
+					scene: new MainScene(navigate, socket, params.id),
 				});
 			});
 
 			return () => destroy({ gameRef, setGame, setIsInitialized });
 		}
-	}, [socket, params?.id]);
+	}, [navigate, socket, params?.id]);
 
 	return (
 		isInitialized && (
