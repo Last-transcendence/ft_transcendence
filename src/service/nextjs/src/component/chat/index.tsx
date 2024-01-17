@@ -2,7 +2,7 @@ import ParticipantList, { PrivateParticipantList } from '@/component/chat/Partic
 import { MenuHeader } from '@/component/common/Header';
 import { useParams } from 'next/navigation';
 import { useContext, useMemo } from 'react';
-import { Participant, ParticipantRole } from '@/type/channel.type';
+import { Channel, Participant, ParticipantRole } from '@/type/channel.type';
 import AuthContext from '@/context/auth.context';
 import useFetchData from '@/hook/useFetchData';
 import Chatroom from '@/type/chatroom.type';
@@ -12,8 +12,9 @@ export const CommonChatRoom = () => {
 	const params = useParams<{ id: string }>();
 	const { me } = useContext(AuthContext);
 	const { data: participantData, isLoading: isParticipantLoading } = useFetchData<Participant[]>(
-		`/channel/${params?.id}/participant`,
+		params?.id ? `/participant?channelId=${params?.id}` : null,
 	);
+	const { data } = useFetchData<Channel>(`/channel/${params?.id}`);
 
 	const myRole = useMemo(() => {
 		const myData = participantData?.find((data: Participant) => data.id === me?.id);
@@ -42,7 +43,7 @@ export const CommonChatRoom = () => {
 				{ type: 'action', content: '님이 입장하셨습니다' },
 			]}
 		>
-			<MenuHeader title={'채팅'} type={'chat'}>
+			<MenuHeader title={data?.title ?? ''} type={'chat'}>
 				<ParticipantList
 					channelId={params?.id}
 					participantData={participantData}
