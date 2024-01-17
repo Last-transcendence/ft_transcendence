@@ -1,13 +1,13 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
-import { ExtractJwt, Strategy } from 'passport-jwt';
-import { Request } from 'express';
+import { Strategy, ExtractJwt } from 'passport-jwt';
 import { User } from '@prisma/client';
-import UserService from '../../user/user.service';
+import UserService from 'api/user/user.service';
+import { Request } from 'express';
 
 @Injectable()
-class UserStrategy extends PassportStrategy(Strategy, 'user-jwt') {
+class UserWsStrategy extends PassportStrategy(Strategy, 'user-ws-jwt') {
 	constructor(
 		private readonly configService: ConfigService,
 		private readonly userService: UserService,
@@ -15,7 +15,11 @@ class UserStrategy extends PassportStrategy(Strategy, 'user-jwt') {
 		super({
 			jwtFromRequest: ExtractJwt.fromExtractors([
 				(request: Request) => {
-					return request.cookies['accessToken'];
+					const cookie = request['handshake']['headers']['cookie'];
+					const accessToken = cookie.split('; ').find(x => x.startsWith('accessToken'));
+					const token = accessToken.split('=')[1];
+
+					return token;
 				},
 			]),
 			ignoreExpiration: false,
@@ -37,4 +41,4 @@ class UserStrategy extends PassportStrategy(Strategy, 'user-jwt') {
 	}
 }
 
-export default UserStrategy;
+export default UserWsStrategy;
