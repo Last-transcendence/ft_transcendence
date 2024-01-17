@@ -13,10 +13,13 @@ const CreateChatPassword = ({ password, setPassword }: CreateChatPasswordProps) 
 		<div className={style.container}>
 			<span>비밀번호 설정</span>
 			<input
-				type="password"
-				placeholder="비밀번호를 입력하세요."
+				type="text"
+				placeholder="비밀번호를 입력하세요. (6자리 숫자)"
 				value={password}
-				onChange={event => setPassword(event.target.value)}
+				onChange={event => {
+					if (event.target.value.length === 6) return;
+					setPassword(event.target.value.replace(/[^0-9]/g, ''));
+				}}
 			/>
 		</div>
 	);

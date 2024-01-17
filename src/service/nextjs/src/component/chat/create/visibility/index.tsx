@@ -48,6 +48,12 @@ const CreateChatVisibility = ({ visibility, setVisibility }: CreateChatVisibilit
 					visibility={visibility}
 					setVisibility={setVisibility}
 				/>
+				<Button
+					name="visibility"
+					value={ChannelVisibility.PRIVATE}
+					visibility={visibility}
+					setVisibility={setVisibility}
+				/>
 			</div>
 		</div>
 	);

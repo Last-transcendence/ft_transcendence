@@ -1,30 +1,47 @@
 import { Container, Box } from '@mui/material';
-import FightRecords, { fightRecordsProps } from './fightRecords';
+import FightRecords from './fightRecords';
 import MyProfileMenu from './myProfileMenu';
 import ProfileAvartar from './profileAvatar';
 import TwoFACheck from './2faCheck';
 import { myImageProps } from '../common/myImage';
 import UserId from '@/component/profile/myProfile/userId';
-import Odds from '@/component/profile/myProfile/odds';
+import Game from '@/type/game.type';
+import { useState, useEffect } from 'react';
+import { getFetcher } from '@/service/api';
+import Odds from './odds';
 
-export interface myProfilePageProps extends myImageProps, fightRecordsProps {
-	odds: number;
+export interface myProfilePageProps extends myImageProps {
+	use2fa?: boolean;
 }
 
-const MyProfileBody = ({ fightRecords, odds, ...userType }: myProfilePageProps) => {
+const MyProfileBody = ({ name, use2fa, image }: myProfilePageProps) => {
+	const [gameRecords, setGameRecords] = useState<Game[]>([]);
+	const [gameRecordsErrorMessage, setGameRecordsErrorMessage] = useState<string>('');
+
+	useEffect(() => {
+		const roadGameRecord = async () => {
+			try {
+				setGameRecords(await getFetcher<Game[]>('/game/history'));
+			} catch (error) {
+				setGameRecordsErrorMessage('데이터를 로드할 수 없습니다.');
+			}
+		};
+		roadGameRecord();
+	}, []);
+
 	return (
-		<Box height="92vh" overflow="auto">
+		<Box overflow="auto">
 			<Container maxWidth="xs" sx={{ paddingBottom: 15 }}>
 				<MyProfileMenu />
-				<ProfileAvartar {...userType} />
-				<UserId userName={userType.name} />
+				<ProfileAvartar name={name} image={image} />
+				<UserId userName={name} />
 				<Box display="flex" flexDirection="column" alignItems="center">
-					<TwoFACheck twoFA={true} />
+					<TwoFACheck twoFA={use2fa} />
 					<div style={{ marginTop: '-30px' }}>
-						<Odds odds={odds} />
+						<Odds gameRecords={gameRecords} message={gameRecordsErrorMessage} />
 					</div>
 				</Box>
-				<FightRecords fightRecords={fightRecords} />
+				<FightRecords fightRecords={gameRecords.slice(0, 5)} message={gameRecordsErrorMessage} />
 			</Container>
 		</Box>
 	);

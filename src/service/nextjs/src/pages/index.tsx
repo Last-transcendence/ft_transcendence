@@ -26,7 +26,7 @@ const MainPage = () => {
 				<MainPageBody />
 				<MatchingButton />
 				<Link href={'/chat/create'}>
-					<BottomButton title={'채널생성'} />
+					<BottomButton title={'채널 생성'} />
 				</Link>
 			</div>
 		</>

@@ -9,6 +9,7 @@ import { Channel, ChannelVisibility } from '@/type/channel.type';
 import { Dispatch, SetStateAction, useCallback, useContext, useEffect, useState } from 'react';
 import CustomSnackbar from '@/component/profile/modifyProfile/customSnackbar';
 import { patchFetcher, postFetcher } from '@/service/api';
+import { useRouter } from 'next/router';
 import SocketContext from '@/context/socket.context';
 import { useRouter } from 'next/navigation';
 import useListeningChannelEvent from '@/hook/useListeningChannelEvent';
@@ -22,6 +23,7 @@ interface ChannelSettingProps {
 const ChannelSetting = ({ isCreate, setOpen, channelData }: ChannelSettingProps) => {
 	const { sockets } = useContext(SocketContext);
 	const { channelSocket } = sockets;
+	const router = useRouter();
 	const label = isCreate ? '채널 생성' : '채널 수정';
 	const [visibility, setVisibility] = useState<ChannelVisibility>(
 		channelData?.visibility ?? ChannelVisibility.PUBLIC,
@@ -35,6 +37,40 @@ const ChannelSetting = ({ isCreate, setOpen, channelData }: ChannelSettingProps)
 	});
 	const router = useRouter();
 
+	const handleSubmit = async () => {
+		setMessage({
+			title: '',
+			success: false,
+		});
+		if (visibility === ChannelVisibility.PROTECTED && !password && password === '') {
+			setMessage({
+				title: '비밀번호를 입력해주세요.',
+				success: false,
+			});
+		}
+		if (visibility === ChannelVisibility.PROTECTED && password.length !== 6) {
+			setMessage({
+				title: '비밀번호는 6자리 숫자로 입력해주세요.',
+				success: false,
+			});
+		}
+		if (!title || title === '') {
+			setMessage({
+				title: '채널명을 입력해주세요.',
+				success: false,
+			});
+		}
+		if (title.length > 8) {
+			setMessage({
+				title: '채널명은 8자 이내로 입력해주세요.',
+				success: false,
+			});
+		}
+
+		if (message.title.length) {
+			return setShowSnackbar(true);
+		}
+
 	//채널 create 시 채널 정보 리슨.
 	useListeningChannelEvent('create', res => {
 		console.log('res', res);
@@ -46,7 +82,7 @@ const ChannelSetting = ({ isCreate, setOpen, channelData }: ChannelSettingProps)
 		const req = {
 			visibility,
 			title,
-			password,
+			password: visibility === ChannelVisibility.PROTECTED ? password : undefined,
 		};
 
 		//채널은 생성되면 아이디 받고 이동하기
@@ -93,7 +129,9 @@ const ChannelSetting = ({ isCreate, setOpen, channelData }: ChannelSettingProps)
 				<Stack gap={4}>
 					<CreateChatVisibility visibility={visibility} setVisibility={setVisibility} />
 					<CreateChatTitle title={title} setTitle={setTitle} />
-					<CreateChatPassword password={password} setPassword={setPassword} />
+					{visibility === 'PROTECTED' && (
+						<CreateChatPassword password={password} setPassword={setPassword} />
+					)}
 				</Stack>
 				{isCreate ? (
 					<BottomButton title={'생성하기'} onClick={handleSubmit} />
