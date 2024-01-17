@@ -17,12 +17,6 @@ interface EditProfileProps {
 	TwoFactorEmail: string;
 }
 
-const a = (props: { a: string; b: string; c: string }) => {
-	const a = props.a;
-	const b = props.b;
-	const c = props.c;
-};
-
 const ModifyMyProfile = ({ UserName, TwoFAtureFalse, TwoFactorEmail }: EditProfileProps) => {
 	const router = useRouter();
 	const [userName, setUsername] = useState(UserName);
