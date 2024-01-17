@@ -40,9 +40,10 @@ class UserService {
 		}
 	}
 
-	async updateUserById(id: string, updateRequestDto: Dto.Request.Update, filename: string): Promise<User> {
+	async updateUserById(id: string, updateRequestDto: Dto.Request.UpdateUser, filename: string): Promise<User> {
 		try {
 			delete updateRequestDto.file;
+			delete updateRequestDto.use2fa;
 			return await this.prismaService.user.update({ where: { id }, data: { ...updateRequestDto, profileImageURI: filename} });
 		} catch (error) {
 			throw new Error(error.message);

@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { Create } from 'api/user/dto/request';
-import MailService from 'api/auth/service/mail.service';
+import { MailService } from 'api/auth/service/mail.service';
 import { Cache } from 'cache-manager';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Inject } from '@nestjs/common';

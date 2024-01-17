@@ -1,6 +1,6 @@
 import { PartialType } from '@nestjs/swagger';
 import Create from '../create';
 
-class Update extends PartialType(Create) {}
+class UpdateUser extends PartialType(Create) {}
 
-export default Update;
+export default UpdateUser;
