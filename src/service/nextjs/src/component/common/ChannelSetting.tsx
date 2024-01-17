@@ -7,7 +7,7 @@ import CreateChatPassword from '@/component/chat/create/password';
 import { BottomButton } from '@/component/common/ButtomButton';
 import { Channel, ChannelVisibility } from '@/type/channel.type';
 import { Dispatch, SetStateAction, useState } from 'react';
-import CustomSnackbar from '@/component/profile/modifyProfile/customSnackbar';
+import PositionableSnackbar from '@/component/common/PositionableSnackbar';
 import { patchFetcher, postFetcher } from '@/service/api';
 import { useRouter } from 'next/router';
 
@@ -94,7 +94,7 @@ const ChannelSetting = ({ isCreate, setOpen, channelData }: ChannelSettingProps)
 
 	return (
 		<div>
-			<CustomSnackbar
+			<PositionableSnackbar
 				open={showSnackbar}
 				onClose={() => setShowSnackbar(false)}
 				message={message.title}
