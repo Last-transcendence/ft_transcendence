@@ -115,7 +115,11 @@ export class AuthController {
 	@UseGuards(Auth.Guard.FtJwt)
 	@ApiOperation({ summary: '2차 인증 로그인' })
 	@ApiOkResponse({ description: '2차 인증 코드 인증 성공' })
-	async confirmCode(@Req() req, @Response({ passthrough: true }) res, @Body() verificationCode: Dto.Request.TwoFaCode) {
+	async confirmCode(
+		@Req() req,
+		@Response({ passthrough: true }) res,
+		@Body() verificationCode: Dto.Request.TwoFaCode,
+	) {
 		try {
 			const user = await this.authService.login(req.user.intraId);
 			await this.twoFactorService.confirmVerificationCode(user, verificationCode.twoFaCode);
