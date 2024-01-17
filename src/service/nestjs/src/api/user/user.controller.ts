@@ -22,19 +22,6 @@ class UserController {
 		return req.user;
 	}
 
-	@Get('image')
-	@UseGuards(Auth.Guard.UserJwt)
-	@ApiOperation({ summary: 'Get image' })
-	@ApiOkResponse({ description: 'Get image info successfully', type: Dto.Response.User })
-	@ApiNotFoundResponse({ description: 'image not found' })
-	async getImage(@Req() req, @Response() res) {
-		const filePath = join(process.cwd(), `upload/`) + req.user.profileImageURI;
-		if (!fs.existsSync(filePath)) {
-			throw new HttpException('File not found', 404);
-		}
-		res.sendFile(filePath);
-	}
-
 	@Patch('me')
 	@UseGuards(Auth.Guard.UserJwt)
 	@ApiOperation({ summary: 'Update my information' })
@@ -55,19 +42,6 @@ class UserController {
 		}
 	}
 
-	@Post('upload')
-	@UseGuards(Auth.Guard.UserJwt)
-	@ApiOperation({ summary: 'Uploads a file' })
-	@ApiOkResponse({ description: 'Get my image successfully' })
-	@ApiFile('file')
-	async uploadProfileImage(@UploadedFile() file: Express.Multer.File, @Req() req) {
-		try {
-			await this.userService.fileUpload(file);
-		} catch (error) {
-			throw new HttpException(error.message, error.status);
-		}
-	}
-
 	@Get(':id')
 	@ApiOperation({ summary: 'Get user by id' })
 	@ApiOkResponse({ description: 'Get user by id successfully', type: Dto.Response.User })
@@ -78,20 +52,6 @@ class UserController {
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
 		}
-	}
-
-	@Get('image/:id')
-	@ApiOperation({ summary: 'Get User image by id' })
-	@ApiOkResponse({ description: 'Get user image by id successfully', type: Dto.Response.User })
-	@ApiNotFoundResponse({ description: 'image not found' })
-	async getUserImage(@Param('id') id: string, @Response() res) {
-		console.log(id);
-		const user = await this.userService.get(id);
-		const filePath = join(process.cwd(), `upload/`) + user.profileImageURI;
-		if (!fs.existsSync(filePath)) {
-			throw new HttpException('File not found', 404);
-		}		
-		res.sendFile(filePath);
 	}
 
 	@Post('search')
