@@ -47,24 +47,23 @@ class GameGateway {
 			socket.join('queue');
 
 			// get clients list of queue
-			const clients = this.getRoom('queue');
+			const clients = Array.from(this.getRoom('queue'));
 
-			if (clients.size === 1) {
-				const gameId = await this.gameService.create();
+			if (clients.length === 1) {
+				//const gameId = await this.gameService.create();
 
-				socket.leave('queue');
-				socket.join(gameId);
-				this.getRoom(gameId).add(JSON.stringify({ mode: 'hard' }));
-				return this.server.to(socket.id).emit('matched', { id: gameId });
+				//socket.leave('queue');
+				//socket.join(gameId);
+				//this.getRoom(gameId).add(JSON.stringify({ mode: 'hard' }));
+				//return this.server.to(socket.id).emit('matched', { id: gameId });
 				return;
 			}
 
-			const player1 = Array.from(clients)[0];
-			const player2 = Array.from(clients)[1];
-			const gameId = await this.gameService.create();
+			const player1 = clients[0];
+			const player2 = clients[1];
 			const socket1 = this.server.sockets.get(player1);
 			const socket2 = this.server.sockets.get(player2);
-			const gameRoom = this.getRoom(gameId);
+			const gameId = await this.gameService.create();
 
 			socket1.leave('queue');
 			socket2.leave('queue');
@@ -72,7 +71,9 @@ class GameGateway {
 			socket1.join(gameId);
 			socket2.join(gameId);
 
-			gameRoom.add(JSON.stringify({ mode: 'hard' }));
+			const gameRoom = this.getRoom(gameId);
+
+			gameRoom.add(JSON.stringify({ mode: 'hard', ready: [] }));
 
 			this.server.to(player1).emit('matched', { id: gameId });
 			this.server.to(player2).emit('matched', { id: gameId });
@@ -82,24 +83,39 @@ class GameGateway {
 	}
 
 	@SubscribeMessage('ready')
-	async handleReadyEvent(@MessageBody() readyRequestDto: Dto.Request.Ready) {
+	async handleReadyEvent(
+		@ConnectedSocket() socket: Socket,
+		@MessageBody() readyRequestDto: Dto.Request.Ready,
+	) {
 		try {
-			const room = Array.from(this.getRoom(readyRequestDto.room));
-			const mode = JSON.parse(room[room.length - 1]).mode;
-			const speed = mode === 'NORMAL' ? 0.25 : 0.5;
+			const room = this.getRoom(readyRequestDto.room);
+			const user = JSON.parse(Array.from(room)[2]).user;
+			const ready = JSON.parse(Array.from(room)[2]).ready;
+			if (!ready.includes(socket.id)) {
+				user.push(socket['user']['id']);
+				ready.push(socket.id);
+				room.delete(Array.from(room)[2]);
+				room.add(JSON.stringify({ mode: 'hard', user: user, ready: ready }));
+				return;
+			}
+			if (ready.length !== 2) {
+				return;
+			}
+			room.delete(Array.from(room)[2]);
+			room.add(JSON.stringify({ mode: 'hard', user: user, ready: [] }));
+
+			const mode = JSON.parse(Array.from(room)[2]).mode;
+			const speed = mode === 'NORMAL' ? 0.15 : 0.3;
 			const randomX =
 				(Math.random() < 0.5 ? Math.random() * 600 + 150 : Math.random() * -600 - 150) * speed;
 			const randomY =
 				(Math.random() < 0.5 ? 1280 - Math.abs(randomX) : Math.abs(randomX) - 1280) * speed;
-			return this.server
-				.to(Array.from(room)[0])
-				.emit('start', { ball: { x: randomX, y: randomY } });
-			if (room.length !== 3) {
-				return;
-			}
+			//return this.server
+			//	.to(Array.from(room)[0])
+			//	.emit('start', { ball: { x: randomX, y: randomY } });
 
-			const player1 = room[0];
-			const player2 = room[1];
+			const player1 = Array.from(room)[0];
+			const player2 = Array.from(room)[1];
 
 			this.server.to(player1).emit('start', { ball: { x: randomX, y: randomY } });
 			this.server.to(player2).emit('start', { ball: { x: -randomX, y: -randomY } });
@@ -131,6 +147,10 @@ class GameGateway {
 			const opponentSocketId = this.getOpponentSocketId(socket, scoreRequestDto.room);
 
 			this.server.to(opponentSocketId).emit('score', scoreRequestDto);
+
+			if (scoreRequestDto.score == 4) {
+				this.server.to(scoreRequestDto.room).emit('end');
+			}
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
 		}

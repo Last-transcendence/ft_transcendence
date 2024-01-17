@@ -21,13 +21,13 @@ import {
 import * as Dto from './dto';
 import * as Auth from '../../common/auth';
 
-@ApiTags('friend')
 @Controller('friend')
+@ApiTags('friend')
+@UseGuards(Auth.Guard.UserJwt)
 class FriendController {
 	constructor(private readonly friendService: FriendService) {}
 
 	@Get()
-	@UseGuards(Auth.Guard.UserJwt)
 	@ApiOperation({ summary: 'Get friend' })
 	@ApiOkResponse({ description: 'Get friend successfully', type: FriendModel })
 	@ApiBadRequestResponse({ description: 'Bad request' })
@@ -40,13 +40,12 @@ class FriendController {
 	}
 
 	@Post()
-	@UseGuards(Auth.Guard.UserJwt)
 	@ApiOperation({ summary: 'Create friend' })
 	@ApiOkResponse({ description: 'Create friend successfully', type: FriendModel })
 	@ApiBadRequestResponse({ description: 'Bad request' })
 	async createFriend(
-		@Body() friendRequestDto: Dto.Request.Friend,
 		@Req() req,
+		@Body() friendRequestDto: Dto.Request.Friend,
 	): Promise<FriendModel> {
 		try {
 			return await this.friendService.createFriend(req.user.id, friendRequestDto.friendId);
@@ -59,7 +58,7 @@ class FriendController {
 	@ApiOperation({ summary: 'Delete friend' })
 	@ApiOkResponse({ description: 'Delete friend successfully', type: FriendModel })
 	@ApiNotFoundResponse({ description: 'Friend not found' })
-	async deleteFriend(@Param('id') id: string, @Req() req): Promise<FriendModel> {
+	async deleteFriend(@Req() req, @Param('id') id: string): Promise<FriendModel> {
 		try {
 			return await this.friendService.deleteFriend(req.user.id, id);
 		} catch (error) {
