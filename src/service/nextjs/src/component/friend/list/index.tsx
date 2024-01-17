@@ -2,16 +2,11 @@ import UserBriefInformation from '@/component/common/user/bried-information';
 import style from '../../../style/friend/list/index.module.css';
 import FriendStatus from './status';
 import User, { UserStatus } from '@/type/user.type';
-import useFetchData from '@/hook/useFetchData';
-import { Skeleton } from '@mui/material';
+import { Skeleton, Typography } from '@mui/material';
 import Friend from '@/type/friend.type';
 
 const Title = () => {
-	return (
-		<div>
-			<span>친구 목록</span>
-		</div>
-	);
+	return <Typography>친구 목록</Typography>;
 };
 
 const FriendList = ({ data }: { data: Friend[] | undefined }) => {
@@ -33,7 +28,7 @@ const FriendList = ({ data }: { data: Friend[] | undefined }) => {
 					);
 				})
 			) : (
-				<div>친구가 없습니다.</div>
+				<Typography>친구가 없습니다.</Typography>
 			)}
 		</div>
 	);
