@@ -65,6 +65,14 @@ export const SocketProvider = (props: { children: ReactNode }) => {
 				...sockets,
 				chatSocket: initSocket('chat'),
 			});
+			sockets?.chatSocket &&
+				(sockets.chatSocket as any).on('game', (res: any) => {
+					setMessage({
+						title: '게임 초대',
+						content: `${res?.nickname}님이 1:1 게임을 초대했습니다`,
+					});
+					setOpen(true);
+				});
 		}
 		if (!sockets.channelSocket) {
 			setSocket({

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import style from '@/style/friend/list/index.module.css';
 import { Button, Stack, Typography } from '@mui/material';
 import UserBriefInformation from '@/component/common/user/bried-information';
@@ -8,6 +8,8 @@ import NickMenu from '@/component/chat/NickMenu';
 import AdminNickMenu from '@/component/chat/AdminNickMenu';
 import Chatroom from '@/type/chatroom.type';
 import ChannelSetting from '@/component/common/ChannelSetting';
+import SocketContext from '@/context/socket.context';
+import AuthContext from '@/context/auth.context';
 
 interface PrivateParticipantListProps {
 	data: Chatroom[] | undefined;
@@ -27,14 +29,14 @@ export const PrivateParticipantList = ({ data }: PrivateParticipantListProps) =>
 								condition={undefined}
 								className={style['user-brief-information']}
 								userId={''}
-								imgUrl={undefined}
+								imgUrl={''}
 							/>
 							<UserBriefInformation
 								nickname={null}
 								condition={undefined}
 								className={style['user-brief-information']}
 								userId={''}
-								imgUrl={undefined}
+								imgUrl={''}
 							/>
 						</div>
 					</div>
@@ -62,6 +64,9 @@ const ParticipantList = ({
 	muteList,
 }: ParticipantListProps) => {
 	const [open, setOpen] = useState(false);
+	const { sockets } = useContext(SocketContext);
+	const { channelSocket } = sockets;
+	const { me } = useContext(AuthContext);
 
 	const ChatStatus = ({ status }: { status: ParticipantRole }) => {
 		const spanRef = useRef<HTMLSpanElement>(null);
@@ -89,6 +94,14 @@ const ParticipantList = ({
 		},
 		[muteList],
 	);
+
+	const handleLeave = useCallback(() => {
+		channelSocket!.emit('leave', { channelId, userId: me?.id }, (res: any) => {
+			if (res) {
+			}
+			console.log(res);
+		});
+	}, []);
 
 	return (
 		<div>
@@ -131,7 +144,9 @@ const ParticipantList = ({
 					<Button variant={'contained'} onClick={() => setOpen(true)}>
 						채널설정
 					</Button>
-					<Button variant={'contained'}>채널 나가기</Button>
+					<Button variant={'contained'} onClick={handleLeave}>
+						채널 나가기
+					</Button>
 				</Stack>
 			</Stack>
 		</div>

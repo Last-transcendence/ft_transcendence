@@ -110,6 +110,7 @@ const AddFriend = ({ friendList }: { friendList: Friend[] | undefined }) => {
 								nickname={user?.nickname}
 								className={style['user-brief-information']}
 								userId={user.id}
+								imgUrl={user?.profileImageURI}
 							/>
 							{isFriend(user.id) ? (
 								<button onClick={() => setFriend(user.id, 'add')}>삭제</button>

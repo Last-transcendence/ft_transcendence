@@ -1,6 +1,5 @@
 import React, { useContext } from 'react';
 import AuthContext from '@/context/auth.context';
-import { postFetcher } from '@/service/api';
 import { Menu, MenuItem, Stack, Typography } from '@mui/material';
 import SocketContext from '@/context/socket.context';
 
@@ -28,18 +27,32 @@ const AdminNickMenu = ({ nickname, userId, channelId, ownerId, isMute }: NickMen
 
 	const handleMenuClick = async (e: React.MouseEvent<HTMLLIElement, MouseEvent>) => {
 		const { id: targetId } = e.target as HTMLLIElement;
+		const req = {
+			channelId,
+			userId: me?.id,
+			toUserId: userId,
+			nickname,
+		};
 		switch (targetId) {
 			case 'kickBtn':
-				postFetcher(`/channel/${channelId}/kick/${userId}`);
+				channelSocket?.emit('kick', req, (res: any) => {
+					console.log('res', res);
+				});
 				break;
 			case 'banBtn':
-				postFetcher(`/channel/${channelId}/ban/${userId}`);
+				channelSocket?.emit('ban', req, (res: any) => {
+					console.log('res', res);
+				});
 				break;
 			case 'muteBtn':
-				postFetcher(`/channel/${channelId}/mute/${userId}`);
+				channelSocket?.emit('mute', req, (res: any) => {
+					console.log('res', res);
+				});
 				break;
 			case 'adminBtn':
-				//how to set admin?
+				channelSocket?.emit('role', req, (res: any) => {
+					console.log('res', res);
+				});
 				break;
 			default:
 				break;
@@ -65,7 +78,7 @@ const AdminNickMenu = ({ nickname, userId, channelId, ownerId, isMute }: NickMen
 				)}
 				{ownerId === me?.id && (
 					<MenuItem id={'adminBtn'} onClick={handleMenuClick}>
-						어드민임명
+						어드민 임명
 					</MenuItem>
 				)}
 			</Menu>

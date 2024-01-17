@@ -7,7 +7,7 @@ import SendChat from '@/component/chat/SendChat';
 import SocketContext from '@/context/socket.context';
 import AuthContext from '@/context/auth.context';
 import useListeningChannelEvent from '@/hook/useListeningChannelEvent';
-import { ChatLiveDataType } from '@/component/chat/index';
+import { ChatLiveDataType } from '@/component/chat/CommonChatRoomPage';
 
 export type CommandType = 'DM' | 'GAME' | 'HELP';
 
@@ -106,7 +106,6 @@ const ChatRoomLayout = ({
 		<Stack width={'100%'} height={'100%'}>
 			{/*헤더 영역*/}
 			<div>{children}</div>
-			{/*채팅 영역*/}
 			<Stack padding={2} spacing={2} sx={{ overflowY: 'scroll' }} height={'100%'}>
 				{chatLiveData?.map((chat: any, index: number) => {
 					if (chat.type === 'chat') {

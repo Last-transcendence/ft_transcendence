@@ -23,6 +23,7 @@ const FriendList = ({ data }: { data: Friend[] | undefined }) => {
 								condition={<FriendStatus status={UserStatus.ONLINE} />}
 								className={style['user-brief-information']}
 								userId={user.id}
+								imgUrl={undefined}
 							/>
 						</div>
 					);

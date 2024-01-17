@@ -1,7 +1,7 @@
 import ParticipantList, { PrivateParticipantList } from '@/component/chat/ParticipantList';
 import { MenuHeader } from '@/component/common/Header';
 import { useParams } from 'next/navigation';
-import { useContext, useEffect, useMemo, useState } from 'react';
+import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { Participant, ParticipantRole } from '@/type/channel.type';
 import AuthContext from '@/context/auth.context';
 import useFetchData from '@/hook/useFetchData';
@@ -17,7 +17,7 @@ export type ChatLiveDataType = {
 	message?: string;
 };
 
-export const CommonChatRoom = () => {
+const CommonChatRoomPage = () => {
 	const params = useParams<{ id: string }>();
 	const { me } = useContext(AuthContext);
 	const { sockets } = useContext(SocketContext);
@@ -25,7 +25,7 @@ export const CommonChatRoom = () => {
 	const [channelData, setChannelData] = useState<ChannelInfo | undefined>(undefined);
 	const [chatLiveData, setChatLiveData] = useState<ChatLiveDataType[]>([]);
 
-	//info 정보 받아오기 emit
+	//채널 정보 받아오기
 	useEffect(() => {
 		if (!params?.id) return;
 		channelSocket?.emit('info', { channelId: params?.id }, (res: any) => {
@@ -34,31 +34,55 @@ export const CommonChatRoom = () => {
 		});
 	}, [channelSocket, params?.id]);
 
-	//참여자 나가고 오는 정보 받기
+	const setActionMessage = useCallback((message: string) => {
+		setChatLiveData(prev => [...prev, { type: 'action', message }]);
+	}, []);
+
+	const removeParticipant = useCallback((userId: string) => {
+		setChannelData(prev => {
+			if (!prev) return prev;
+			return { ...prev, participant: prev?.participant?.filter(data => data.id !== userId) };
+		});
+	}, []);
+
+	//이용자 참여
 	useListeningChannelEvent('join', (res: any) => {
 		console.log(res);
 		setChannelData(prev => {
 			if (!prev) return prev;
-			// 이용자 정보 추가
 			return { ...prev, participant: [...prev?.participant, res] };
 		});
-		setChatLiveData(prev => [
-			...prev,
-			{ type: 'action', message: `${res?.nickname}님이 들어오셨습니다.` },
-		]);
+		setActionMessage(`${res?.nickname}님이 들어오셨습니다.`);
 	});
 
+	//이용자 퇴장
 	useListeningChannelEvent('leave', (res: any) => {
+		console.log(res);
+		removeParticipant(res?.id);
+		setActionMessage(`${res?.nickname}님이 나가셨습니다.`);
+	});
+
+	//이용자 뮤트
+	useListeningChannelEvent('mute', (res: any) => {
 		console.log(res);
 		setChannelData(prev => {
 			if (!prev) return prev;
-			// 이용자 정보 제거
-			return { ...prev, participant: prev?.participant?.filter(data => data.id !== res?.id) };
+			return { ...prev, mute: [...prev?.mute, res?.id] };
 		});
-		setChatLiveData(prev => [
-			...prev,
-			{ type: 'action', message: `${res?.nickname}님이 나가셨습니다.` },
-		]);
+		setActionMessage(`${res?.nickname}님이 뮤트되었습니다.`);
+	});
+
+	//이용자 차단
+	useListeningChannelEvent('ban', (res: any) => {
+		console.log(res);
+		removeParticipant(res?.id);
+		setActionMessage(`${res?.nickname}님이 밴되었습니다.`);
+	});
+
+	useListeningChannelEvent('kick', (res: any) => {
+		console.log(res);
+		removeParticipant(res?.id);
+		setActionMessage(`${res?.nickname}님이 킥되었습니다.`);
 	});
 
 	const myRole = useMemo(() => {
@@ -76,7 +100,6 @@ export const CommonChatRoom = () => {
 	return (
 		<ChatRoomLayout
 			ownerId={ownerId}
-			type={'chat'}
 			data={channelData}
 			chatLiveData={chatLiveData}
 			setChatLiveData={setChatLiveData}
@@ -96,17 +119,4 @@ export const CommonChatRoom = () => {
 	);
 };
 
-export const PrivateChatRoom = () => {
-	const params = useParams<{ id: string }>();
-	const { data, isLoading } = useFetchData<Chatroom[]>(`/chatroom/${params?.id}`);
-	const { data: chatData } = useFetchData<any[]>(`/chatroom/chat?destId=${params?.id}`);
-	const [chatLiveData, setChatLiveData] = useState<ChatLiveDataType[]>([]);
-
-	return (
-		<ChatRoomLayout type={'dm'} chatLiveData={chatLiveData} setChatLiveData={setChatLiveData}>
-			<MenuHeader title={'채팅'} type={'chat'}>
-				<PrivateParticipantList data={data} />
-			</MenuHeader>
-		</ChatRoomLayout>
-	);
-};
+export default CommonChatRoomPage;
