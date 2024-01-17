@@ -1,9 +1,9 @@
 import User from '@/type/user.type';
 
 export enum ChannelVisibility {
-	PUBLIC = 'public',
-	PROTECTED = 'protected',
-	PRIVATE = 'private',
+	PUBLIC = 'PUBLIC',
+	PROTECTED = 'PROTECTED',
+	PRIVATE = 'PRIVATE',
 }
 
 export enum ParticipantRole {

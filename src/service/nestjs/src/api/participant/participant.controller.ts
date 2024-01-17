@@ -22,11 +22,11 @@ import {
 	ApiOperation,
 	ApiTags,
 } from '@nestjs/swagger';
-import ParticipantService from './participant.service';
-import ChannelService from 'api/channel/channel.service';
 import BanService from 'api/ban/ban.service';
-import * as Dto from './dto';
+import ChannelService from 'api/channel/channel.service';
 import * as Auth from '../../common/auth';
+import * as Dto from './dto';
+import ParticipantService from './participant.service';
 
 @Controller('participant')
 @ApiTags('participant')
@@ -55,49 +55,6 @@ class ParticipantController {
 			}
 
 			return await this.participantService.getList(channelId);
-		} catch (error) {
-			throw new HttpException(error.message, error.status);
-		}
-	}
-
-	@Post()
-	@UseGuards(Auth.Guard.UserJwt)
-	@ApiOperation({ summary: 'Add participant to channel' })
-	@ApiOkResponse({
-		description: 'Participant added successfully',
-		type: Dto.Response.Participant,
-	})
-	@ApiBadRequestResponse({ description: 'Failed to add participant' })
-	async addParticipant(
-		@Req() req,
-		@Body() createParticipantRequestDto: Dto.Request.Create,
-	): Promise<Dto.Response.Participant> {
-		try {
-			if (await this.participantService.isParticipated(req.user.id)) {
-				throw new BadRequestException('User is already participated');
-			}
-
-			const channel = await this.channelService.getChannel(createParticipantRequestDto.channelId);
-			if (!channel) {
-				throw new BadRequestException('Channel not found');
-			}
-			if (
-				channel.visibility === 'PROTECTED' &&
-				!(await this.channelService.validatePassword(
-					createParticipantRequestDto.channelId,
-					createParticipantRequestDto.password,
-				))
-			) {
-				throw new BadRequestException('Wrong password');
-			}
-			if (await this.banService.isBanned(req.user.id, createParticipantRequestDto.channelId)) {
-				throw new BadRequestException('User is banned');
-			}
-
-			return await this.participantService.create(
-				createParticipantRequestDto.channelId,
-				req.user.id,
-			);
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
 		}

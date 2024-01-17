@@ -1,6 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import PrismaService from 'common/prisma/prisma.service';
 import * as Dto from './dto';
+import { MessageBody } from '@nestjs/websockets';
+import { plainToClass } from 'class-transformer';
+import { validate } from 'class-validator';
 
 @Injectable()
 class ChannelService {
@@ -48,12 +51,17 @@ class ChannelService {
 		}
 	}
 
-	async updateChannel(
-		id: string,
-		updateChannelDto: Dto.Request.Update,
-	): Promise<Dto.Response.UpdateChannel> {
+	async editChannel(@MessageBody() data) {
 		try {
-			return await this.prismaService.channel.update({
+			const updateChannelDto = plainToClass(Dto.Request.Create, data);
+			const error = await validate(updateChannelDto);
+
+			if (error.length > 0) {
+				throw new Error('Failed validation: ' + JSON.stringify(error));
+			}
+
+			const id = data.channelId;
+			await this.prismaService.channel.update({
 				where: { id },
 				data: updateChannelDto,
 				select: {
@@ -62,7 +70,7 @@ class ChannelService {
 				},
 			});
 		} catch (error) {
-			throw new Error(error.message);
+			throw new Error('Failed to update channel info: ' + error.message);
 		}
 	}
 
