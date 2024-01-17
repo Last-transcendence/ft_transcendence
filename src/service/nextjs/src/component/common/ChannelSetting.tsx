@@ -6,10 +6,8 @@ import CreateChatTitle from '@/component/chat/create/title';
 import CreateChatPassword from '@/component/chat/create/password';
 import { BottomButton } from '@/component/common/ButtomButton';
 import { Channel, ChannelVisibility } from '@/type/channel.type';
-import { Dispatch, SetStateAction, useCallback, useContext, useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useCallback, useContext, useState } from 'react';
 import CustomSnackbar from '@/component/profile/modifyProfile/customSnackbar';
-import { patchFetcher, postFetcher } from '@/service/api';
-import { useRouter } from 'next/router';
 import SocketContext from '@/context/socket.context';
 import { useRouter } from 'next/navigation';
 import useListeningChannelEvent from '@/hook/useListeningChannelEvent';
@@ -21,9 +19,9 @@ interface ChannelSettingProps {
 }
 
 const ChannelSetting = ({ isCreate, setOpen, channelData }: ChannelSettingProps) => {
+	const router = useRouter();
 	const { sockets } = useContext(SocketContext);
 	const { channelSocket } = sockets;
-	const router = useRouter();
 	const label = isCreate ? '채널 생성' : '채널 수정';
 	const [visibility, setVisibility] = useState<ChannelVisibility>(
 		channelData?.visibility ?? ChannelVisibility.PUBLIC,
@@ -35,9 +33,15 @@ const ChannelSetting = ({ isCreate, setOpen, channelData }: ChannelSettingProps)
 		title: '',
 		success: true,
 	});
-	const router = useRouter();
 
-	const handleSubmit = async () => {
+	//채널 create 시 채널 정보 리슨.
+	useListeningChannelEvent('create', res => {
+		console.log('res', res);
+		res.channelId && router.push(`/chat/${res.channelId}`);
+	});
+
+	const handleSubmit = useCallback(() => {
+		// 채널 생성
 		setMessage({
 			title: '',
 			success: false,
@@ -71,14 +75,6 @@ const ChannelSetting = ({ isCreate, setOpen, channelData }: ChannelSettingProps)
 			return setShowSnackbar(true);
 		}
 
-	//채널 create 시 채널 정보 리슨.
-	useListeningChannelEvent('create', res => {
-		console.log('res', res);
-		res.channelId && router.push(`/chat/${res.channelId}`);
-	});
-
-	// 채널 생성
-	const handleSubmit = useCallback(() => {
 		const req = {
 			visibility,
 			title,
@@ -89,30 +85,36 @@ const ChannelSetting = ({ isCreate, setOpen, channelData }: ChannelSettingProps)
 		if (isCreate) {
 			channelSocket?.emit('create', req, (res: any) => {
 				console.log(res);
+				res.channelId && router.push(`/chat/${res.channelId}`);
 			});
 			//navigate
 		} else {
 			channelSocket?.emit('edit', { ...req, channelId: channelData?.id }, (res: any) => {
-				console.log(res);
+				if (res) {
+					setMessage({
+						title: label + ' 성공',
+						success: true,
+					});
+				} else {
+					setMessage({
+						title: `${label} 실패 ${res?.message ? ': ' + res?.message : ''}`,
+						success: false,
+					});
+				}
+				setShowSnackbar(true);
 			});
 		}
-
-		//@todo 소켓 에러처리 공부
-		// setMessage({
-		// 	title: label + ' 성공',
-		// 	success: true,
-		// });
-		// try {
-		// } catch (e) {
-		// 	setMessage({
-		// 		title: label + ' 실패',
-		// 		success: false,
-		// 	});
-		// 	console.error(e);
-		// } finally {
-		// 	setShowSnackbar(true);
-		// }
-	}, [channelData?.id, channelSocket, isCreate, password, title, visibility]);
+	}, [
+		channelData?.id,
+		channelSocket,
+		isCreate,
+		label,
+		message.title.length,
+		password,
+		router,
+		title,
+		visibility,
+	]);
 
 	return (
 		<div>
@@ -145,5 +147,4 @@ const ChannelSetting = ({ isCreate, setOpen, channelData }: ChannelSettingProps)
 		</div>
 	);
 };
-
 export default ChannelSetting;

@@ -1,5 +1,5 @@
 import Avatar from '@mui/material/Avatar';
-import { useState, useEffect, useContext } from 'react';
+import { useState, useContext } from 'react';
 import ProfileModar from '@/component/common/detailProfile/profileModar';
 import ProfileMenus from '@/component/common/detailProfile/profileMenus';
 import ProfilePageBody from '@/component/common/detailProfile/profilePageBody';
@@ -12,6 +12,7 @@ import getFriend from '@/service/getFriend';
 
 interface OpenProfileAvatarProps {
 	otherUserId: string;
+	imgUrl: string | undefined;
 }
 
 export interface otherUser {
@@ -21,11 +22,10 @@ export interface otherUser {
 	isFriend: boolean;
 }
 
-const OpenProfileAvatar = ({ otherUserId }: OpenProfileAvatarProps) => {
+const OpenProfileAvatar = ({ otherUserId, imgUrl }: OpenProfileAvatarProps) => {
 	const router = useRouter();
 	const { me } = useContext(AuthContext);
 	const isMe = me?.id ? me.id === otherUserId : false;
-	const friendList = getFriend();
 
 	const [otherUserData, setOtherUserData] = useState<otherUser>({
 		img: '',
@@ -40,15 +40,16 @@ const OpenProfileAvatar = ({ otherUserId }: OpenProfileAvatarProps) => {
 	// useEffect(() => {
 	// 	const fetchData = async () => {
 	// 		try {
+	// 			const friendList = getFriend();
 	// 			const blockList = await getFetcher<Block[]>('/block');
-	// 			const data = await getFetcher<User>(`/user/${otherUserId}`);
-	// 			setOtherUserData({
-	// 				img: data.profileImageURI,
-	// 				name: data.nickname,
-	// 				state: data.status,
-	// 				isFriend: friendList.includes(data.nickname),
-	// 			});
-	// 			setIsBlockUser(blockList.some(blockedUser => blockedUser.id === otherUserId));
+	// 	// 			const data = await getFetcher<User>(`/user/${otherUserId}`);
+	// 	// 			setOtherUserData({
+	// 	// 				img: data.profileImageURI,
+	// 	// 				name: data.nickname,
+	// 	// 				state: data.status,
+	// 	// 				isFriend: friendList.includes(data.nickname),
+	// 	// 			});
+	// 	// 			setIsBlockUser(blockList.some(blockedUser => blockedUser.id === otherUserId));
 	// 		} catch (error) {
 	// 			setErrorMessage(error.message);
 	// 		}
@@ -56,7 +57,7 @@ const OpenProfileAvatar = ({ otherUserId }: OpenProfileAvatarProps) => {
 	// 	if (click === true) {
 	// 		fetchData();
 	// 	}
-	// }, [otherUserId, friendList, click]);
+	// }, [otherUserId, click]);
 
 	const handleAvatarOpen = () => {
 		if (isMe) {
@@ -72,7 +73,12 @@ const OpenProfileAvatar = ({ otherUserId }: OpenProfileAvatarProps) => {
 
 	return (
 		<>
-			<Avatar alt="User Avatar" onClick={handleAvatarOpen} sx={{ cursor: 'pointer' }} />
+			<Avatar
+				alt="User Avatar"
+				onClick={handleAvatarOpen}
+				sx={{ cursor: 'pointer' }}
+				src={imgUrl}
+			/>
 			{click && (
 				<ProfileModar setClick={setClick} childMenu={<ProfileMenus />}>
 					<ProfilePageBody otherUserId={otherUserId} {...otherUserData} />

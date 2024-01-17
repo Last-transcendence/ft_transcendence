@@ -10,6 +10,7 @@ interface UserBriefInformationProps {
 	className?: string;
 	userId: string;
 	isMute?: boolean;
+	imgUrl: string | undefined;
 }
 
 const UserBriefInformation = ({
@@ -18,10 +19,11 @@ const UserBriefInformation = ({
 	className,
 	userId,
 	isMute,
+	imgUrl,
 }: UserBriefInformationProps) => {
 	return (
 		<div className={className}>
-			<OpenProfileAvatar otherUserId={userId} />
+			<OpenProfileAvatar otherUserId={userId} imgUrl={imgUrl} />
 			<div>{nickname}</div>
 			{condition && <div>{condition}</div>}
 			{isMute && <VolumeOffIcon />}

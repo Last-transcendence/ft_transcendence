@@ -4,9 +4,10 @@ import { Button, Stack, Typography } from '@mui/material';
 import UserBriefInformation from '@/component/common/user/bried-information';
 import CustomModal from '@/component/common/CustomModal';
 import { Ban, Mute, Participant, ParticipantRole } from '@/type/channel.type';
-import { AdminNickMenu, NickMenu } from '@/component/chat/NickMenu';
-import ChannelSetting from '@/component/common/ChannelSetting';
+import NickMenu from '@/component/chat/NickMenu';
+import AdminNickMenu from '@/component/chat/AdminNickMenu';
 import Chatroom from '@/type/chatroom.type';
+import ChannelSetting from '@/component/common/ChannelSetting';
 
 interface PrivateParticipantListProps {
 	data: Chatroom[] | undefined;
@@ -26,12 +27,14 @@ export const PrivateParticipantList = ({ data }: PrivateParticipantListProps) =>
 								condition={undefined}
 								className={style['user-brief-information']}
 								userId={''}
+								imgUrl={undefined}
 							/>
 							<UserBriefInformation
 								nickname={null}
 								condition={undefined}
 								className={style['user-brief-information']}
 								userId={''}
+								imgUrl={undefined}
 							/>
 						</div>
 					</div>
@@ -43,7 +46,7 @@ export const PrivateParticipantList = ({ data }: PrivateParticipantListProps) =>
 
 interface ParticipantListProps {
 	channelId: string;
-	participantData?: Participant[] | null;
+	participantData?: Participant[] | null | undefined;
 	myRole?: ParticipantRole;
 	isProtected?: boolean;
 	ownerId: string | undefined;
@@ -59,8 +62,6 @@ const ParticipantList = ({
 	muteList,
 }: ParticipantListProps) => {
 	const [open, setOpen] = useState(false);
-	const [password, setPassword] = useState('');
-	const [title, setTitle] = useState('');
 
 	const ChatStatus = ({ status }: { status: ParticipantRole }) => {
 		const spanRef = useRef<HTMLSpanElement>(null);
@@ -121,6 +122,7 @@ const ParticipantList = ({
 								className={style['user-brief-information']}
 								userId={data?.userId}
 								isMute={isMute(data?.userId)}
+								imgUrl={data?.user.profileImageURI}
 							/>
 						))}
 					</div>

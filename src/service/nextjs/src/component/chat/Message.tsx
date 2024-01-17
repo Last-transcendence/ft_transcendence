@@ -1,42 +1,33 @@
-import { Avatar, Box, Stack, Typography } from '@mui/material';
+import { Box, Stack, Typography } from '@mui/material';
 import React from 'react';
-import { AdminNickMenu, NickMenu } from '@/component/chat/NickMenu';
+import NickMenu from '@/component/chat/NickMenu';
+import AdminNickMenu from '@/component/chat/AdminNickMenu';
 import { ParticipantRole } from '@/type/channel.type';
 import OpenProfileAvatar from '@/component/common/detailProfile/openProfileAvatar';
+import User from '@/type/user.type';
 
 interface ChatMsgProps {
-	userId: string;
-	channelId?: string;
-	nickname?: string;
+	userData: User;
+	channelId: string;
 	myRole?: ParticipantRole;
 	ownerId: string | undefined;
 	message: string;
 }
 
-//@todo props drilling 해결
-//@todo 닉네임 정책 있는지 확인 (닉네임 글자수)
-export const ChatMsg = ({
-	userId,
-	channelId,
-	nickname,
-	myRole,
-	ownerId,
-	message,
-}: ChatMsgProps) => {
+export const ChatMsg = ({ userData, channelId, myRole, ownerId, message }: ChatMsgProps) => {
 	return (
 		<Stack flexDirection={'row'} alignItems={'center'} gap={1}>
 			<Stack flexDirection={'row'} gap={1} alignItems={'center'} width={'100%'}>
-				<OpenProfileAvatar otherUserId={userId} />
+				<OpenProfileAvatar otherUserId={userData?.id} imgUrl={userData?.profileImageURI} />
 				{myRole && myRole !== ParticipantRole.USER ? (
-					//@todo ''는 타입스크립트 오류때문에 넣었습니다. 추후 지우겠습니다
 					<AdminNickMenu
-						nickname={nickname || ''}
-						userId={userId}
-						channelId={channelId || ''}
+						nickname={userData?.nickname}
+						userId={userData.id}
+						channelId={channelId}
 						ownerId={ownerId}
 					/>
 				) : (
-					<NickMenu nickname={nickname || ''} />
+					<NickMenu nickname={userData?.nickname} />
 				)}
 			</Stack>
 			<Typography>{message}</Typography>
@@ -44,8 +35,8 @@ export const ChatMsg = ({
 	);
 };
 
-export const StatusMsg = ({ content }: { content: string }) => {
-	return <Typography fontWeight={'bold'}>{content}</Typography>;
+export const StatusMsg = ({ message }: { message: string }) => {
+	return <Typography fontWeight={'bold'}>{message}</Typography>;
 };
 
 export const HelpMsg = () => {

@@ -13,15 +13,13 @@ import { Channel, ChannelVisibility } from '@/type/channel.type';
 import useFetchData from '@/hook/useFetchData';
 import { AxiosError } from 'axios';
 import SocketContext from '@/context/socket.context';
-import useListeningChannelEvent from '@/hook/useListeningChannelEvent';
 import CustomModal from '@/component/common/CustomModal';
-import ChannelSetting from '@/component/common/ChannelSetting';
 
 export type ChattingMode = 'normal' | 'private';
 
 const MainPageBody = () => {
-	const [mode, setMode] = useState<ChattingMode>('normal');
 	const router = useRouter();
+	const [mode, setMode] = useState<ChattingMode>('normal');
 	const [showSnackbar, setShowSnackbar] = useState(false);
 	const [message, setMessage] = useState<string>('');
 	const [open, setOpen] = useState(false);
@@ -44,8 +42,8 @@ const MainPageBody = () => {
 	} = useFetchData<Chatroom[]>('/chatroom');
 
 	const navigateChannel = useCallback(
-		(channelId: string) => {
-			channelSocket?.emit('join', { channelId }, (res: any) => {
+		(channelId: string, password?: string) => {
+			channelSocket?.emit('join', { channelId, password }, (res: any) => {
 				console.log(res);
 				if (res.enter) router.push(`/chat/${channelId}/common`);
 				else {
@@ -53,17 +51,8 @@ const MainPageBody = () => {
 					setShowSnackbar(true);
 				}
 			});
-		async (channelId: string, password?: string) => {
-			// if (password)
-			// password 검증 필요
-			try {
-				await router.push(`/chat/${channelId}/common`);
-			} catch (e) {
-				setMessage('채널 입장에 실패했습니다.');
-				setShowSnackbar(true);
-			}
 		},
-		[channelSocket],
+		[channelSocket, password, router],
 	);
 
 	const getView = (
@@ -82,7 +71,7 @@ const MainPageBody = () => {
 					mode === 'normal'
 						? (data as Channel)?.visibility === 'PROTECTED'
 							? setOpen(true)
-							: navigateChannel(data?.id, password)
+							: navigateChannel(data?.id)
 						: router.push(`/chat/${data?.id}/private`)
 				}
 				style={{ textDecoration: 'none' }}
@@ -92,9 +81,13 @@ const MainPageBody = () => {
 					<CustomModal setIsOpened={setOpen}>
 						<Stack spacing={2}>
 							<Typography>비밀번호를 입력해주세요. (6자리 숫자)</Typography>
-							<TextField size="small" />
+							<TextField
+								size="small"
+								value={password}
+								onChange={e => setPassword(e?.target?.value)}
+							/>
 							<Stack flexDirection={'row'} gap={1}>
-								<Button variant={'contained'} onClick={() => navigateChannel(data.id)}>
+								<Button variant={'contained'} onClick={() => navigateChannel(data.id, password)}>
 									입장
 								</Button>
 								<Button variant={'contained'} onClick={() => setOpen(false)}>

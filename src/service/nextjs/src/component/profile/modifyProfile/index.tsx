@@ -38,18 +38,12 @@ const ModifyMyProfile = ({ UserName, TwoFAtureFalse, TwoFactorEmail }: EditProfi
 
 			if (response.status === 200 || response.status === 201) {
 				setShowSuccessSnackbar(true);
-				setTimeout(() => {
-					router.reload();
-				}, 1000);
 				router.push('/profile/testDetailProfile');
 			} else {
 				console.error('프로필 업데이트 에러:', response.status);
 			}
 		} catch (error) {
 			setShowFailSnackbar(true);
-			setTimeout(() => {
-				router.reload();
-			}, 1000);
 			// 타임아웃 에러
 		}
 	};

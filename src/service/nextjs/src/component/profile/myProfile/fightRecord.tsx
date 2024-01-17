@@ -73,7 +73,10 @@ const FightRecord = ({
 					>
 						<Grid container display="flex" flexDirection="row" alignItems="center">
 							<Grid item xs={4}>
-								<OpenProfileAvatar otherUserId={recordData?.user1.id || ''} />
+								<OpenProfileAvatar
+									imgUrl={recordData?.user1.profileImageURI}
+									otherUserId={recordData?.user1.id || ''}
+								/>
 								<p>{recordData?.user1.nickname}</p>
 							</Grid>
 							<Grid item xs={4}>
@@ -81,7 +84,10 @@ const FightRecord = ({
 								<MatchPoint score1={recordData?.score1 || 0} score2={recordData?.score2 || 0} />
 							</Grid>
 							<Grid item xs={4}>
-								<OpenProfileAvatar otherUserId={recordData?.user2.id || ''} />
+								<OpenProfileAvatar
+									otherUserId={recordData?.user2.id || ''}
+									imgUrl={recordData?.user2.profileImageURI}
+								/>
 								<p>{recordData?.user2.nickname}</p>
 							</Grid>
 						</Grid>
