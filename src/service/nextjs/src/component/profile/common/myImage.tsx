@@ -10,8 +10,8 @@ export interface avatarImgStyle {
 }
 
 export interface myImageProps {
-	name: string;
-	image: string;
+	name?: string;
+	image?: string;
 }
 
 const MyImage = ({ name, image, avatarImgStyle }: myImageProps & avatarImgStyle) => {
@@ -24,7 +24,15 @@ const MyImage = ({ name, image, avatarImgStyle }: myImageProps & avatarImgStyle)
 		wValue = 100;
 		hValue = 100;
 	}
-	return <Image alt={name} src={image} width={wValue} height={hValue} style={avatarImgStyle} />;
+	return (
+		<Image
+			alt={name || 'user'}
+			src={image || '/unknown_user.png'}
+			width={wValue}
+			height={hValue}
+			style={avatarImgStyle}
+		/>
+	);
 };
 
 export default MyImage;
