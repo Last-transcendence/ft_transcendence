@@ -15,9 +15,9 @@ import {
 import { ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import ParticipantService from 'api/participant/participant.service';
 import { ChannelModel } from 'common/model';
-import * as Auth from '../../common/auth';
 import ChannelService from './channel.service';
 import * as Dto from './dto';
+import * as Auth from '../../common/auth';
 
 @Controller('channel')
 @ApiTags('channel')
@@ -59,30 +59,6 @@ class ChannelController {
 			}
 
 			return await this.channelService.getChannel(id);
-		} catch (error) {
-			throw new HttpException(error.message, error.status);
-		}
-	}
-
-	@Patch(':id')
-	@UseGuards(Auth.Guard.UserJwt)
-	@ApiOperation({ summary: 'Change channel info' })
-	@ApiOkResponse({
-		description: 'Channel info changed successfully',
-		type: ChannelModel,
-	})
-	@ApiNotFoundResponse({ description: 'Failed to change channel info' })
-	async updateChannel(
-		@Req() req,
-		@Param('id', new ParseUUIDPipe()) id: string,
-		@Body() updateChannelDto: Dto.Request.Update,
-	): Promise<Dto.Response.UpdateChannel> {
-		try {
-			if (!(await this.participantService.isAuthorized(req.user.id))) {
-				throw new BadRequestException('User is not authorized');
-			}
-
-			return await this.channelService.updateChannel(id, updateChannelDto);
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
 		}

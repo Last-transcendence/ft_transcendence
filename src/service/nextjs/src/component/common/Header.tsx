@@ -64,7 +64,7 @@ export const MenuHeader = ({ type, title, children }: MenuHeaderProps) => {
 						<ArrowBackIosNew fontSize={'large'} />
 					</IconButton>
 				) : (
-					<IconButton onClick={() => router.push('/profile')}>
+					<IconButton onClick={() => router.push('/profile/myProfile')}>
 						<Avatar />
 					</IconButton>
 				)}

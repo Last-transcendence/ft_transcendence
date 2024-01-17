@@ -24,6 +24,7 @@ const CustomSnackbar = ({
 			open={open}
 			autoHideDuration={1000}
 			onClose={onClose}
+			sx={{ width: '100%' }}
 			anchorOrigin={{ vertical: position ?? 'top', horizontal: horizontal ?? 'right' }}
 		>
 			<MuiAlert variant="filled" severity={success ? 'success' : 'error'} onClose={onClose}>

@@ -1,10 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
-import { Request } from 'express';
 import { ExtractJwt, Strategy } from 'passport-jwt';
+import { Request } from 'express';
 import { User } from '@prisma/client';
 import UserService from '../../user/user.service';
-import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 class UserStrategy extends PassportStrategy(Strategy, 'user-jwt') {
@@ -19,17 +19,21 @@ class UserStrategy extends PassportStrategy(Strategy, 'user-jwt') {
 				},
 			]),
 			ignoreExpiration: false,
-			secretOrKey: configService.get('JWT_SECRET'),
+			secretOrKey: configService.getOrThrow<string>('JWT_SECRET'),
 		});
 	}
 
 	async validate(payload: any, done: (err: Error, data: User) => void) {
-		const user = await this.userService.findByIntraId(payload.intraId);
-		if (!user) {
-			throw new NotFoundException();
-		}
+		try {
+			const user = await this.userService.findByIntraId(payload.intraId);
+			if (!user) {
+				throw new NotFoundException();
+			}
 
-		done(null, user);
+			done(null, user);
+		} catch (error) {
+			done(error, null);
+		}
 	}
 }
 
