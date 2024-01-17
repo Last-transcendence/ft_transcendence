@@ -26,6 +26,7 @@ services:
     volumes:
       - nestjs_src_volume:/app/src
       - nestjs_prisma_volume:/app/prisma
+      - nestjs_upload_volume:/app/upload
     networks:
       - ft_transcendence
     depends_on:
@@ -90,6 +91,13 @@ volumes:
       type: none
       o: bind
       device: ./service/nestjs/prisma
+  nestjs_upload_volume:
+    name: nestjs_upload_volume
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./service/nestjs/upload
   nextjs_src_volume:
     name: nextjs_src_volume
     driver: local

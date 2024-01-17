@@ -1,5 +1,5 @@
 import GameService from './game.service';
-import { Server, Socket } from 'socket.io';
+import { Namespace, Socket } from 'socket.io';
 import {
 	ConnectedSocket,
 	MessageBody,
@@ -27,76 +27,79 @@ class GameGateway {
 	constructor(private readonly gameService: GameService) {}
 
 	@WebSocketServer()
-	server: Server;
+	server: Namespace;
 
 	handleConnection() {
-		console.log('Client connected to game namespace');
+		//console.log('Client connected to game namespace');
 	}
 
-	getClients(room: string): Set<string> {
-		return this.server.adapter['rooms'].get(room);
+	getRoom(room: string): Set<string> {
+		return this.server.adapter.rooms.get(room);
 	}
 
 	getOpponentSocketId(socket: Socket, room: string): string {
-		return Array.from(this.getClients(room)).find(client => client !== socket.id);
+		return Array.from(this.getRoom(room)).find(client => client !== socket.id);
 	}
 
-	@SubscribeMessage('/queue/join')
+	@SubscribeMessage('queue')
 	async handleQueueEvent(@ConnectedSocket() socket: Socket) {
 		try {
 			socket.join('queue');
 
 			// get clients list of queue
-			const clients = this.getClients('queue');
-			return this.server.to(Array.from(clients)[0]).emit('matched', { id: 'test' });
+			const clients = this.getRoom('queue');
+
 			if (clients.size === 1) {
+				const gameId = await this.gameService.create();
+
+				socket.leave('queue');
+				socket.join(gameId);
+				this.getRoom(gameId).add(JSON.stringify({ mode: 'hard' }));
+				return this.server.to(socket.id).emit('matched', { id: gameId });
 				return;
 			}
 
-			// pop first two clients from queue
 			const player1 = Array.from(clients)[0];
 			const player2 = Array.from(clients)[1];
+			const gameId = await this.gameService.create();
+			const socket1 = this.server.sockets.get(player1);
+			const socket2 = this.server.sockets.get(player2);
+			const gameRoom = this.getRoom(gameId);
 
-			// create game
-			const game = await this.gameService.create();
+			socket1.leave('queue');
+			socket2.leave('queue');
 
-			// send game to clients
-			this.server.to(player1).emit('matched', { id: game });
-			this.server.to(player2).emit('matched', { id: game });
-		} catch (error) {
-			throw new HttpException(error.message, error.status);
-		}
-	}
+			socket1.join(gameId);
+			socket2.join(gameId);
 
-	@SubscribeMessage('/queue/leave')
-	async handleLeaveQueueEvent(@ConnectedSocket() socket: Socket) {
-		try {
-			socket.leave('queue');
+			gameRoom.add(JSON.stringify({ mode: 'hard' }));
+
+			this.server.to(player1).emit('matched', { id: gameId });
+			this.server.to(player2).emit('matched', { id: gameId });
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
 		}
 	}
 
 	@SubscribeMessage('ready')
-	async handleReadyEvent(
-		@ConnectedSocket() socket: Socket,
-		@MessageBody() readyRequestDto: Dto.Request.Ready,
-	) {
+	async handleReadyEvent(@MessageBody() readyRequestDto: Dto.Request.Ready) {
 		try {
-			socket.join(readyRequestDto.room);
-
-			const clients = this.getClients(readyRequestDto.room);
-			const randomX = Math.random() < 0.5 ? Math.random() * 600 + 150 : Math.random() * -600 - 150;
-			const randomY = Math.random() < 0.5 ? 1280 - Math.abs(randomX) : Math.abs(randomX) - 1280;
+			const room = Array.from(this.getRoom(readyRequestDto.room));
+			const mode = JSON.parse(room[room.length - 1]).mode;
+			const speed = mode === 'NORMAL' ? 0.25 : 0.5;
+			const randomX =
+				(Math.random() < 0.5 ? Math.random() * 600 + 150 : Math.random() * -600 - 150) * speed;
+			const randomY =
+				(Math.random() < 0.5 ? 1280 - Math.abs(randomX) : Math.abs(randomX) - 1280) * speed;
 			return this.server
-				.to(Array.from(clients)[0])
+				.to(Array.from(room)[0])
 				.emit('start', { ball: { x: randomX, y: randomY } });
-			if (clients.size !== 2) {
+			if (room.length !== 3) {
 				return;
 			}
 
-			const player1 = Array.from(clients)[0];
-			const player2 = Array.from(clients)[1];
+			const player1 = room[0];
+			const player2 = room[1];
 
 			this.server.to(player1).emit('start', { ball: { x: randomX, y: randomY } });
 			this.server.to(player2).emit('start', { ball: { x: -randomX, y: -randomY } });
