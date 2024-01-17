@@ -1,13 +1,13 @@
-import { Controller, Get, HttpException, Param, Post, Query, Req, UseGuards, UploadedFile, UseInterceptors, Patch,ParseUUIDPipe, Body } from '@nestjs/common';
-import { ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Controller, Get, HttpException, Param, Post, Query, Req, UseGuards, UploadedFile, UseInterceptors, Patch, Body, Response } from '@nestjs/common';
+import { ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiTags, ApiConsumes } from '@nestjs/swagger';
 import UserService from './user.service';
-import { User } from '@prisma/client';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { multerOption } from '../user/multer.options';
 import * as Dto from './dto';
 import { UserModel } from 'common/model';
 import * as Auth from '../../common/auth';
-
+import { ApiFile } from '../../common/multer/apifile.decorator';
+import { FileInterceptor } from '@nestjs/platform-express';
+import * as fs from 'fs';
+import { join } from 'path';
 @Controller('user')
 @ApiTags('user')
 class UserController {
@@ -18,28 +18,24 @@ class UserController {
 	@ApiOperation({ summary: 'Get my information' })
 	@ApiOkResponse({ description: 'Get my info successfully', type: Dto.Response.User })
 	@ApiNotFoundResponse({ description: 'User not found' })
-	async me(@Req() req): Promise<Dto.Response.User> {
+	async me(@Req() req): Promise<UserModel> {
 		return req.user;
 	}
-	
-    // @UseInterceptors(FileInterceptor('profileImage'))
+
 	@Patch('me')
 	@UseGuards(Auth.Guard.UserJwt)
 	@ApiOperation({ summary: 'Update my information' })
 	@ApiOkResponse({ description: 'Get my info successfully', type: UserModel })
 	@ApiNotFoundResponse({ description: 'User not found' })
+	@ApiConsumes('multipart/form-data')
+	@UseInterceptors(FileInterceptor('file'))
 	async meUpdate(
-		// @Param('id', ParseUUIDPipe) id: string,
-		@Body() updateData: User ,
+		@Body() updateData: Dto.Request.Update,
 		@Req() req,
-	): Promise<Dto.Response.User> {
+		@UploadedFile() file: Express.Multer.File,
+	): Promise<UserModel> {
 		try {
-			// if (updateData.profileImageURI) {
-			// 	await this.userService.setProfileImage(req.user.id, updateData.profileImageURI);
-			// }
-			console.log(updateData.nickname);
-
-			return await this.userService.updateUserById(req.user.id, updateData);
+			return await this.userService.updateUserById(req.user.id, updateData, file.filename);
 		}
 		catch (error) {
 			throw new HttpException(error.message, error.status);
