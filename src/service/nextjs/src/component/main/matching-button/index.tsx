@@ -9,9 +9,10 @@ import { useRouter } from 'next/navigation';
 const MatchingButton = () => {
 	const { sockets } = useContext(SocketContext);
 	const navigate = useRouter();
+	const socket = sockets.gameSocket;
 
-	if (!sockets.gameSocket) {
-		return;
+	if (!socket) {
+		return null;
 	}
 
 	return (
@@ -21,11 +22,12 @@ const MatchingButton = () => {
 					width={'75cqw'}
 					height={'75cqw'}
 					onClick={() => {
-						alert('matching button clicked');
-						sockets.gameSocket?.on('queue', response => {
-							console.log(response);
+						socket.on('matched', response => {
+							socket.off('matched');
+							socket.emit('/queue/leave');
 							navigate.push(`/game/${response.id}`);
 						});
+						socket.emit('/queue/join');
 					}}
 				/>
 			</div>
