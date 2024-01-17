@@ -1,22 +1,25 @@
 import { createContext, Dispatch, ReactNode, SetStateAction, useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 
-const connect = () => {
-	alert('Connected');
+const connect = (namespace: string) => {
+	//alert(`Socket connected on ${namespace}`);
 };
 
-const disconnect = () => {
-	alert('Disconnected');
+const disconnect = (namespace: string) => {
+	//alert(`Socket disconnected on ${namespace}`);
 };
 
 const initSocket = (namespace: string): Socket => {
-	const socket = io(`${process.env.NEXT_PUBLIC_API_URL}/socket/${namespace}`);
+	const socket = io(`${process.env.NEXT_PUBLIC_API_URL}/socket/${namespace}`, {
+		transports: ['websocket'],
+		withCredentials: true,
+	});
 
 	socket.on('connect', () => {
-		connect();
+		connect(namespace);
 	});
 	socket.on('disconnect', () => {
-		disconnect();
+		disconnect(namespace);
 	});
 	return socket;
 };
@@ -49,13 +52,22 @@ export const SocketProvider = (props: { children: ReactNode }) => {
 
 	useEffect(() => {
 		if (!sockets.chatSocket) {
-			sockets.chatSocket = initSocket('chat');
+			setSocket({
+				...sockets,
+				chatSocket: initSocket('chat'),
+			});
 		}
 		if (!sockets.channelSocket) {
-			sockets.channelSocket = initSocket('channel');
+			setSocket({
+				...sockets,
+				channelSocket: initSocket('channel'),
+			});
 		}
 		if (!sockets.gameSocket) {
-			sockets.gameSocket = initSocket('game');
+			setSocket({
+				...sockets,
+				gameSocket: initSocket('game'),
+			});
 		}
 	}, [sockets]);
 

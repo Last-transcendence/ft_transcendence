@@ -10,9 +10,6 @@ import {
 	UseGuards,
 	Delete,
 } from '@nestjs/common';
-import { AuthService } from './service/auth.service';
-import { CookieService } from './service/cookie.service';
-import { TwoFactorService } from './service/twofactor.service';
 import {
 	ApiBadRequestResponse,
 	ApiOkResponse,
@@ -21,10 +18,13 @@ import {
 	ApiTags,
 	ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { AuthService } from './service/auth.service';
+import { CookieService } from './service/cookie.service';
+import { TwoFactorService } from './service/twofactor.service';
 import { ConfigService } from '@nestjs/config';
+import { User } from 'api/user/dto/response';
 import * as Auth from '../../common/auth';
 import * as Dto from './dto';
-import { User } from 'api/user/dto/response';
 
 @Controller('auth')
 @ApiTags('auth')
