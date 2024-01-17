@@ -36,7 +36,6 @@ async function bootstrap() {
 	await prismaService.enableShutdownHooks(app);
 
 	setupSwagger(app);
-
 	await app.listen(configService.getOrThrow('PORT'));
 }
 bootstrap();
