@@ -4,10 +4,7 @@ import UserService from './user.service';
 import * as Dto from './dto';
 import { UserModel } from 'common/model';
 import * as Auth from '../../common/auth';
-import { ApiFile } from '../../common/multer/apifile.decorator';
 import { FileInterceptor } from '@nestjs/platform-express';
-import * as fs from 'fs';
-import { join } from 'path';
 @Controller('user')
 @ApiTags('user')
 class UserController {
@@ -30,7 +27,7 @@ class UserController {
 	@ApiConsumes('multipart/form-data')
 	@UseInterceptors(FileInterceptor('file'))
 	async meUpdate(
-		@Body() updateData: Dto.Request.Update,
+		@Body() updateData: Dto.Request.UpdateUser,
 		@Req() req,
 		@UploadedFile() file: Express.Multer.File,
 	): Promise<UserModel> {

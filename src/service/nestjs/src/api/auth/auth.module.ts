@@ -4,11 +4,9 @@ import { AuthService } from './service/auth.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { CookieService } from './service/cookie.service';
-import * as Ft from './ft';
-import * as Jwt from './jwt';
-import MailService from 'api/auth/service/mail.service';
 import { TwoFactorService } from './service/twofactor.service';
 import { CacheModule } from '@nestjs/cache-manager';
+import { MailService } from './service/mail.service';
 import UserModule from '../user/user.module';
 import JwtAuthModule from './jwt/jwt.module';
 import FtAuthModule from './ft/ft.module';
@@ -32,8 +30,8 @@ import FtAuthModule from './ft/ft.module';
 			isGlobal: true,
 		}),
 	],
-	providers: [AuthService, CookieService, Ft.FtStrategy, Jwt.FtStrategy, Jwt.UserStrategy, MailService, TwoFactorService],
 	controllers: [AuthController],
+	providers: [AuthService, CookieService, TwoFactorService, MailService],
 })
 class AuthModule {}
 
