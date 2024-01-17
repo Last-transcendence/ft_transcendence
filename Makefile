@@ -16,7 +16,7 @@ logs:
 	@${DOCKER_COMPOSE} logs
 
 prune:
-	@docker system prune -af
+	@docker system prune -af 2>/dev/null || true
 
 .PHONY: up down stop start fclean
 
