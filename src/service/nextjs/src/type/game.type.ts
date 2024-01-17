@@ -18,6 +18,8 @@ type Game = {
 	userScore2: number;
 	mode: Mode;
 	result: Result;
+	createdAt: string;
+	updatedAt: string;
 };
 
 export default Game;

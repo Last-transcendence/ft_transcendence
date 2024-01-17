@@ -5,12 +5,12 @@ import useFetchData from '@/hook/useFetchData';
 import Friend from '@/type/friend.type';
 
 const FriendPage = () => {
-	const { data, isLoading } = useFetchData<Friend[]>('/friend');
+	const { data } = useFetchData<Friend[]>('/friend');
 
 	return (
 		<div className={style.container}>
 			<AddFriend friendList={data} />
-			<FriendList data={data} isLoading={isLoading} />
+			<FriendList data={data} />
 		</div>
 	);
 };
