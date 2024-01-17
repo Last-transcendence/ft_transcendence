@@ -1,7 +1,7 @@
 import style from '../../../style/friend/add/index.module.css';
 import SearchFriend from './search';
 import UserBriefInformation from '@/component/common/user/bried-information';
-import { Skeleton } from '@mui/material';
+import { Skeleton, Typography } from '@mui/material';
 import User, { UserStatus } from '@/type/user.type';
 import { useState } from 'react';
 // import { getFetcher } from '@/component/api/getFetcher';
@@ -35,31 +35,26 @@ const dummyUsers: User[] = [
 
 const AddFriend = ({ friendList }: { friendList: Friend[] | undefined }) => {
 	const [searchData, setSearchData] = useState<User[]>([]);
-	const [isLoading, setLoading] = useState(false);
 	const [showSuccessSnackbar, setShowSuccessSnackbar] = useState(false);
 	const [message, setMessage] = useState({
 		title: '',
 		success: true,
 	});
+	const [isSearching, setIsSearching] = useState(false);
 
-	const onSearch = (name: string) => {
-		if (isLoading) return;
+	const onSearch = async (name: string) => {
 		if (name.length === 0) setSearchData([]);
-		setSearchData(dummyUsers);
-		//@todo api test
-		// try {
-		// 	setLoading(true);
-		// 	const res = await api.post(`/user/search?queryString=${name}`);
-		// 	setSearchData(res.data);
-		// 	setLoading(false);
-		// } catch (error) {
-		// 	console.error('Error fetching data:', error);
-		// 	setLoading(false);
-		// }
+		try {
+			const res = await postFetcher(`/user/search?queryString=${name}`);
+			setSearchData(res as any);
+		} catch (error) {
+			setMessage({
+				title: '검색 실패',
+				success: false,
+			});
+			setShowSuccessSnackbar(true);
+		}
 	};
-
-	if (isLoading) return <Skeleton />;
-	if (!searchData) return <div>유저가 없습니다.</div>;
 
 	const setFriend = async (id: string, mode: 'add' | 'delete') => {
 		const title = mode === 'add' ? '친구 추가' : '친구 삭제';
@@ -97,15 +92,19 @@ const AddFriend = ({ friendList }: { friendList: Friend[] | undefined }) => {
 			/>
 			<div className={style['add-container']}>
 				<Title />
-				<SearchFriend onSearch={onSearch} />
+				<SearchFriend
+					onSearch={onSearch}
+					isSearching={isSearching}
+					setIsSearching={setIsSearching}
+				/>
 			</div>
-			{isLoading ? (
-				<Skeleton />
-			) : !searchData ? (
-				<>데이터가 없습니다</>
+			{!isSearching ? (
+				<></>
+			) : !searchData || !searchData.length ? (
+				<Typography>유저가 없습니다.</Typography>
 			) : (
 				<div className={style['user-container']}>
-					{searchData?.map(user => (
+					{searchData.map(user => (
 						<div key={user.id}>
 							<UserBriefInformation
 								nickname={user?.nickname}
