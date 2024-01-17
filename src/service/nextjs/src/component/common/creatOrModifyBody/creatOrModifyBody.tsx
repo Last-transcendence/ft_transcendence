@@ -1,14 +1,16 @@
 import styles from '@/style/auth/creatUser/index.module.css';
 import { Container, Box, Stack } from '@mui/material';
 import UserPhoto from './userPhoto';
-import { ChangeEvent, useState, useEffect } from 'react';
+import { ChangeEvent, useState, useEffect, useContext } from 'react';
 import Modify2FA, { ModifyTwoFactorProps } from '@/component/common/modify2FA';
 import { useRouter } from 'next/navigation';
 import { Dispatch, SetStateAction } from 'react';
 import CustomSnackbar from '@/component/common/customSnackbar';
 import CustomTextField, { customTextFieldProps } from '@/component/common/customInputField';
 import { useCallback } from 'react';
-import { getFetcher, postFetcher } from '@/service/api';
+import { getFetcher, postFetcher, patchFetcher } from '@/service/api';
+import AuthContext from '@/context/auth.context';
+import Me from '@/type/me.type';
 
 interface EditProfileProps {
 	isModify: boolean;
@@ -35,6 +37,7 @@ const CreatOrModifyBody = ({
 	execSendServer,
 	setExecSendServer,
 }: EditProfileProps) => {
+	const { setMe } = useContext(AuthContext);
 	const [imgFile, setImgFile] = useState<File | undefined>(undefined);
 	const [img, setImg] = useState<string | ArrayBuffer | null>(null);
 	const [userName, setUserName] = useState<string>('');
@@ -43,7 +46,7 @@ const CreatOrModifyBody = ({
 	const [errorMessage, setErrorMessage] = useState<string>('');
 	const router = useRouter();
 
-	const path = isModify ? '/user/em' : '/auth/register';
+	const path = isModify ? '/user/me' : '/auth/register';
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -87,7 +90,9 @@ const CreatOrModifyBody = ({
 			// const response = await postFetcher(path, formData, {
 			// 	headers: { 'Content-Type': 'multipart/form-data' },
 			// });
-			const response = await postFetcher(path, user);
+			const response =
+				isModify === false ? await postFetcher<Me>(path, user) : await patchFetcher<Me>(path, user);
+			setMe(response);
 			router.push('/');
 		} catch (error) {
 			console.log('에러발생');
@@ -96,7 +101,7 @@ const CreatOrModifyBody = ({
 			setLoading(false);
 		}
 		// }, [imgFile, userName, twoFATrueFalse, path, towFactorEmail, router, setLoading]);
-	}, [userName, twoFATrueFalse, path, router, setLoading]);
+	}, [userName, twoFATrueFalse, path, router, setLoading, setMe, isModify]);
 
 	const userNameChecker = useCallback(() => {
 		try {
