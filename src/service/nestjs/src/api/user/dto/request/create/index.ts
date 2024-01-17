@@ -1,7 +1,6 @@
 import { Trim } from '@miaooo/class-transformer-trim';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator';
-
 class Create {
 	@IsString()
 	@IsNotEmpty()
@@ -21,10 +20,10 @@ class Create {
 	email2fa?: string;
 
 	@IsOptional()
-	@IsString()
-	@Trim()
-	@ApiProperty({ description: 'Profile image URI', required: false })
-	profileImageURI?: string;
+    @IsString()
+    @Trim()
+    @ApiProperty({ description: 'Field Name', format: 'binary', required: false })
+    file?: string;
 }
 
 export default Create;
