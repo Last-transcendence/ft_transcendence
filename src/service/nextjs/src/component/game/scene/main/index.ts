@@ -45,7 +45,7 @@ class MainScene extends Phaser.Scene {
 		}
 
 		this.myScore.setText((parseInt(this.myScore.text, 10) + 1).toString());
-		this.socket.emit(`score`, {
+		this.socket.emit('score', {
 			room: this.room,
 			score: this.myScore.text,
 		});
@@ -94,23 +94,25 @@ class MainScene extends Phaser.Scene {
 	}
 
 	initSocket() {
-		this.socket.on(`start`, response => {
-			const normal = 0.5;
-			const hard = 0.75;
-			const ballX = response.ball.x * hard;
-			const ballY = response.ball.y * hard;
-
+		this.socket.on('start', response => {
 			this.isPlaying = true;
-
-			console.log(this.ball);
-			this.ball.setVelocity(ballX, ballY);
+			this.ball.setVelocity(response.ball.x, response.ball.y);
 		});
-		this.socket.on(`move`, response => {
+		this.socket.on('move', response => {
 			this.enemyPaddle.x = response.x;
 		});
-		this.socket.on(`score`, response => {
+		this.socket.on('score', response => {
 			this.enemyScore.setText(parseInt(response.score, 10).toString());
 			this.reset();
+		});
+		this.socket.on('end', response => {
+			this.socket.off('start');
+			this.socket.off('move');
+			this.socket.off('score');
+			this.socket.off('end');
+			this.scene.start('EndScene', {
+				winner: response.winner,
+			});
 		});
 	}
 
@@ -168,7 +170,7 @@ class MainScene extends Phaser.Scene {
 			this.game.canvas.width - this.myPaddle.width / 2,
 		);
 
-		this.socket.emit(`move`, {
+		this.socket.emit('move', {
 			room: this.room,
 			x: this.myPaddle.x,
 		});
