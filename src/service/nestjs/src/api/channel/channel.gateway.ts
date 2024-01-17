@@ -12,8 +12,8 @@ import { Server, Socket } from 'socket.io';
 import { ConfigService } from '@nestjs/config';
 import ChannelService from './channel.service';
 import * as Auth from '../../common/auth';
-import * as ParticipantDto from '../participant/dto';
 import * as ChannelDto from './dto';
+import * as ParticipantDto from '../participant/dto';
 
 const getCorsOrigin = () => {
 	const configService = new ConfigService();
