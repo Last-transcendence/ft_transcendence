@@ -19,10 +19,14 @@ class FtStrategy extends PassportStrategy(Strategy, 'ft-jwt') {
 	}
 
 	async validate(payload: any, done: (err: Error, data: any) => void) {
-		if (!payload) {
-			done(new Error('Invalid payload'), null);
+		try {
+			if (!payload) {
+				done(new Error('Invalid payload'), null);
+			}
+			done(null, payload);
+		} catch (error) {
+			done(error, null);
 		}
-		done(null, payload);
 	}
 }
 

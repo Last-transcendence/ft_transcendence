@@ -8,7 +8,7 @@ import { useRouter } from 'next/router';
 const MyProfilePage = () => {
 	const router = useRouter();
 	const onClick = () => {
-		router.push('/profile/testModifyProfile');
+		router.push('/profile/modifyProfile');
 	};
 	const { me } = useContext(AuthContext);
 	console.log(me?.nickname);
@@ -21,9 +21,22 @@ const MyProfilePage = () => {
 				flexDirection: 'column',
 			}}
 		>
-			<Header title={'마이프로필'} />
-			<MyProfileBody image={me?.profileImageURI} name={me?.nickname} use2fa={me?.use2fa} />
-			<BottomButton title="수정" onClick={onClick} />
+			<div style={{ position: 'relative' }}>
+				<Header title={'마이프로필'} />
+			</div>
+			<div
+				style={{
+					width: '100%',
+					position: 'absolute',
+					top: '60px',
+					display: 'flex',
+					flexDirection: 'column',
+					justifyContent: 'center',
+				}}
+			>
+				<MyProfileBody image={me?.profileImageURI} name={me?.nickname} use2fa={me?.use2fa} />
+			</div>
+			<BottomButton title="프로필 수정하기" onClick={onClick} />
 		</div>
 	);
 };

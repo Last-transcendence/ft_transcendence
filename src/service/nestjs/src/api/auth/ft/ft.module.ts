@@ -6,6 +6,6 @@ import FtStrategy from './ft.strategy';
 	imports: [PassportModule],
 	providers: [FtStrategy],
 })
-class FtModule {}
+class FtAuthModule {}
 
-export default FtModule;
+export default FtAuthModule;
