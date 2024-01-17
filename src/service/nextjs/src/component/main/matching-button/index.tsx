@@ -24,10 +24,9 @@ const MatchingButton = () => {
 					onClick={() => {
 						socket.on('matched', response => {
 							socket.off('matched');
-							socket.emit('/queue/leave');
 							navigate.push(`/game/${response.id}`);
 						});
-						socket.emit('/queue/join');
+						socket.emit('queue');
 					}}
 				/>
 			</div>
