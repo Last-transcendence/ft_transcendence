@@ -43,9 +43,7 @@ class UserService {
 	async updateUserById(id: string, updateRequestDto: Dto.Request.Update, filename: string): Promise<User> {
 		try {
 			delete updateRequestDto.file;
-			delete updateRequestDto.use2fa;
-			const use2fa = updateRequestDto.email2fa ? true : false;
-			return await this.prismaService.user.update({ where: { id }, data: { ...updateRequestDto, profileImageURI: filename, use2fa: use2fa} });
+			return await this.prismaService.user.update({ where: { id }, data: { ...updateRequestDto, profileImageURI: filename} });
 		} catch (error) {
 			throw new Error(error.message);
 		}
@@ -57,13 +55,6 @@ class UserService {
 		} catch (error) {
 			throw new Error(error.message);
 		}
-	}
-
-	fileUpload(file: Express.Multer.File) {
-		if (!file) {
-			throw new Error('File not found');
-		}
-		return file.filename;
 	}
 }
 
