@@ -6,7 +6,6 @@ import { useState } from 'react';
 
 const CreatUserBody = () => {
 	const [loading, setLoading] = useState<boolean>(false);
-
 	const [sendServer, setSendServer] = useState<boolean>(false);
 
 	return (
