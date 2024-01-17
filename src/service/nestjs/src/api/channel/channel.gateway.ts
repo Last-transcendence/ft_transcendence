@@ -33,15 +33,25 @@ class ChannelGateway {
 	@SubscribeMessage('create')
 	@UseGuards(Auth.Guard.UserJwtWs)
 	async handleCreate(
-		@MessageBody() createChannelDto: ChannelDto.Request.Create,
+		@MessageBody() createChannelDto: Dto.Request.Create,
 		@ConnectedSocket() socket: Socket,
 	) {
-		const newChannel = await this.channelService.createChannel(createChannelDto);
-		const newParticipant = await this.participantService.create(newChannel.id, socket.data.user.id);
+		try {
+			const newChannel = await this.channelService.createChannel(createChannelDto);
+			const newParticipant = await this.participantService.create(
+				newChannel.id,
+				socket.data.user.id,
+			);
 
-		await this.participantService.update(newParticipant.id, { role: 'OWNER' });
+			await this.participantService.update(newParticipant.id, { role: 'OWNER' });
 
-		socket.join(newChannel.id);
+			socket.join(newChannel.id);
+			return { res: true, channelId: newChannel.id };
+		} catch (error) {
+			console.error("An error occurred channel.gateway 'create':", error);
+			socket.emit('error', { message: "An error occurred channel.gateway 'create'" });
+			return { res: false };
+		}
 	}
 
 	@SubscribeMessage('join')
