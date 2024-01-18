@@ -65,6 +65,7 @@ export class AuthController {
 	@ApiUnauthorizedResponse({ description: 'Unauthorized' })
 	async login(@Request() req, @Response({ passthrough: true }) res) {
 		try {
+			//403 error
 			const user = await this.authService.login(req.user.intraId);
 			const jwt = this.cookieService.createJwt({
 				id: user.id,
