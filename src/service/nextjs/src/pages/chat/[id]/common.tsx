@@ -1,7 +1,7 @@
-import { CommonChatRoom } from '@/component/chat';
+import CommonChatRoomPage from '@/component/chat/CommonChatRoomPage';
 
 const ChatCommonPage = () => {
-	return <CommonChatRoom />;
+	return <CommonChatRoomPage />;
 };
 
 export default ChatCommonPage;
