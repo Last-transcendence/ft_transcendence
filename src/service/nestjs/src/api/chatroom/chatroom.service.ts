@@ -16,6 +16,16 @@ class ChatRoomService {
 		}
 	}
 
+	async getChatRoomById(chatRoomId: string): Promise<ChatRoomModel> {
+		try {
+			return await this.prismaService.chatRoom.findUnique({
+				where: { id: chatRoomId },
+			});
+		} catch (error) {
+			throw new Error(error.message);
+		}
+	}
+
 	async create(srcId: string, destId: string): Promise<ChatRoomModel> {
 		try {
 			this.prismaService.chatRoom.create({

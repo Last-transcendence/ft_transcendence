@@ -1,13 +1,16 @@
-import { Body, Controller, Get, HttpException, Post, Req } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, Post, Req, UseGuards, Param } from '@nestjs/common';
 import ChatRoomService from './chatroom.service';
 import { ApiBadRequestResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ChatRoomModel } from 'common/model';
+import UserService from 'api/user/user.service';
+import * as Auth from '../../common/auth';
 import * as Dto from './dto';
-
+import { User } from 'prisma/prisma-client';
 @Controller('chatroom')
 @ApiTags('chatroom')
 class ChatRoomController {
-	constructor(private readonly chatRoomService: ChatRoomService) {}
+	constructor(private readonly chatRoomService: ChatRoomService,
+				private readonly userService: UserService) {}
 
 	@Get()
 	@ApiOperation({ summary: 'Get chat room' })
@@ -16,6 +19,20 @@ class ChatRoomController {
 	async getChatRoom(@Req() req): Promise<ChatRoomModel[]> {
 		try {
 			return await this.chatRoomService.get(req.user.id);
+		} catch (error) {
+			throw new HttpException(error.message, error.status);
+		}
+	}
+
+	@Get(':id')
+	@UseGuards(Auth.Guard.UserJwt)
+	@ApiOperation({ summary: 'Get chat room by id' })
+	@ApiOkResponse({ description: 'Get chat room by id successfully' })
+	@ApiBadRequestResponse({ description: 'Bad request' })
+	async getChatRoomById(@Req() req, @Param('id') id: string): Promise<User> {
+		try {
+			const chatRoom = await this.chatRoomService.getChatRoomById(id);
+			return await this.userService.get(chatRoom.destId);
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
 		}

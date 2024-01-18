@@ -6,14 +6,12 @@ import {
 	WebSocketGateway,
 	WebSocketServer,
 } from '@nestjs/websockets';
-import { Server, Socket } from 'socket.io';
+import { Server, Socket, Namespace } from 'socket.io';
 import { ConfigService } from '@nestjs/config';
 import ChatRoomService from './chatroom.service';
 import * as Auth from '../../common/auth';
 import * as ChatRoomDto from './dto';
-import * as ParticipantDto from '../participant/dto';
 import ParticipantService from 'api/participant/participant.service';
-import { join } from 'path';
 
 const getCorsOrigin = () => {
     const configService = new ConfigService();
@@ -33,53 +31,52 @@ class ChatRoomGateway {
     ) {}
 
     @WebSocketServer()
-    server: Server;
+    // server: Server;
+    server: Namespace;
 
     handleConnection() {
         console.log('Client connected to chatroom namespace');
     }
 
-    @SubscribeMessage('create')
+    @SubscribeMessage('join')
     @UseGuards(Auth.Guard.UserWsJwt)
-    async handleCreate(
-        @MessageBody() createChatRoomDto: ChatRoomDto.Request.Create,
+    async handleJoin(
+        @MessageBody() joinChatRoomDto: ChatRoomDto.Request.Create,
         @ConnectedSocket() socket: Socket,
     ) {
         try {
             const userId: string = socket.data.user.id;
-            const destId: string = createChatRoomDto.destId;
-            const newChatRoom = await this.chatRoomService.create(userId, destId);
-            socket.join(newChatRoom.id);
-            return { res: true, chatRoomId: newChatRoom.id };
-        } catch (error) {
-            throw new BadRequestException(error.message);
-        }
-    }
-
-    @SubscribeMessage('join')
-    @UseGuards(Auth.Guard.UserWsJwt)
-    async handleJoin(
-        @MessageBody() joinChatRoomDto: ParticipantDto.Request.Create,
-        @ConnectedSocket() socket: Socket,
-    ) {
-        try {
-            const userId: string = socket.data.user .id;
-            
-            if (await this.participantService.isParticipated(userId)) {
-                throw new BadRequestException('User is already participated');
-            }
-            // 수 정
-            const chatRoom = await this.chatRoomService.find(userId, joinChatRoomDto.channelId);
+            const destId: string = joinChatRoomDto.destId;
+            const chatRoom = await this.chatRoomService.find(userId, destId);
             if (!chatRoom){
-                throw new BadRequestException('ChatRoom is not exist');
+                await this.chatRoomService.create(userId, destId);
             }
-            
-            socket.join(joinChatRoomDto.channelId);
+            const chatRoomName = [userId, destId].sort().join('_');
+            socket.join(chatRoomName);
             return { res: true };
         } catch (error) {
             console.error("An error occurred chatRoom.gateway 'join':", error);
 			socket.emit('error', { message: 'An error occurred' });
 			return { res: false };
+        }
+    }
+
+    @SubscribeMessage('message')
+    @UseGuards(Auth.Guard.UserWsJwt)
+    async handleMessage(
+        @MessageBody() messageDto: ChatRoomDto.Request.Message,
+        @ConnectedSocket() socket: Socket,
+    ) {
+        try {
+            const userId: string = socket.data.user.id;
+            const destId: string = messageDto.destId;
+            const chatRoomName = [userId, destId].sort().join('_');
+            socket.to(chatRoomName).emit('message', messageDto);
+            return { res: true };
+        } catch (error) {
+            console.error("An error occurred chatRoom.gateway 'message':", error);
+            socket.emit('error', { message: 'An error occurred' });
+            return { res: false };
         }
     }
 }
