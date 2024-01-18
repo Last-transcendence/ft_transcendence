@@ -79,6 +79,7 @@ class ChatRoomGateway {
             }
             const chatRoomName = [userId, destId].sort().join('_');
             await this.chatService.create(userId, destId, messageDto.message);
+            await this.chatService.create(destId, userId, messageDto.message);
             socket.to(chatRoomName).emit('message', messageDto);
             return { res: true };
         } catch (error) {
