@@ -2,14 +2,22 @@ import { IconButton, Input, Stack } from '@mui/material';
 import { EnterKey } from '@/component/chat/icon';
 import React, { ChangeEvent, useState } from 'react';
 import { CommandType } from '@/component/chat/ChatRoomLayout';
+import { useParams } from 'next/navigation';
 
 interface SendChatProps {
 	sendAction: (message: string) => void;
-	commandAction: (type: CommandType, nickname?: string, message?: string) => void;
+	commandAction: (
+		type: CommandType,
+		nickname?: string,
+		message?: string,
+		channelId?: string,
+	) => void;
 }
 
 const SendChat = ({ sendAction, commandAction }: SendChatProps) => {
 	const [chat, setChat] = useState('');
+	const params = useParams<{ id: string }>();
+
 	const onEnter = () => {
 		if (chat === '' || !chat) return;
 		if (chat[0] === '/') {
@@ -23,13 +31,10 @@ const SendChat = ({ sendAction, commandAction }: SendChatProps) => {
 					commandAction('HELP');
 					break;
 				case '/w':
-					commandAction('DM', nickname, message);
-					break;
-				case '/i':
-					commandAction('INVITE', nickname);
+					commandAction('DM', nickname, message, params?.id);
 					break;
 				case '/g':
-					commandAction('GAME', nickname);
+					commandAction('GAME', nickname, undefined, params?.id);
 					break;
 				default:
 					sendAction(chat ?? '');
