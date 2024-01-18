@@ -14,15 +14,16 @@ const FriendList = ({ data }: { data: Friend[] | undefined }) => {
 		<div className={style.container}>
 			<Title />
 			{data && data?.length ? (
-				data.map((user: Friend) => {
+				data.map(user => {
 					return (
-						<div key={user.id}>
+						<div key={user?.userId}>
 							{/*@todo 문자제거.*/}
 							<UserBriefInformation
-								nickname={'친구'}
-								condition={<FriendStatus status={UserStatus.ONLINE} />}
+								nickname={user?.user?.nickname}
+								condition={<FriendStatus status={user?.user?.status} />}
 								className={style['user-brief-information']}
-								userId={user.id}
+								userId={user?.userId}
+								imgUrl={user?.user?.profileImageURI}
 							/>
 						</div>
 					);

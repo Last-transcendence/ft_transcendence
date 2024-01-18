@@ -3,7 +3,7 @@ import SearchFriend from './search';
 import UserBriefInformation from '@/component/common/user/bried-information';
 import { Skeleton, Typography } from '@mui/material';
 import User, { UserStatus } from '@/type/user.type';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 // import { getFetcher } from '@/component/api/getFetcher';
 // import Friend from '@/type/friend.type';
 import CustomSnackbar from '@/component/profile/modifyProfile/customSnackbar';
@@ -18,22 +18,13 @@ const Title = () => {
 	);
 };
 
-const dummyUsers: User[] = [
-	{
-		id: '1',
-		nickname: 'John Doe',
-		profileImageURI: 'https://example.com/john_doe.jpg',
-		status: UserStatus.ONLINE,
-	},
-	{
-		id: '2',
-		nickname: 'Jane Smith',
-		profileImageURI: undefined,
-		status: UserStatus.OFFLINE,
-	},
-];
-
-const AddFriend = ({ friendList }: { friendList: Friend[] | undefined }) => {
+const AddFriend = ({
+	friendList,
+	refetch,
+}: {
+	friendList: Friend[] | undefined;
+	refetch: () => void;
+}) => {
 	const [searchData, setSearchData] = useState<User[]>([]);
 	const [showSuccessSnackbar, setShowSuccessSnackbar] = useState(false);
 	const [message, setMessage] = useState({
@@ -56,11 +47,10 @@ const AddFriend = ({ friendList }: { friendList: Friend[] | undefined }) => {
 		}
 	};
 
-	const setFriend = async (id: string, mode: 'add' | 'delete') => {
+	const setFriend = useCallback(async (id: string, mode: 'add' | 'delete') => {
 		const title = mode === 'add' ? '친구 추가' : '친구 삭제';
-
 		try {
-			await (mode === 'add'
+			await (mode == 'add'
 				? postFetcher('/friend', { friendId: id })
 				: deleteFetcher(`/friend/${id}`));
 			setMessage({
@@ -68,6 +58,7 @@ const AddFriend = ({ friendList }: { friendList: Friend[] | undefined }) => {
 				success: true,
 			});
 			setShowSuccessSnackbar(true);
+			refetch();
 		} catch (error) {
 			setMessage({
 				title: title + ' 실패',
@@ -75,7 +66,7 @@ const AddFriend = ({ friendList }: { friendList: Friend[] | undefined }) => {
 			});
 			setShowSuccessSnackbar(true);
 		}
-	};
+	}, []);
 
 	const isFriend = (id: string) => {
 		return friendList?.some(friend => friend.friendId === id);
@@ -110,11 +101,12 @@ const AddFriend = ({ friendList }: { friendList: Friend[] | undefined }) => {
 								nickname={user?.nickname}
 								className={style['user-brief-information']}
 								userId={user.id}
+								imgUrl={user?.profileImageURI}
 							/>
 							{isFriend(user.id) ? (
-								<button onClick={() => setFriend(user.id, 'add')}>삭제</button>
+								<button onClick={() => setFriend(user.id, 'delete')}>삭제</button>
 							) : (
-								<button onClick={() => setFriend(user.id, 'delete')}>추가</button>
+								<button onClick={() => setFriend(user.id, 'add')}>추가</button>
 							)}
 						</div>
 					))}
