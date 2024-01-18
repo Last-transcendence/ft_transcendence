@@ -30,20 +30,20 @@ class UserService {
 		}
 	}
 
-	async create(intraId: string, { use2fa, file, ...registerRequestDto}: Dto.Request.Create, filename: string): Promise<User> {
+	async create(intraId: string, { use2fa, file, ...registerRequestDto}: Dto.Request.Create): Promise<User> {
 		try {
 			return await this.prismaService.user.create({
-				data: { intraId, ...registerRequestDto, profileImageURI: filename, use2fa: use2fa === 'true' ? true : false },
+				data: { intraId, ...registerRequestDto, profileImageURI: file, use2fa: use2fa === 'true' ? true : false },
 			});
 		} catch (error) {
 			throw new Error(error.message);
 		}
 	}
 
-	async updateUserById(id: string, { use2fa, file, ...updateRequestDto}: Dto.Request.UpdateUser, filename: string): Promise<User> {
+	async updateUserById(id: string, { use2fa, file, ...updateRequestDto}: Dto.Request.UpdateUser): Promise<User> {
 		try {
 			return await this.prismaService.user.update({ 
-				where: { id }, data: { ...updateRequestDto, profileImageURI: filename, use2fa: use2fa === 'true' ? true : false},
+				where: { id }, data: { ...updateRequestDto, profileImageURI: file, use2fa: use2fa === 'true' ? true : false},
 			});
 		} catch (error) {
 			throw new Error(error.message);

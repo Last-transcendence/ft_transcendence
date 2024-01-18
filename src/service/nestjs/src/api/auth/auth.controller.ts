@@ -9,6 +9,8 @@ import {
 	Response,
 	UseGuards,
 	Delete,
+	UploadedFile,
+	UseInterceptors,
 } from '@nestjs/common';
 import {
 	ApiBadRequestResponse,
@@ -17,12 +19,15 @@ import {
 	ApiResponse,
 	ApiTags,
 	ApiUnauthorizedResponse,
+	ApiConsumes,
 } from '@nestjs/swagger';
 import { AuthService } from './service/auth.service';
 import { CookieService } from './service/cookie.service';
 import { TwoFactorService } from './service/twofactor.service';
 import { ConfigService } from '@nestjs/config';
 import { User } from 'api/user/dto/response';
+import { FileInterceptor } from '@nestjs/platform-express';
+
 import * as Auth from '../../common/auth';
 import * as Dto from './dto';
 
@@ -66,6 +71,9 @@ export class AuthController {
 	async login(@Request() req, @Response({ passthrough: true }) res) {
 		try {
 			const user = await this.authService.login(req.user.intraId);
+			if (!user.use2fa) {
+				throw new HttpException('2fa is not enabled', 403);
+			}
 			const jwt = this.cookieService.createJwt({
 				id: user.id,
 				intraId: user.intraId,
@@ -89,9 +97,15 @@ export class AuthController {
 	@UseGuards(Auth.Guard.FtJwt)
 	@ApiOperation({ summary: 'register' })
 	@ApiOkResponse({ description: 'Register successfully', type: User })
-	async register(@Body() registerRequestDto: Dto.Request.Register, @Req() req): Promise<User> {
+	@ApiConsumes('multipart/form-data')
+	@UseInterceptors(FileInterceptor('file'))
+	async register(
+		@Body() registerRequestDto: Dto.Request.Register, 
+		@Req() req,
+		@UploadedFile() file: Express.Multer.File,
+	): Promise<User> {
 		try {
-			return this.authService.register(req.user.intraId, registerRequestDto);
+			return this.authService.register(req.user.intraId, registerRequestDto, file.filename);
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
 		}
@@ -145,7 +159,7 @@ export class AuthController {
 	async logout(@Req() req, @Response({ passthrough: true }) res) {
 		try {
 			const cookieOption = this.cookieService.getCookieOption();
-			res.clearcookie('accessToken', cookieOption);
+			res.clearCookie('accessToken', cookieOption);
 			return { message: 'Logout successfully' };
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
