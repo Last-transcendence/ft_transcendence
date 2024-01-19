@@ -11,7 +11,6 @@ import BanService from 'api/ban/ban.service';
 import ParticipantService from 'api/participant/participant.service';
 import { Server, Socket } from 'socket.io';
 import * as Auth from '../../common/auth';
-import * as ParticipantDto from '../participant/dto';
 import ChannelService from './channel.service';
 
 const getCorsOrigin = () => {
@@ -45,7 +44,7 @@ class ChannelGateway {
 		try {
 			if (await this.participantService.isParticipated(socket.user.id)) {
 				const participatedChannel = await this.participantService.get(socket.user.id);
-				await this.participantService.kick(participatedChannel.id);
+				await this.channelService.leaveChannel(participatedChannel.id);
 			}
 			const newChannel = await this.channelService.createChannel(data);
 			const newParticipant = await this.participantService.create(newChannel.id, socket.user.id);
@@ -63,33 +62,28 @@ class ChannelGateway {
 
 	@SubscribeMessage('join')
 	@UseGuards(Auth.Guard.UserWsJwt)
-	async handleJoin(
-		@MessageBody() joinDto: ParticipantDto.Request.Create,
-		@ConnectedSocket() socket: Socket,
-	) {
+	async handleJoin(@MessageBody() joinData, @ConnectedSocket() socket) {
 		try {
-			const userId: string = socket.data.user.id;
+			console.log(joinData.channelId);
+			const userId = socket.user.id;
 
-			if (await this.participantService.isParticipated(userId)) {
-				throw new BadRequestException('User is already participated');
-			}
+			await this.channelService.leaveChannel(userId);
 
-			const channel = await this.channelService.getChannel(joinDto.channelId);
+			const channel = await this.channelService.getChannel(joinData.channelId);
 			if (!channel) {
 				throw new BadRequestException('Channel not found');
 			}
+			if (await this.banService.isBanned(userId, joinData.channelId)) {
+				throw new BadRequestException('User is banned');
+			}
 			if (
 				channel.visibility === 'PROTECTED' &&
-				!(await this.channelService.validatePassword(joinDto.channelId, joinDto.password))
+				!(await this.channelService.validatePassword(joinData.channelId, joinData.password))
 			) {
 				throw new BadRequestException('Wrong password');
 			}
-			if (await this.banService.isBanned(userId, joinDto.channelId)) {
-				throw new BadRequestException('User is banned');
-			}
 
-			socket.join(joinDto.channelId);
-
+			socket.join(joinData.channelId);
 			return { res: true };
 		} catch (error) {
 			console.error("An error occurred channel.gateway 'join':", error);
