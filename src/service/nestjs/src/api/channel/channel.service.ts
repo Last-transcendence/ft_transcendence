@@ -64,8 +64,15 @@ class ChannelService {
 		}
 	}
 
-	async createChannel(createRequestDto: Dto.Request.Create): Promise<Dto.Response.Channel> {
+	async createChannel(data): Promise<Dto.Response.Channel> {
 		try {
+			const createRequestDto = plainToClass(Dto.Request.Create, data);
+			const error = await validate(createRequestDto);
+
+			if (error.length > 0) {
+				throw new Error('Failed validation: ' + JSON.stringify(error));
+			}
+
 			return await this.prismaService.channel.create({
 				data: { ...createRequestDto },
 			});

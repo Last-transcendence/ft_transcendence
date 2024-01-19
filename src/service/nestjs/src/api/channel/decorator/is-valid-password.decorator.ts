@@ -15,10 +15,8 @@ export function IsValidPassword(validationOptions?: ValidationOptions) {
 					const visibility = object.visibility;
 					const password = value;
 
-					if (visibility === ChannelVisibility.PROTECTED && password.length === 6) {
-						if (/^\d+$/.test(password)) {
-							return true;
-						}
+					if (visibility === ChannelVisibility.PROTECTED) {
+						return password.length === 6 && /^\d+$/.test(password);
 					} else if (
 						visibility === ChannelVisibility.PUBLIC ||
 						visibility === ChannelVisibility.PRIVATE
