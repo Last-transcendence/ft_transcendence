@@ -16,7 +16,7 @@ class ChatRoomService {
 		}
 	}
 
-	async getChatRoomById(chatRoomId: string): Promise<ChatRoomModel> {
+	async getDestId(chatRoomId: string): Promise<ChatRoomModel> {
 		try {
 			return await this.prismaService.chatRoom.findUnique({
 				where: { id: chatRoomId },

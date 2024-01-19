@@ -6,7 +6,7 @@ import {
 	WebSocketGateway,
 	WebSocketServer,
 } from '@nestjs/websockets';
-import { Server, Socket, Namespace } from 'socket.io';
+import { Socket, Namespace } from 'socket.io';
 import { ConfigService } from '@nestjs/config';
 import ChatRoomService from './chatroom.service';
 import * as Auth from '../../common/auth';
@@ -33,7 +33,7 @@ class ChatRoomGateway {
     ) {}
 
     @WebSocketServer()
-    server: Server;
+    server: Namespace;
 
     handleConnection() {
         console.log('Client connected to chatroom namespace');
@@ -73,9 +73,9 @@ class ChatRoomGateway {
         try {
             const userId: string = req.user.id;
             const destId: string = messageDto.destId;
-            const blockUser = await this.blockService.find(userId, destId);
-            if (blockUser) {
-                throw new BadRequestException('blocked User');
+            const isBlocked = await this.blockService.find(userId, destId);
+            if (isBlocked) {
+                throw new BadRequestException('User is blocked');
             }
             const chatRoomName = [userId, destId].sort().join('_');
             await this.chatService.create(userId, destId, messageDto.message);
