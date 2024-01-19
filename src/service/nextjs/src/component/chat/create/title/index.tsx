@@ -17,7 +17,7 @@ const CreateChatTitle = ({ title, setTitle }: CreateChatTitleProps) => {
 				value={title}
 				placeholder="채널명을 입력하세요."
 				onChange={event => {
-					if (event.target.value.length === 8) return;
+					if (event.target.value.length === 10) return;
 					setTitle(event.target.value);
 				}}
 			/>

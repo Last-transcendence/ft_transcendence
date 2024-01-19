@@ -3,66 +3,25 @@ import style from '@/style/friend/list/index.module.css';
 import { Button, Stack, Typography } from '@mui/material';
 import UserBriefInformation from '@/component/common/user/bried-information';
 import CustomModal from '@/component/common/CustomModal';
-import { Ban, Mute, Participant, ParticipantRole } from '@/type/channel.type';
+import { Mute, ParticipantRole } from '@/type/channel.type';
 import NickMenu from '@/component/chat/NickMenu';
 import AdminNickMenu from '@/component/chat/AdminNickMenu';
 import Chatroom from '@/type/chatroom.type';
 import ChannelSetting from '@/component/common/ChannelSetting';
 import SocketContext from '@/context/socket.context';
 import AuthContext from '@/context/auth.context';
-
-interface PrivateParticipantListProps {
-	data: Chatroom[] | undefined;
-}
-
-export const PrivateParticipantList = ({ data }: PrivateParticipantListProps) => {
-	return (
-		<div>
-			{/*채널이 protected일때만 비밀번호 변경 보임*/}
-			<Stack justifyContent={'space-between'} height={'100cqh'}>
-				<div className={style.container}>
-					<div>참여 목록</div>
-					<div>
-						<div>
-							<UserBriefInformation
-								nickname={null}
-								condition={undefined}
-								className={style['user-brief-information']}
-								userId={''}
-								imgUrl={''}
-							/>
-							<UserBriefInformation
-								nickname={null}
-								condition={undefined}
-								className={style['user-brief-information']}
-								userId={''}
-								imgUrl={''}
-							/>
-						</div>
-					</div>
-				</div>
-			</Stack>
-		</div>
-	);
-};
+import { ChannelInfo } from '@/type/channel-info.type';
+import { useRouter } from 'next/router';
 
 interface ParticipantListProps {
-	channelId: string;
-	participantData?: Participant[] | null | undefined;
 	myRole?: ParticipantRole;
-	isProtected?: boolean;
 	ownerId: string | undefined;
-	muteList: Mute[];
+	channelData: ChannelInfo | undefined;
+	channelId: string;
 }
 
-const ParticipantList = ({
-	channelId,
-	participantData,
-	myRole,
-	isProtected,
-	ownerId,
-	muteList,
-}: ParticipantListProps) => {
+const ParticipantList = ({ myRole, ownerId, channelData, channelId }: ParticipantListProps) => {
+	const router = useRouter();
 	const [open, setOpen] = useState(false);
 	const { sockets } = useContext(SocketContext);
 	const { channelSocket } = sockets;
@@ -89,34 +48,39 @@ const ParticipantList = ({
 	const isMute = useCallback(
 		(userId: string) => {
 			if (!userId) return false;
-			if (!muteList) return false;
-			return muteList.some((data: Mute) => data.id === userId);
+			if (!channelData?.mute || channelData?.mute.length == 0) return false;
+			return channelData?.mute?.some((data: Mute) => data.id === userId);
 		},
-		[muteList],
+		[channelData?.mute],
 	);
 
 	const handleLeave = useCallback(() => {
 		channelSocket!.emit('leave', { channelId, userId: me?.id }, (res: any) => {
 			if (res) {
-				//루트로 네비게이션
+				router.push('/');
 			}
 			console.log(res);
 		});
-	}, []);
+	}, [channelId, channelSocket, me?.id, router]);
 
 	return (
 		<div>
 			{/*채널이 protected일때만 비밀번호 변경 보임*/}
 			{open && (
 				<CustomModal setIsOpened={setOpen}>
-					<ChannelSetting isCreate={false} setOpen={setOpen} />
+					<ChannelSetting
+						isCreate={false}
+						setOpen={setOpen}
+						channelData={channelData}
+						channelId={channelId}
+					/>
 				</CustomModal>
 			)}
 			<Stack justifyContent={'space-between'} height={'100cqh'}>
 				<div className={style.container}>
 					<div>참여 목록</div>
 					<div>
-						{participantData?.map((data, index) => (
+						{channelData?.participant?.map((data, index) => (
 							<UserBriefInformation
 								key={index}
 								nickname={
@@ -142,9 +106,12 @@ const ParticipantList = ({
 					</div>
 				</div>
 				<Stack gap={1} flexDirection={'row'} mb={'4cqh'}>
-					<Button variant={'contained'} onClick={() => setOpen(true)}>
-						채널설정
-					</Button>
+					{/*owner에게만 노출*/}
+					{ownerId === me?.id && (
+						<Button variant={'contained'} onClick={() => setOpen(true)}>
+							채널설정
+						</Button>
+					)}
 					<Button variant={'contained'} onClick={handleLeave}>
 						채널 나가기
 					</Button>

@@ -1,15 +1,14 @@
-import ParticipantList, { PrivateParticipantList } from '@/component/chat/ParticipantList';
+import ParticipantList from '@/component/chat/ParticipantList';
 import { MenuHeader } from '@/component/common/Header';
 import { useParams } from 'next/navigation';
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { Participant, ParticipantRole } from '@/type/channel.type';
 import AuthContext from '@/context/auth.context';
-import useFetchData from '@/hook/useFetchData';
-import Chatroom from '@/type/chatroom.type';
 import ChatRoomLayout from '@/component/chat/ChatRoomLayout';
 import SocketContext from '@/context/socket.context';
 import useListeningChannelEvent from '@/hook/useListeningChannelEvent';
 import { ChannelInfo } from '@/type/channel-info.type';
+import { useRouter } from 'next/router';
 
 export type ChatLiveDataType = {
 	type: 'chat' | 'action' | 'help';
@@ -19,6 +18,7 @@ export type ChatLiveDataType = {
 
 const CommonChatRoomPage = () => {
 	const params = useParams<{ id: string }>();
+	const router = useRouter();
 	const { me } = useContext(AuthContext);
 	const { sockets } = useContext(SocketContext);
 	const { channelSocket } = sockets;
@@ -32,7 +32,12 @@ const CommonChatRoomPage = () => {
 			console.log(res);
 			setChannelData(res);
 		});
-	}, [channelSocket, params?.id]);
+		//속해있지 않을 경우 홈으로 이동
+		if (channelData?.participant?.some((data: Participant) => data.id === me?.id)) {
+			router.push('/');
+		}
+		setChatLiveData(prev => [...prev, { type: 'action', message: '채널에 입장하셨습니다.' }]);
+	}, [channelData?.participant, channelSocket, me?.id, params?.id, router]);
 
 	const setActionMessage = useCallback((message: string) => {
 		setChatLiveData(prev => [...prev, { type: 'action', message }]);
@@ -99,6 +104,7 @@ const CommonChatRoomPage = () => {
 
 	return (
 		<ChatRoomLayout
+			type={'channel'}
 			ownerId={ownerId}
 			data={channelData}
 			chatLiveData={chatLiveData}
@@ -107,12 +113,9 @@ const CommonChatRoomPage = () => {
 			<MenuHeader title={channelData?.title ?? ''} type={'chat'}>
 				<ParticipantList
 					channelId={params?.id}
-					participantData={channelData?.participant}
-					// myRole={myRole}
-					myRole={ParticipantRole.ADMIN}
-					isProtected={channelData?.visibility === 'PROTECTED'}
+					myRole={myRole}
 					ownerId={ownerId}
-					muteList={channelData?.mute ?? []}
+					channelData={channelData}
 				/>
 			</MenuHeader>
 		</ChatRoomLayout>

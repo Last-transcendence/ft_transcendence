@@ -2,11 +2,12 @@ import { Box } from '@mui/material';
 import BottomAvatarsGrid from '@/component/common/detailProfile/bottomAvatars';
 import { avatarStyle } from '../../profile/common/newAvatar';
 import { imgStyle } from '../../profile/common/myImage';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { postFetcher, getFetcher, deleteFetcher } from '@/service/api';
 import Chatroom from '@/type/chatroom.type';
 import { useRouter } from 'next/navigation';
 import CustomSnackbar from '../customSnackbar';
+import SocketContext from '@/context/socket.context';
 
 const sxStyle: avatarStyle = {
 	width: 50,
@@ -30,6 +31,7 @@ const BottomProfile = ({ otherUserId, isFriend }: BottomProfileProps) => {
 	const [isFrd, setIsFrd] = useState<boolean>(isFriend);
 	const [loading, setLoading] = useState<boolean>(false);
 	const [errorMessage, setErrorMessage] = useState<string>('');
+	const { chatSocket } = useContext(SocketContext).sockets;
 
 	const friendAdd = async (): Promise<void> => {
 		try {
@@ -62,26 +64,14 @@ const BottomProfile = ({ otherUserId, isFriend }: BottomProfileProps) => {
 		}
 	};
 
-	const makeNewChatroom = async (otherUserId: string): Promise<string> => {
-		try {
-			const newChatroom: Chatroom = await postFetcher('/chatroom', { destId: otherUserId });
-			return newChatroom.id;
-		} catch (error) {
-			throw error;
-		}
-	};
-
 	const dmRequest = async (): Promise<void> => {
 		try {
 			setLoading(true);
-			const data: Chatroom[] = await getFetcher('/chatroom');
-			const chatroom: Chatroom | undefined = findUserFromDm(otherUserId, data);
-			if (chatroom === undefined) {
-				const id = await makeNewChatroom(otherUserId);
-				await router.push(`/chat/${id}`);
-			} else {
-				await router.push(`/chat/${chatroom.id}`);
-			}
+			// const data: Chatroom[] = await getFetcher('/chatroom');
+			// const chatroom: Chatroom | undefined = findUserFromDm(otherUserId, data);
+			//@todo dm 접속에 실패할 경우 처리 필요
+			chatSocket?.emit('join', { toUserId: otherUserId });
+			router.push(`/chat/${otherUserId}/private`);
 		} catch (error: any) {
 			console.log('dm 생성실패');
 			setErrorMessage(error.message);

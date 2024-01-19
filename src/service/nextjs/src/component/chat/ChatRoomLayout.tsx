@@ -1,17 +1,26 @@
 import { useParams } from 'next/navigation';
-import { Dispatch, ReactNode, SetStateAction, useCallback, useContext } from 'react';
+import {
+	Dispatch,
+	ReactNode,
+	SetStateAction,
+	useCallback,
+	useContext,
+	useEffect,
+	useMemo,
+} from 'react';
 import { Stack } from '@mui/material';
 import { ChatMsg, HelpMsg, StatusMsg } from '@/component/chat/Message';
 import { ParticipantRole } from '@/type/channel.type';
 import SendChat from '@/component/chat/SendChat';
 import SocketContext from '@/context/socket.context';
 import AuthContext from '@/context/auth.context';
-import useListeningChannelEvent from '@/hook/useListeningChannelEvent';
 import { ChatLiveDataType } from '@/component/chat/CommonChatRoomPage';
+import ListenContext from '@/context/listen.context';
 
 export type CommandType = 'DM' | 'GAME' | 'HELP';
 
 interface ChatRoomLayoutProps {
+	type: 'channel' | 'chatroom';
 	children: ReactNode;
 	myRole?: ParticipantRole;
 	data?: any;
@@ -21,6 +30,7 @@ interface ChatRoomLayoutProps {
 }
 
 const ChatRoomLayout = ({
+	type,
 	children,
 	myRole,
 	data,
@@ -29,33 +39,48 @@ const ChatRoomLayout = ({
 	setChatLiveData,
 }: ChatRoomLayoutProps) => {
 	const params = useParams<{ id: string }>();
-	const { sockets } = useContext(SocketContext);
-	const { channelSocket } = sockets;
+	const { channelSocket, chatSocket } = useContext(SocketContext).sockets;
 	const { me } = useContext(AuthContext);
+	const { currentDm } = useContext(ListenContext);
+	const socket = useMemo(() => {
+		if (type === 'channel') return channelSocket;
+		else return chatSocket;
+	}, [channelSocket, chatSocket, type]);
 
-	//메세지 수신
-	useListeningChannelEvent('message', (res: any) => {
+	//채널 메세지 수신 (한번만 등록)
+	useEffect(() => {
+		if (type === 'chatroom') return;
+		channelSocket?.on('message', res => {
+			if (params?.id === res.channelId)
+				setChatLiveData((prev: ChatLiveDataType[]) => [
+					...prev,
+					{ type: 'chat', id: res?.userId, message: res?.message },
+				]);
+		});
+		return () => {
+			channelSocket?.off('message');
+		};
+	}, []);
+
+	//DM 메세지 세팅
+	useEffect(() => {
 		setChatLiveData((prev: ChatLiveDataType[]) => [
 			...prev,
-			{ type: 'chat', id: res?.userId, message: res?.message },
+			{ type: 'chat', id: currentDm?.userId, message: currentDm?.message },
 		]);
-	});
+	}, [currentDm?.message, currentDm?.userId, setChatLiveData]);
 
 	const sendAction = (message: string) => {
 		if (message === '') return;
 		// send message
-		channelSocket?.emit(
-			'message',
-			{ channelId: params?.id, userId: me?.id, message },
-			(res: any) => {
-				console.log(res);
-				//성공 시 세팅
-				setChatLiveData((prev: ChatLiveDataType[]) => [
-					...prev,
-					{ type: 'chat', id: me?.id, message: message },
-				]);
-			},
-		);
+		socket?.emit('message', { channelId: params?.id, userId: me?.id, message }, (res: any) => {
+			console.log(res);
+			//성공 시 세팅
+			setChatLiveData((prev: ChatLiveDataType[]) => [
+				...prev,
+				{ type: 'chat', id: me?.id, message: message },
+			]);
+		});
 	};
 
 	const commandAction = (
@@ -66,11 +91,11 @@ const ChatRoomLayout = ({
 	) => {
 		switch (type) {
 			case 'HELP':
-				alert('HELP');
 				setChatLiveData((prev: ChatLiveDataType[]) => [...prev, { type: 'help' }]);
 				break;
 			case 'DM':
-				alert('DM');
+				if (!nickname) return;
+
 				// send DM invite (nickname, message)
 				break;
 			case 'GAME':
