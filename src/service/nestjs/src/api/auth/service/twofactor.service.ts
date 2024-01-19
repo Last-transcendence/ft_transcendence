@@ -1,5 +1,4 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { MailService } from 'api/auth/service/mail.service';
 import { Cache } from 'cache-manager';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Inject } from '@nestjs/common';
@@ -7,16 +6,7 @@ import { User } from '@prisma/client';
 
 @Injectable()
 export class TwoFactorService {
-    constructor(private readonly mailService: MailService,
-                @Inject(CACHE_MANAGER) private cacheManager: Cache) {}
-
-    async send2faEmail(user: User, code: string) {
-        if (!user.email2fa) {
-            throw new BadRequestException('Email 정보가 없습니다.');
-        }
-        await this.cacheManager.set(user.email2fa, code);
-        await this.mailService.send(user.email2fa, user.nickname, code);
-    }
+    constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {}
 
     async createCode() {
         return Math.floor(10000 + Math.random() * 900000).toString();

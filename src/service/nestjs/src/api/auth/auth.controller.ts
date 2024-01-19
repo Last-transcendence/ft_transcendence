@@ -11,6 +11,8 @@ import {
 	Delete,
 	UploadedFile,
 	UseInterceptors,
+	UnauthorizedException,
+	BadRequestException,
 } from '@nestjs/common';
 import {
 	ApiBadRequestResponse,
@@ -27,6 +29,10 @@ import { TwoFactorService } from './service/twofactor.service';
 import { ConfigService } from '@nestjs/config';
 import { User } from 'api/user/dto/response';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { MailService } from 'api/auth/service/mail.service';
+import { Cache } from 'cache-manager';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Inject } from '@nestjs/common';
 
 import * as Auth from '../../common/auth';
 import * as Dto from './dto';
@@ -39,6 +45,8 @@ export class AuthController {
 		private readonly authService: AuthService,
 		private readonly cookieService: CookieService,
 		private readonly twoFactorService: TwoFactorService,
+		private readonly mailService: MailService,
+        @Inject(CACHE_MANAGER) private cacheManager: Cache
 	) {}
 
 	@Get('ft')
@@ -71,8 +79,8 @@ export class AuthController {
 	async login(@Request() req, @Response({ passthrough: true }) res) {
 		try {
 			const user = await this.authService.login(req.user.intraId);
-			if (!user.use2fa) {
-				throw new HttpException('2fa is not enabled', 403);
+			if (user.use2fa) {
+				throw new UnauthorizedException("Try login with two factor authentication: POST /auth/2fa")
 			}
 			const jwt = this.cookieService.createJwt({
 				id: user.id,
@@ -118,8 +126,12 @@ export class AuthController {
 	async send2faEmail(@Req() req) {
 		try {
 			const code = await this.twoFactorService.createCode();
-			const user = await this.authService.login(req.user.intraId);
-			return await this.twoFactorService.send2faEmail(user, code);
+			const user = await this.authService.login(req.user.intraId)
+			if (!user || !user.use2fa || !user.email2fa) {
+				throw new BadRequestException("Bad request")
+			}
+			this.cacheManager.set(user.email2fa, code);
+			this.mailService.send(user.email2fa, user.nickname, code)
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
 		}

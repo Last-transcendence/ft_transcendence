@@ -22,10 +22,10 @@ class Register {
 	email2fa?: string;
 
 	@IsOptional()
-	@IsString()
-	@Trim()
-	@ApiProperty({ description: 'Profile image URI', required: false })
-	profileImageURI?: string;
+    @IsString()
+    @Trim()
+    @ApiProperty({ description: 'Field Name', format: 'binary', required: false })
+    file?: string;
 }
 
 export default Register;
