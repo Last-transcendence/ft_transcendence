@@ -1,4 +1,4 @@
-import { Controller, Get, HttpException, Param, Post, Query, Req, UseGuards, UploadedFile, UseInterceptors, Patch, Body, Response } from '@nestjs/common';
+import { Controller, Get, HttpException, Param, Post, Query, Req, UseGuards, UploadedFile, UseInterceptors, Patch, Body } from '@nestjs/common';
 import { ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiTags, ApiConsumes } from '@nestjs/swagger';
 import UserService from './user.service';
 import * as Dto from './dto';
@@ -32,7 +32,8 @@ class UserController {
 		@UploadedFile() file: Express.Multer.File,
 	): Promise<UserModel> {
 		try {
-			return await this.userService.updateUserById(req.user.id, updateData, file.filename);
+			updateData.file = file.filename;
+			return await this.userService.updateUserById(req.user.id, updateData);
 		}
 		catch (error) {
 			throw new HttpException(error.message, error.status);

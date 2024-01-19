@@ -10,9 +10,10 @@ class Register {
 	nickname: string;
 
 	@IsOptional()
+	@IsString()
 	@Trim()
 	@ApiProperty({ description: 'Use 2FA' })
-	use2fa: boolean;
+	use2fa: string;
 
 	@IsOptional()
 	@IsEmail()
@@ -21,10 +22,10 @@ class Register {
 	email2fa?: string;
 
 	@IsOptional()
-	@IsString()
-	@Trim()
-	@ApiProperty({ description: 'Profile image URI', required: false })
-	profileImageURI?: string;
+    @IsString()
+    @Trim()
+    @ApiProperty({ description: 'Field Name', format: 'binary', required: false })
+    file?: string;
 }
 
 export default Register;

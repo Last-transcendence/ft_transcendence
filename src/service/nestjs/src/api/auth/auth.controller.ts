@@ -9,6 +9,10 @@ import {
 	Response,
 	UseGuards,
 	Delete,
+	UploadedFile,
+	UseInterceptors,
+	UnauthorizedException,
+	BadRequestException,
 } from '@nestjs/common';
 import {
 	ApiBadRequestResponse,
@@ -17,12 +21,19 @@ import {
 	ApiResponse,
 	ApiTags,
 	ApiUnauthorizedResponse,
+	ApiConsumes,
 } from '@nestjs/swagger';
 import { AuthService } from './service/auth.service';
 import { CookieService } from './service/cookie.service';
 import { TwoFactorService } from './service/twofactor.service';
 import { ConfigService } from '@nestjs/config';
 import { User } from 'api/user/dto/response';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { MailService } from 'api/auth/service/mail.service';
+import { Cache } from 'cache-manager';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Inject } from '@nestjs/common';
+
 import * as Auth from '../../common/auth';
 import * as Dto from './dto';
 
@@ -34,6 +45,8 @@ export class AuthController {
 		private readonly authService: AuthService,
 		private readonly cookieService: CookieService,
 		private readonly twoFactorService: TwoFactorService,
+		private readonly mailService: MailService,
+        @Inject(CACHE_MANAGER) private cacheManager: Cache
 	) {}
 
 	@Get('ft')
@@ -66,6 +79,9 @@ export class AuthController {
 	async login(@Request() req, @Response({ passthrough: true }) res) {
 		try {
 			const user = await this.authService.login(req.user.intraId);
+			if (user.use2fa) {
+				throw new UnauthorizedException("Try login with two factor authentication: POST /auth/2fa")
+			}
 			const jwt = this.cookieService.createJwt({
 				id: user.id,
 				intraId: user.intraId,
@@ -74,6 +90,7 @@ export class AuthController {
 			});
 			const cookieOption = this.cookieService.getCookieOption();
 
+			user.status = 'online';
 			res.cookie('accessToken', jwt, cookieOption);
 			res.redirect(`${this.configService.getOrThrow('NEXTJS_URL')}/auth/login/callback`);
 		} catch (error) {
@@ -89,9 +106,15 @@ export class AuthController {
 	@UseGuards(Auth.Guard.FtJwt)
 	@ApiOperation({ summary: 'register' })
 	@ApiOkResponse({ description: 'Register successfully', type: User })
-	async register(@Body() registerRequestDto: Dto.Request.Register, @Req() req): Promise<User> {
+	@ApiConsumes('multipart/form-data')
+	@UseInterceptors(FileInterceptor('file'))
+	async register(
+		@Body() registerRequestDto: Dto.Request.Register, 
+		@Req() req,
+		@UploadedFile() file: Express.Multer.File,
+	): Promise<User> {
 		try {
-			return this.authService.register(req.user.intraId, registerRequestDto);
+			return this.authService.register(req.user.intraId, registerRequestDto, file.filename);
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
 		}
@@ -104,8 +127,12 @@ export class AuthController {
 	async send2faEmail(@Req() req) {
 		try {
 			const code = await this.twoFactorService.createCode();
-			const user = await this.authService.login(req.user.intraId);
-			return await this.twoFactorService.send2faEmail(user, code);
+			const user = await this.authService.login(req.user.intraId)
+			if (!user || !user.use2fa || !user.email2fa) {
+				throw new BadRequestException("Bad request")
+			}
+			this.cacheManager.set(user.email2fa, code);
+			this.mailService.send(user.email2fa, user.nickname, code)
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
 		}
@@ -130,6 +157,7 @@ export class AuthController {
 				nickname: user.nickname,
 				profileImageURI: user.profileImageURI,
 			});
+			user.status = 'online';
 			res.cookie('accessToken', jwt, cookieOption);
 			res.redirect(`${this.configService.getOrThrow('NEXTJS_URL')}/auth/login/callback`);
 		} catch (error) {
@@ -145,7 +173,7 @@ export class AuthController {
 	async logout(@Req() req, @Response({ passthrough: true }) res) {
 		try {
 			const cookieOption = this.cookieService.getCookieOption();
-			res.clearcookie('accessToken', cookieOption);
+			res.clearCookie('accessToken', cookieOption);
 			return { message: 'Logout successfully' };
 		} catch (error) {
 			throw new HttpException(error.message, error.status);

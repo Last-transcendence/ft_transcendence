@@ -10,6 +10,8 @@ import { MailService } from './service/mail.service';
 import UserModule from '../user/user.module';
 import JwtAuthModule from './jwt/jwt.module';
 import FtAuthModule from './ft/ft.module';
+import { MulterModule } from '@nestjs/platform-express';
+import { MulterConfigService } from '../../common/multer/multer.config';
 
 @Module({
 	imports: [
@@ -28,6 +30,9 @@ import FtAuthModule from './ft/ft.module';
 			ttl: 300000,
 			max: 2,
 			isGlobal: true,
+		}),
+		MulterModule.registerAsync({
+			useClass: MulterConfigService,
 		}),
 	],
 	controllers: [AuthController],
