@@ -31,7 +31,7 @@ class FriendController {
 	@ApiOperation({ summary: 'Get friend' })
 	@ApiOkResponse({ description: 'Get friend successfully', type: FriendModel })
 	@ApiBadRequestResponse({ description: 'Bad request' })
-	async getFriend(@Req() req): Promise<FriendModel[]> {
+	async getFriend(@Req() req): Promise<Dto.Response.Get[]> {
 		try {
 			return await this.friendService.getFriend(req.user.id);
 		} catch (error) {
