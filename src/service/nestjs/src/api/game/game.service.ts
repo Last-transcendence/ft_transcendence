@@ -28,12 +28,52 @@ class GameService {
 		}
 	}
 
+	async getHistoryById(gameId: string): Promise<GameModel> {
+		try {
+			return await this.prismaService.game.findUnique({
+				where: {
+					id: gameId,
+				},
+			});
+		} catch (error) {
+			throw new Error(error.message);
+		}
+	}
+
+	async getFirstHistory(player1Id: string, player2Id: string): Promise<GameModel> {
+		try {
+			return await this.prismaService.game.findFirst({
+				where: {
+					player1Id,
+					player2Id,
+				},
+			});
+		} catch (error) {
+			throw new Error(error.message);
+		}
+	}
+
 	async createHistory(userId: string, createRequestDto: Dto.Request.Create): Promise<GameModel> {
 		try {
 			return await this.prismaService.game.create({
 				data: {
 					player1Id: userId,
 					...createRequestDto,
+				},
+			});
+		} catch (error) {
+			throw new Error(error.message);
+		}
+	}
+
+	async updateHistory(gameId: string, updateRequestDto: Dto.Request.Update): Promise<GameModel> {
+		try {
+			return await this.prismaService.game.update({
+				where: {
+					id: gameId,
+				},
+				data: {
+					...updateRequestDto,
 				},
 			});
 		} catch (error) {

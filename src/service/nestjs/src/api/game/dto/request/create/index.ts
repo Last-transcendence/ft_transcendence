@@ -31,12 +31,6 @@ class Create {
 	@Trim()
 	@ApiProperty({ description: 'Game result' })
 	result: $Enums.GameResult;
-
-	@ApiProperty({ required: false })
-	createdAt: Date;
-
-	@ApiProperty({ required: false })
-	updatedAt: Date;
 }
 
 export default Create;
