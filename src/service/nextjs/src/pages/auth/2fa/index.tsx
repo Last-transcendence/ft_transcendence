@@ -1,4 +1,4 @@
-import TwoFactorBody from '@/component/auth/2fa/sign';
+import TwoFactorBody from '@/component/auth/2fa';
 
 const TwoFactor = () => {
 	return (

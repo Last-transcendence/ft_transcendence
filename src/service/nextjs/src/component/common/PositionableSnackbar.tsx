@@ -11,7 +11,7 @@ interface CustomSnackbarProps {
 	horizontal?: 'left' | 'center' | 'right';
 }
 
-const CustomSnackbar = ({
+const PositionableSnackbar = ({
 	open,
 	onClose,
 	message,
@@ -34,4 +34,4 @@ const CustomSnackbar = ({
 	);
 };
 
-export default CustomSnackbar;
+export default PositionableSnackbar;
