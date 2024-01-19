@@ -116,7 +116,7 @@ class ChannelGateway {
 
 	@SubscribeMessage('info')
 	@UseGuards(Auth.Guard.UserWsJwt)
-	async handleInfo(@MessageBody() data, @ConnectedSocket() socket: Socket) {
+	async handleInfo(@MessageBody() data) {
 		return this.channelService.getChannel(data.channelId);
 	}
 }
