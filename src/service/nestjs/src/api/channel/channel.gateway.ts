@@ -113,16 +113,23 @@ class ChannelGateway {
 
 	@SubscribeMessage('message')
 	async handleMessage(@MessageBody() data, @ConnectedSocket() socket) {
-		const filteredMessage = this.channelService.messageFilter(
-			data.channelId,
-			data.userId,
-			data.message,
-		);
-		this.server.to(data.channelId).emit('message', {
-			channelId: data.channelId,
-			userId: socket.user.id,
-			message: filteredMessage,
-		});
+		try {
+			const filteredMessage = this.channelService.messageFilter(
+				data.channelId,
+				data.userId,
+				data.message,
+			);
+			this.server.to(data.channelId).emit('message', {
+				channelId: data.channelId,
+				userId: socket.user.id,
+				message: filteredMessage,
+			});
+			return { res: true };
+		} catch (error) {
+			console.error("An error occurred in channel.gateway 'message':", error);
+			socket.emit('error', { message: "An error occurred in channel.gateway 'message'" });
+			return { res: false };
+		}
 	}
 }
 
