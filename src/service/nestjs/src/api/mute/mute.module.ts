@@ -7,6 +7,7 @@ import ParticipantModule from 'api/participant/participant.module';
 	imports: [forwardRef(() => ParticipantModule)],
 	controllers: [MuteController],
 	providers: [MuteService],
+	exports: [MuteService],
 })
 class MuteModule {}
 
