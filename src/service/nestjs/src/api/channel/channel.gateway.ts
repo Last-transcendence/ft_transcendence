@@ -1,4 +1,5 @@
 import { BadRequestException, Inject, UseGuards, forwardRef } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import {
 	ConnectedSocket,
 	MessageBody,
@@ -9,11 +10,9 @@ import {
 import BanService from 'api/ban/ban.service';
 import ParticipantService from 'api/participant/participant.service';
 import { Server, Socket } from 'socket.io';
-import { ConfigService } from '@nestjs/config';
-import ChannelService from './channel.service';
 import * as Auth from '../../common/auth';
-import * as ChannelDto from './dto';
 import * as ParticipantDto from '../participant/dto';
+import ChannelService from './channel.service';
 
 const getCorsOrigin = () => {
 	const configService = new ConfigService();
@@ -42,16 +41,14 @@ class ChannelGateway {
 
 	@SubscribeMessage('create')
 	@UseGuards(Auth.Guard.UserWsJwt)
-	async handleCreate(
-		@MessageBody() createChannelDto: ChannelDto.Request.Create,
-		@ConnectedSocket() socket: Socket,
-	) {
+	async handleCreate(@ConnectedSocket() socket, @MessageBody() data) {
 		try {
-			const newChannel = await this.channelService.createChannel(createChannelDto);
-			const newParticipant = await this.participantService.create(
-				newChannel.id,
-				socket.data.user.id,
-			);
+			if (await this.participantService.isParticipated(socket.user.id)) {
+				const participatedChannel = await this.participantService.get(socket.user.id);
+				await this.participantService.kick(participatedChannel.id);
+			}
+			const newChannel = await this.channelService.createChannel(data);
+			const newParticipant = await this.participantService.create(newChannel.id, socket.user.id);
 
 			await this.participantService.update(newParticipant.id, { role: 'OWNER' });
 
