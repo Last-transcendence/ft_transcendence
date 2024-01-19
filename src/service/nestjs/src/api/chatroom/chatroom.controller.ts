@@ -32,9 +32,9 @@ class ChatRoomController {
 	@ApiOperation({ summary: 'Get chat room by id' })
 	@ApiOkResponse({ description: 'Get chat room by id successfully' })
 	@ApiBadRequestResponse({ description: 'Bad request' })
-	async getChatRoomDestIdById(@Req() req, @Param('id') id: string): Promise<User> {
+	async getDestIdById(@Req() req, @Param('id') id: string): Promise<User> {
 		try {
-			const chatRoom = await this.chatRoomService.getDestId(id);
+			const chatRoom = await this.chatRoomService.getDestIdById(id);
 			return await this.userService.get(chatRoom.destId);
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
