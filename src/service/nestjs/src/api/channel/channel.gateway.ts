@@ -9,7 +9,7 @@ import {
 } from '@nestjs/websockets';
 import BanService from 'api/ban/ban.service';
 import ParticipantService from 'api/participant/participant.service';
-import { Server, Socket } from 'socket.io';
+import { Namespace, Socket } from 'socket.io';
 import * as Auth from '../../common/auth';
 import ChannelService from './channel.service';
 
@@ -32,7 +32,7 @@ class ChannelGateway {
 	) {}
 
 	@WebSocketServer()
-	server: Server;
+	server: Namespace;
 
 	handleConnection() {
 		console.log('Client connected to channel namespace');
@@ -109,6 +109,20 @@ class ChannelGateway {
 	@UseGuards(Auth.Guard.UserWsJwt)
 	async handleInfo(@MessageBody() data) {
 		return this.channelService.getChannel(data.channelId);
+	}
+
+	@SubscribeMessage('message')
+	async handleMessage(@MessageBody() data, @ConnectedSocket() socket) {
+		const filteredMessage = this.channelService.messageFilter(
+			data.channelId,
+			data.userId,
+			data.message,
+		);
+		this.server.to(data.channelId).emit('message', {
+			channelId: data.channelId,
+			userId: socket.user.id,
+			message: filteredMessage,
+		});
 	}
 }
 
