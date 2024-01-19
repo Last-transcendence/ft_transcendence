@@ -64,22 +64,27 @@ const ChatRoomLayout = ({
 
 	//DM 메세지 세팅
 	useEffect(() => {
+		if (type === 'channel') return;
+		if (!currentDm?.message || currentDm?.message === '') return;
 		setChatLiveData((prev: ChatLiveDataType[]) => [
 			...prev,
 			{ type: 'chat', id: currentDm?.userId, message: currentDm?.message },
 		]);
-	}, [currentDm?.message, currentDm?.userId, setChatLiveData]);
+	}, [currentDm]);
 
 	const sendAction = (message: string) => {
 		if (message === '') return;
 		// send message
 		socket?.emit('message', { channelId: params?.id, userId: me?.id, message }, (res: any) => {
 			console.log(res);
+			console.log('message', message);
 			//성공 시 세팅
-			setChatLiveData((prev: ChatLiveDataType[]) => [
-				...prev,
-				{ type: 'chat', id: me?.id, message: message },
-			]);
+			if (res?.res) {
+				setChatLiveData((prev: ChatLiveDataType[]) => [
+					...prev,
+					{ type: 'chat', id: me?.id, message: message, me: true },
+				]);
+			}
 		});
 	};
 
@@ -134,7 +139,7 @@ const ChatRoomLayout = ({
 			<Stack padding={2} spacing={2} sx={{ overflowY: 'scroll' }} height={'100%'}>
 				{chatLiveData?.map((chat: any, index: number) => {
 					if (chat.type === 'chat') {
-						const userData = getUser(chat?.id);
+						const userData = chat?.me ? me : getUser(chat?.id);
 						return (
 							<ChatMsg
 								userData={userData}

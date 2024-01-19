@@ -14,6 +14,7 @@ export type ChatLiveDataType = {
 	type: 'chat' | 'action' | 'help';
 	id?: string;
 	message?: string;
+	me?: boolean;
 };
 
 const CommonChatRoomPage = () => {
@@ -32,12 +33,19 @@ const CommonChatRoomPage = () => {
 			console.log(res);
 			setChannelData(res);
 		});
-		//속해있지 않을 경우 홈으로 이동
-		if (channelData?.participant?.some((data: Participant) => data.id === me?.id)) {
+	}, [params?.id]);
+
+	useEffect(() => {
+		if (!channelData || !me) return;
+		if (channelData.participant?.some((data: Participant) => data.userId === me?.id)) {
+			setChatLiveData(prev => [
+				...prev,
+				{ type: 'action', message: `${channelData?.title} 채널에 입장하셨습니다.` },
+			]);
+		} else {
 			router.push('/');
 		}
-		setChatLiveData(prev => [...prev, { type: 'action', message: '채널에 입장하셨습니다.' }]);
-	}, [channelData?.participant, channelSocket, me?.id, params?.id, router]);
+	}, [channelData, me?.id]);
 
 	const setActionMessage = useCallback((message: string) => {
 		setChatLiveData(prev => [...prev, { type: 'action', message }]);
