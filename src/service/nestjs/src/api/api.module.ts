@@ -10,6 +10,7 @@ import FriendModule from './friend/friend.module';
 import GameModule from './game/game.module';
 import MuteModule from './mute/mute.module';
 import ParticipantModule from './participant/participant.module';
+import TestModule from './test/test.module';
 import UserModule from './user/user.module';
 
 @Module({
@@ -26,6 +27,7 @@ import UserModule from './user/user.module';
 		MuteModule,
 		ParticipantModule,
 		UserModule,
+		TestModule,
 	],
 })
 class ApiModule {}
