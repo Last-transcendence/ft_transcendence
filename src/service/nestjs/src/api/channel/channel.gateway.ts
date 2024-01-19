@@ -1,4 +1,5 @@
 import { BadRequestException, Inject, UseGuards, forwardRef } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import {
 	ConnectedSocket,
 	MessageBody,
@@ -8,12 +9,9 @@ import {
 } from '@nestjs/websockets';
 import BanService from 'api/ban/ban.service';
 import ParticipantService from 'api/participant/participant.service';
-import { Server, Socket } from 'socket.io';
-import { ConfigService } from '@nestjs/config';
-import ChannelService from './channel.service';
+import { Namespace, Socket } from 'socket.io';
 import * as Auth from '../../common/auth';
-import * as ChannelDto from './dto';
-import * as ParticipantDto from '../participant/dto';
+import ChannelService from './channel.service';
 
 const getCorsOrigin = () => {
 	const configService = new ConfigService();
@@ -34,7 +32,7 @@ class ChannelGateway {
 	) {}
 
 	@WebSocketServer()
-	server: Server;
+	server: Namespace;
 
 	handleConnection() {
 		console.log('Client connected to channel namespace');
@@ -42,16 +40,14 @@ class ChannelGateway {
 
 	@SubscribeMessage('create')
 	@UseGuards(Auth.Guard.UserWsJwt)
-	async handleCreate(
-		@MessageBody() createChannelDto: ChannelDto.Request.Create,
-		@ConnectedSocket() socket: Socket,
-	) {
+	async handleCreate(@ConnectedSocket() socket, @MessageBody() data) {
 		try {
-			const newChannel = await this.channelService.createChannel(createChannelDto);
-			const newParticipant = await this.participantService.create(
-				newChannel.id,
-				socket.data.user.id,
-			);
+			if (await this.participantService.isParticipated(socket.user.id)) {
+				const participatedChannel = await this.participantService.get(socket.user.id);
+				await this.channelService.leaveChannel(participatedChannel.id);
+			}
+			const newChannel = await this.channelService.createChannel(data);
+			const newParticipant = await this.participantService.create(newChannel.id, socket.user.id);
 
 			await this.participantService.update(newParticipant.id, { role: 'OWNER' });
 
@@ -66,33 +62,28 @@ class ChannelGateway {
 
 	@SubscribeMessage('join')
 	@UseGuards(Auth.Guard.UserWsJwt)
-	async handleJoin(
-		@MessageBody() joinDto: ParticipantDto.Request.Create,
-		@ConnectedSocket() socket: Socket,
-	) {
+	async handleJoin(@MessageBody() joinData, @ConnectedSocket() socket) {
 		try {
-			const userId: string = socket.data.user.id;
+			console.log(joinData.channelId);
+			const userId = socket.user.id;
 
-			if (await this.participantService.isParticipated(userId)) {
-				throw new BadRequestException('User is already participated');
-			}
+			await this.channelService.leaveChannel(userId);
 
-			const channel = await this.channelService.getChannel(joinDto.channelId);
+			const channel = await this.channelService.getChannel(joinData.channelId);
 			if (!channel) {
 				throw new BadRequestException('Channel not found');
 			}
+			if (await this.banService.isBanned(userId, joinData.channelId)) {
+				throw new BadRequestException('User is banned');
+			}
 			if (
 				channel.visibility === 'PROTECTED' &&
-				!(await this.channelService.validatePassword(joinDto.channelId, joinDto.password))
+				!(await this.channelService.validatePassword(joinData.channelId, joinData.password))
 			) {
 				throw new BadRequestException('Wrong password');
 			}
-			if (await this.banService.isBanned(userId, joinDto.channelId)) {
-				throw new BadRequestException('User is banned');
-			}
 
-			socket.join(joinDto.channelId);
-
+			socket.join(joinData.channelId);
 			return { res: true };
 		} catch (error) {
 			console.error("An error occurred channel.gateway 'join':", error);
@@ -110,6 +101,33 @@ class ChannelGateway {
 		} catch (error) {
 			console.error("An error occurred in channel.gateway 'edit':", error);
 			socket.emit('error', { message: "An error occurred in channel.gateway 'edit'" });
+			return { res: false };
+		}
+	}
+
+	@SubscribeMessage('info')
+	@UseGuards(Auth.Guard.UserWsJwt)
+	async handleInfo(@MessageBody() data) {
+		return this.channelService.getChannel(data.channelId);
+	}
+
+	@SubscribeMessage('message')
+	async handleMessage(@MessageBody() data, @ConnectedSocket() socket) {
+		try {
+			const filteredMessage = this.channelService.messageFilter(
+				data.channelId,
+				data.userId,
+				data.message,
+			);
+			this.server.to(data.channelId).emit('message', {
+				channelId: data.channelId,
+				userId: socket.user.id,
+				message: filteredMessage,
+			});
+			return { res: true };
+		} catch (error) {
+			console.error("An error occurred in channel.gateway 'message':", error);
+			socket.emit('error', { message: "An error occurred in channel.gateway 'message'" });
 			return { res: false };
 		}
 	}

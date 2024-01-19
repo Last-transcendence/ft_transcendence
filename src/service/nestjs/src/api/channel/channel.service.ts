@@ -1,13 +1,18 @@
 import { Injectable } from '@nestjs/common';
-import PrismaService from 'common/prisma/prisma.service';
-import * as Dto from './dto';
 import { MessageBody } from '@nestjs/websockets';
+import { $Enums } from '@prisma/client';
+import MuteService from 'api/mute/mute.service';
 import { plainToClass } from 'class-transformer';
 import { validate } from 'class-validator';
+import PrismaService from 'common/prisma/prisma.service';
+import * as Dto from './dto';
 
 @Injectable()
 class ChannelService {
-	constructor(private readonly prismaService: PrismaService) {}
+	constructor(
+		private readonly prismaService: PrismaService,
+		private readonly muteService: MuteService,
+	) {}
 
 	async getChannelList(): Promise<Dto.Response.Channel[]> {
 		try {
@@ -25,14 +30,36 @@ class ChannelService {
 		}
 	}
 
-	async getChannel(id: string): Promise<Dto.Response.Channel> {
+	async getChannel(id: string): Promise<{
+		title: string;
+		visibility: $Enums.ChannelVisibility;
+		participant: Array<{
+			id: string;
+			userId: string;
+		}>;
+		mute: Array<{
+			id: string;
+			userId: string;
+		}>;
+	} | null> {
 		try {
 			const channelDetail = await this.prismaService.channel.findUnique({
 				where: { id },
 				select: {
-					id: true,
 					title: true,
 					visibility: true,
+					participant: {
+						select: {
+							id: true,
+							userId: true,
+						},
+					},
+					mute: {
+						select: {
+							id: true,
+							userId: true,
+						},
+					},
 				},
 			});
 			return channelDetail;
@@ -41,8 +68,15 @@ class ChannelService {
 		}
 	}
 
-	async createChannel(createRequestDto: Dto.Request.Create): Promise<Dto.Response.Channel> {
+	async createChannel(data): Promise<Dto.Response.Channel> {
 		try {
+			const createRequestDto = plainToClass(Dto.Request.Create, data);
+			const error = await validate(createRequestDto);
+
+			if (error.length > 0) {
+				throw new Error('Failed validation: ' + JSON.stringify(error));
+			}
+
 			return await this.prismaService.channel.create({
 				data: { ...createRequestDto },
 			});
@@ -74,6 +108,23 @@ class ChannelService {
 		}
 	}
 
+	async leaveChannel(userId: string) {
+		try {
+			const participant = await this.prismaService.participant.findUnique({
+				where: { id: userId },
+			});
+			if (!participant) {
+				return;
+			}
+
+			return await this.prismaService.participant.delete({
+				where: { id: userId },
+			});
+		} catch (error) {
+			throw new Error(error.message);
+		}
+	}
+
 	async validatePassword(id: string, password: string): Promise<boolean> {
 		try {
 			const channel = await this.prismaService.channel.findUnique({
@@ -83,6 +134,16 @@ class ChannelService {
 			return channel.password === password;
 		} catch (error) {
 			throw new Error(error.message);
+		}
+	}
+
+	async messageFilter(channelId: string, userId: string, message: string): Promise<string> {
+		const muteList = await this.muteService.getMuteList(channelId);
+		const isUserMuted = muteList.some(item => item.userId === userId);
+		if (isUserMuted) {
+			return 'This message is from a muted user';
+		} else {
+			return message;
 		}
 	}
 }
