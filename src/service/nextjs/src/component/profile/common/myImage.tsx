@@ -21,15 +21,20 @@ const MyImage = ({ name, image, avatarImgStyle }: myImageProps & avatarImgStyle)
 		wValue = 50;
 		hValue = 50;
 	} else {
-		wValue = 100;
-		hValue = 100;
+		wValue = 150;
+		hValue = 150;
 	}
+	const loader = ({ src }: { src: string }): string => {
+		return `https://dev.transcendence.42seoul.kr/upload/${src}`;
+	};
 	return (
 		<Image
-			alt={name || 'user'}
+			loader={loader}
 			src={image || '/unknown_user.png'}
+			alt={name || 'user'}
 			width={wValue}
 			height={hValue}
+			priority
 			style={avatarImgStyle}
 		/>
 	);

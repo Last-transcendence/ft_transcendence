@@ -1,16 +1,22 @@
 import { Badge } from '@mui/material';
+import Image from 'next/image';
 import SmallAvatar from './smallAvatar';
 import BigAvatar from './bigAvatar';
 import AddAPhotoIcon from '@mui/icons-material/AddAPhoto';
 
 interface UserPhotoProps {
-	imgUrl: string | ArrayBuffer | null;
+	imgUrl: string;
 	onClick: () => void;
 	onChangePicture: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const UserPhoto = ({ imgUrl, onClick, onChangePicture }: UserPhotoProps) => {
-	return (
+	const loader = ({ src }: { src: string }): string => {
+		return `https://dev.transcendence.42seoul.kr/upload/${src}`;
+	};
+	return imgUrl === null ? (
+		<></>
+	) : (
 		<Badge
 			overlap="circular"
 			anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
@@ -20,7 +26,9 @@ const UserPhoto = ({ imgUrl, onClick, onChangePicture }: UserPhotoProps) => {
 				</SmallAvatar>
 			}
 		>
-			<BigAvatar alt="person img" src={imgUrl ? (imgUrl as string) : ''} />
+			<BigAvatar alt="person img">
+				<Image loader={loader} src={imgUrl} alt="user img" width={150} height={150} priority />
+			</BigAvatar>
 			<input
 				type="file"
 				id="fileInput"

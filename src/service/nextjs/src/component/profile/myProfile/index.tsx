@@ -4,6 +4,7 @@ import { Header } from '@/component/common/Header';
 import { useContext } from 'react';
 import AuthContext from '@/context/auth.context';
 import { useRouter } from 'next/router';
+import Loading from '@/component/common/Loading';
 
 const MyProfilePage = () => {
 	const router = useRouter();
@@ -11,8 +12,9 @@ const MyProfilePage = () => {
 		router.push('/profile/modifyProfile');
 	};
 	const { me } = useContext(AuthContext);
-	console.log(me?.nickname);
-	return (
+	return !me ? (
+		<Loading />
+	) : (
 		<div
 			style={{
 				height: '100vh',
@@ -34,7 +36,11 @@ const MyProfilePage = () => {
 					justifyContent: 'center',
 				}}
 			>
-				<MyProfileBody image={me?.profileImageURI} name={me?.nickname} use2fa={me?.use2fa} />
+				<MyProfileBody
+					image={me.profileImageURI}
+					name={me.nickname}
+					use2fa={`${me.use2fa}` === 'true' ? true : false}
+				/>
 			</div>
 			<BottomButton title="프로필 수정하기" onClick={onClick} />
 		</div>

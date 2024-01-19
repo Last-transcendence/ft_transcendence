@@ -7,6 +7,8 @@ import AppModule from './app.module';
 import PrismaService from './common/prisma/prisma.service';
 import * as cookieParser from 'cookie-parser';
 import * as passport from 'passport';
+import * as express from 'express';
+import { join } from 'path';
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule);
@@ -29,6 +31,8 @@ async function bootstrap() {
 		origin: originList,
 		credentials: true,
 	});
+
+	app.use('/upload', express.static(join(__dirname, '../../upload')));
 	app.use(cookieParser());
 	app.use(passport.initialize());
 	app.useWebSocketAdapter(new IoAdapter(app));
