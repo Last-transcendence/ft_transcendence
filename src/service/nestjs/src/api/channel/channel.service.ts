@@ -104,6 +104,23 @@ class ChannelService {
 		}
 	}
 
+	async leaveChannel(userId: string) {
+		try {
+			const participant = await this.prismaService.participant.findUnique({
+				where: { id: userId },
+			});
+			if (!participant) {
+				return;
+			}
+
+			return await this.prismaService.participant.delete({
+				where: { id: userId },
+			});
+		} catch (error) {
+			throw new Error(error.message);
+		}
+	}
+
 	async validatePassword(id: string, password: string): Promise<boolean> {
 		try {
 			const channel = await this.prismaService.channel.findUnique({
