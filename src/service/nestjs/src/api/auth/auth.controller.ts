@@ -90,7 +90,7 @@ export class AuthController {
 			});
 			const cookieOption = this.cookieService.getCookieOption();
 
-			user.status = 'online';
+			user.status = 'ONLINE';
 			res.cookie('accessToken', jwt, cookieOption);
 			res.redirect(`${this.configService.getOrThrow('NEXTJS_URL')}/auth/login/callback`);
 		} catch (error) {
@@ -157,7 +157,7 @@ export class AuthController {
 				nickname: user.nickname,
 				profileImageURI: user.profileImageURI,
 			});
-			user.status = 'online';
+			user.status = 'ONLINE';
 			res.cookie('accessToken', jwt, cookieOption);
 			res.redirect(`${this.configService.getOrThrow('NEXTJS_URL')}/auth/login/callback`);
 		} catch (error) {
