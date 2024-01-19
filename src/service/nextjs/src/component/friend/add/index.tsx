@@ -6,7 +6,7 @@ import User, { UserStatus } from '@/type/user.type';
 import { useCallback, useState } from 'react';
 // import { getFetcher } from '@/component/api/getFetcher';
 // import Friend from '@/type/friend.type';
-import CustomSnackbar from '@/component/profile/modifyProfile/customSnackbar';
+import PositionableSnackbar from '@/component/common/PositionableSnackbar';
 import { deleteFetcher, postFetcher } from '@/service/api';
 import Friend from '@/type/friend.type';
 
@@ -74,7 +74,7 @@ const AddFriend = ({
 
 	return (
 		<div className={style.container}>
-			<CustomSnackbar
+			<PositionableSnackbar
 				open={showSuccessSnackbar}
 				onClose={() => setShowSuccessSnackbar(false)}
 				message={message.title}
