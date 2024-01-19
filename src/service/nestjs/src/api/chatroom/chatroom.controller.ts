@@ -1,11 +1,13 @@
-import { Body, Controller, Get, HttpException, Post, Req } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, Post, Req, UseGuards } from '@nestjs/common';
 import ChatRoomService from './chatroom.service';
 import { ApiBadRequestResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ChatRoomModel } from 'common/model';
 import * as Dto from './dto';
+import * as Auth from '../../common/auth';
 
 @Controller('chatroom')
 @ApiTags('chatroom')
+@UseGuards(Auth.Guard.UserJwt)
 class ChatRoomController {
 	constructor(private readonly chatRoomService: ChatRoomService) {}
 

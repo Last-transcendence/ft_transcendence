@@ -22,11 +22,12 @@ const SearchFriend = ({ onSearch, isSearching, setIsSearching }: SearchFriendPro
 				placeholder="친구 추가할 이름을 입력하세요."
 				onChange={event => {
 					setText(event.target.value);
-					if (event.target.value === '') setIsSearching(false);
+					setIsSearching(false);
 				}}
 				onKeyDown={e => {
 					if (e.key === 'Enter') {
 						onSearch(text);
+						setIsSearching(true);
 					}
 				}}
 			/>
@@ -44,6 +45,7 @@ const SearchFriend = ({ onSearch, isSearching, setIsSearching }: SearchFriendPro
 					height="9"
 					onClick={() => {
 						onSearch(text);
+						setIsSearching(true);
 					}}
 				/>
 			)}
