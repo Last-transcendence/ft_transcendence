@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { MessageBody } from '@nestjs/websockets';
+import { $Enums } from '@prisma/client';
 import { plainToClass } from 'class-transformer';
 import { validate } from 'class-validator';
 import PrismaService from 'common/prisma/prisma.service';
@@ -25,14 +26,36 @@ class ChannelService {
 		}
 	}
 
-	async getChannel(id: string): Promise<Dto.Response.Channel> {
+	async getChannel(id: string): Promise<{
+		title: string;
+		visibility: $Enums.ChannelVisibility;
+		participant: Array<{
+			id: string;
+			userId: string;
+		}>;
+		mute: Array<{
+			id: string;
+			userId: string;
+		}>;
+	} | null> {
 		try {
 			const channelDetail = await this.prismaService.channel.findUnique({
 				where: { id },
 				select: {
-					id: true,
 					title: true,
 					visibility: true,
+					participant: {
+						select: {
+							id: true,
+							userId: true,
+						},
+					},
+					mute: {
+						select: {
+							id: true,
+							userId: true,
+						},
+					},
 				},
 			});
 			return channelDetail;

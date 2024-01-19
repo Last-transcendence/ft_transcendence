@@ -110,6 +110,12 @@ class ChannelGateway {
 			return { res: false };
 		}
 	}
+
+	@SubscribeMessage('info')
+	@UseGuards(Auth.Guard.UserWsJwt)
+	async handleInfo(@MessageBody() data) {
+		return this.channelService.getChannel(data.channelId);
+	}
 }
 
 export default ChannelGateway;
