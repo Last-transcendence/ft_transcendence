@@ -20,7 +20,7 @@ export class AuthService {
 		}
 	}
 
-	async register(intraId: string, registerRequestDto: Dto.Request.Register) {
+	async register(intraId: string, registerRequestDto: Dto.Request.Register, fileName?: string) {
 		try {
 			let user = await this.userSerivice.findByIntraId(intraId);
 			if (user) {
@@ -35,7 +35,7 @@ export class AuthService {
 			if (registerRequestDto.use2fa && !registerRequestDto.email2fa) {
 				throw new BadRequestException('Email used in 2fa is empty');
 			}
-
+			registerRequestDto.file = fileName;
 			return await this.userSerivice.create(intraId, registerRequestDto);
 		} catch (error) {
 			throw new Error(error.message);

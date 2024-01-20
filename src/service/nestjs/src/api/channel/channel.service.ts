@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { MessageBody } from '@nestjs/websockets';
 import { $Enums } from '@prisma/client';
+import MuteService from 'api/mute/mute.service';
 import { plainToClass } from 'class-transformer';
 import { validate } from 'class-validator';
 import PrismaService from 'common/prisma/prisma.service';
@@ -8,7 +9,10 @@ import * as Dto from './dto';
 
 @Injectable()
 class ChannelService {
-	constructor(private readonly prismaService: PrismaService) {}
+	constructor(
+		private readonly prismaService: PrismaService,
+		private readonly muteService: MuteService,
+	) {}
 
 	async getChannelList(): Promise<Dto.Response.Channel[]> {
 		try {
@@ -130,6 +134,16 @@ class ChannelService {
 			return channel.password === password;
 		} catch (error) {
 			throw new Error(error.message);
+		}
+	}
+
+	async messageFilter(channelId: string, userId: string, message: string): Promise<string> {
+		const muteList = await this.muteService.getMuteList(channelId);
+		const isUserMuted = muteList.some(item => item.userId === userId);
+		if (isUserMuted) {
+			return 'This message is from a muted user';
+		} else {
+			return message;
 		}
 	}
 }
