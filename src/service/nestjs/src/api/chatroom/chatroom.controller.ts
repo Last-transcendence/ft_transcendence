@@ -6,7 +6,6 @@ import UserService from 'api/user/user.service';
 import * as Auth from '../../common/auth';
 import * as Dto from './dto';
 import { User } from 'prisma/prisma-client';
-import * as Auth from '../../common/auth';
 
 @Controller('chatroom')
 @ApiTags('chatroom')
