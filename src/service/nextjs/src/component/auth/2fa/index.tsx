@@ -5,7 +5,7 @@ import { useState } from 'react';
 import styles from '@/style/auth/2fa/sign/index.module.css';
 import { getFetcher, postFetcher } from '@/service/api';
 import CustomSnackbar from '@/component/common/customSnackbar';
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/router';
 
 const TwoFactorBody = () => {
 	const router = useRouter();

@@ -9,10 +9,8 @@ import {
 } from '@nestjs/websockets';
 import { HttpException, UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { $Enums } from '@prisma/client';
 import * as Auth from '../../common/auth';
 import * as Dto from './dto';
-import UserService from 'api/user/user.service';
 
 const getCorsOrigin = () => {
 	const configService = new ConfigService();
@@ -26,10 +24,7 @@ const getCorsOrigin = () => {
 })
 @UseGuards(Auth.Guard.UserWsJwt)
 class GameGateway {
-	constructor(
-		private readonly gameService: GameService,
-		private readonly userService: UserService,
-	) {}
+	constructor(private readonly gameService: GameService) {}
 
 	@WebSocketServer()
 	server: Namespace;
@@ -51,13 +46,16 @@ class GameGateway {
 		try {
 			socket.join('queue');
 
-			//this.userService.updateUserById(socket['user']['id'], {
-			//	status: 'ONLINE',
-			//});
-
+			// get clients list of queue
 			const clients = Array.from(this.getRoom('queue'));
 
 			if (clients.length === 1) {
+				//const gameId = await this.gameService.create();
+
+				//socket.leave('queue');
+				//socket.join(gameId);
+				//this.getRoom(gameId).add(JSON.stringify({ mode: 'hard' }));
+				//return this.server.to(socket.id).emit('matched', { id: gameId });
 				return;
 			}
 
@@ -74,12 +72,11 @@ class GameGateway {
 			socket2.join(gameId);
 
 			const gameRoom = this.getRoom(gameId);
-			const mode: $Enums.GameMode = 'HARD';
 
-			gameRoom.add(JSON.stringify({ mode, user: [], ready: [] }));
+			gameRoom.add(JSON.stringify({ mode: 'hard', ready: [] }));
 
-			this.server.to(player1).emit('matched', { room: gameId });
-			this.server.to(player2).emit('matched', { room: gameId });
+			this.server.to(player1).emit('matched', { id: gameId });
+			this.server.to(player2).emit('matched', { id: gameId });
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
 		}
@@ -92,22 +89,22 @@ class GameGateway {
 	) {
 		try {
 			const room = this.getRoom(readyRequestDto.room);
-			const mode: $Enums.GameMode = JSON.parse(Array.from(room)[2]).mode;
 			const user = JSON.parse(Array.from(room)[2]).user;
 			const ready = JSON.parse(Array.from(room)[2]).ready;
-			if (ready.includes(socket.id)) {
+			if (!ready.includes(socket.id)) {
+				user.push(socket['user']['id']);
+				ready.push(socket.id);
+				room.delete(Array.from(room)[2]);
+				room.add(JSON.stringify({ mode: 'hard', user: user, ready: ready }));
 				return;
 			}
-			user.push(socket['user']);
-			ready.push(socket.id);
-			room.delete(Array.from(room)[2]);
-			room.add(JSON.stringify({ mode, user, ready }));
 			if (ready.length !== 2) {
 				return;
 			}
 			room.delete(Array.from(room)[2]);
-			room.add(JSON.stringify({ mode, user, ready: [] }));
+			room.add(JSON.stringify({ mode: 'hard', user: user, ready: [] }));
 
+			const mode = JSON.parse(Array.from(room)[2]).mode;
 			const speed = mode === 'NORMAL' ? 0.15 : 0.3;
 			const randomX =
 				(Math.random() < 0.5 ? Math.random() * 600 + 150 : Math.random() * -600 - 150) * speed;
@@ -147,88 +144,12 @@ class GameGateway {
 		@MessageBody() scoreRequestDto: Dto.Request.Score,
 	) {
 		try {
-			const room = Array.from(this.getRoom(scoreRequestDto.room));
-			const user = JSON.parse(room[2]).user;
-			const player1 = user.find(user => user.id === socket['user']['id']);
-			const player2 = user.find(user => user.id !== socket['user']['id']);
+			const opponentSocketId = this.getOpponentSocketId(socket, scoreRequestDto.room);
 
-			// socket
-			{
-				const opponentSocketId = this.getOpponentSocketId(socket, scoreRequestDto.room);
+			this.server.to(opponentSocketId).emit('score', scoreRequestDto);
 
-				this.server.to(opponentSocketId).emit('score', scoreRequestDto);
-
-				if (parseInt(scoreRequestDto.score) === 4) {
-					this.server.sockets.get(room[0]).leave(scoreRequestDto.room);
-					this.server.sockets.get(room[1]).leave(scoreRequestDto.room);
-					this.server.to(socket.id).emit('end', {
-						me: {
-							nickname: player1.nickname,
-							profileImageURI: player1.profileImageURI,
-						},
-						opponent: {
-							nickname: player2.nickname,
-							profileImageURI: player2.profileImageURI,
-						},
-					});
-					this.server.to(opponentSocketId).emit('end', {
-						me: {
-							nickname: player2.nickname,
-							profileImageURI: player2.profileImageURI,
-						},
-						opponent: {
-							nickname: player1.nickname,
-							profileImageURI: player1.profileImageURI,
-						},
-					});
-				}
-			}
-
-			// database
-			{
-				const mode: $Enums.GameMode = JSON.parse(room[2]).mode;
-				const player1Id = player1.id;
-				const player2Id = player2.id;
-				let player1History = await this.gameService.getFirstHistory(player1Id, player2Id);
-				let player2History = await this.gameService.getFirstHistory(player2Id, player1Id);
-
-				if (!player1History && !player2History) {
-					player1History = await this.gameService.createHistory(player1Id, {
-						player2Id,
-						mode,
-						player1Score: parseInt(scoreRequestDto.score),
-						player2Score: 0,
-						result: 'PENDING',
-					});
-					player2History = await this.gameService.createHistory(player2Id, {
-						player2Id: player1Id,
-						mode,
-						player1Score: 0,
-						player2Score: parseInt(scoreRequestDto.score),
-						result: 'PENDING',
-					});
-				} else {
-					this.gameService.updateHistory(player1History.id, {
-						player1Score: parseInt(scoreRequestDto.score),
-					});
-					this.gameService.updateHistory(player2History.id, {
-						player2Score: parseInt(scoreRequestDto.score),
-					});
-				}
-				if (parseInt(scoreRequestDto.score) === 4) {
-					this.gameService.updateHistory(player1History.id, {
-						result: 'WIN',
-					});
-					this.gameService.updateHistory(player2History.id, {
-						result: 'LOSE',
-					});
-					//this.userService.updateUserById(player1Id, {
-					//	status: 'ONLINE',
-					//});
-					//this.userService.updateUserById(player2Id, {
-					//	status: 'ONLINE',
-					//});
-				}
+			if (scoreRequestDto.score == 4) {
+				this.server.to(scoreRequestDto.room).emit('end');
 			}
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
