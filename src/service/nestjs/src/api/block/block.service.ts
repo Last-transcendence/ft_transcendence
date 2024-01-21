@@ -21,6 +21,14 @@ class BlockService {
 			throw new Error(error.message);
 		}
 	}
+
+	async find(userId: string, blockedId: string): Promise<BlockModel> {
+		try {
+			return await this.prismaService.block.findUnique({ where: { userId_blockedId: { userId, blockedId } } });
+		} catch (error) {
+			throw new Error(error.message);
+		}
+	}
 }
 
 export default BlockService;

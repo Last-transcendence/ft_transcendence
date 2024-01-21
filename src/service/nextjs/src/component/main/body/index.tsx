@@ -5,7 +5,7 @@ import style from '../../../style/main/body/index.module.css';
 import ChattingRoom from './chatting-room';
 import ChattingModeToggle from './chatting-mode';
 import { Box, Button, Skeleton, Stack, TextField, Typography } from '@mui/material';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import PositionableSnackbar from '@/component/common/PositionableSnackbar';
 import Chatroom from '@/type/chatroom.type';
 import { Channel, ChannelVisibility } from '@/type/channel.type';
