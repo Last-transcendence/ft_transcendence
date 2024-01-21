@@ -4,6 +4,7 @@ import { Header } from '@/component/common/Header';
 import { useContext } from 'react';
 import AuthContext from '@/context/auth.context';
 import { useRouter } from 'next/navigation';
+import Loading from '@/component/common/Loading';
 
 const MyProfilePage = () => {
 	const router = useRouter();
@@ -11,8 +12,9 @@ const MyProfilePage = () => {
 		router.push('/profile/modifyProfile');
 	};
 	const { me } = useContext(AuthContext);
-	console.log(me?.nickname);
-	return (
+	return !me ? (
+		<Loading />
+	) : (
 		<div
 			style={{
 				height: '100vh',

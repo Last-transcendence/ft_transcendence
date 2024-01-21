@@ -80,8 +80,11 @@ export class AuthController {
 		try {
 			const user = await this.authService.login(req.user.intraId);
 			if (user.use2fa) {
-				throw new UnauthorizedException("Try login with two factor authentication: POST /auth/2fa")
+				// throw new UnauthorizedException("Try login with two factor authentication: POST /auth/2fa");
+				res.redirect(`${this.configService.getOrThrow('NEXTJS_URL')}/auth/2fa`);
+				return;
 			}
+
 			const jwt = this.cookieService.createJwt({
 				id: user.id,
 				intraId: user.intraId,
@@ -96,7 +99,7 @@ export class AuthController {
 		} catch (error) {
 			res.redirect(
 				`${this.configService.getOrThrow('NEXTJS_URL')}/auth/register?nickname=${
-					req.user.nickname
+					req.user.intraId
 				}`,
 			);
 		}
@@ -114,7 +117,8 @@ export class AuthController {
 		@UploadedFile() file: Express.Multer.File,
 	): Promise<User> {
 		try {
-			return this.authService.register(req.user.intraId, registerRequestDto, file.filename);
+			registerRequestDto.file = file ? file.filename : "";
+			return this.authService.register(req.user.intraId, registerRequestDto);
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
 		}
@@ -127,12 +131,13 @@ export class AuthController {
 	async send2faEmail(@Req() req) {
 		try {
 			const code = await this.twoFactorService.createCode();
-			const user = await this.authService.login(req.user.intraId)
+			const user = await this.authService.login(req.user.intraId);
+			console.log(code);
 			if (!user || !user.use2fa || !user.email2fa) {
 				throw new BadRequestException("Bad request")
 			}
 			this.cacheManager.set(user.email2fa, code);
-			this.mailService.send(user.email2fa, user.nickname, code)
+			// this.mailService.send(user.email2fa, user.nickname, code)
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
 		}
@@ -159,7 +164,7 @@ export class AuthController {
 			});
 			user.status = 'ONLINE';
 			res.cookie('accessToken', jwt, cookieOption);
-			res.redirect(`${this.configService.getOrThrow('NEXTJS_URL')}/auth/login/callback`);
+			// res.redirect(`${this.configService.getOrThrow('NEXTJS_URL')}/auth/login/callback`);
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
 		}
