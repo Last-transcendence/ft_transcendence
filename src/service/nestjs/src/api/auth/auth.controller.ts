@@ -137,7 +137,7 @@ export class AuthController {
 				throw new BadRequestException("Bad request")
 			}
 			this.cacheManager.set(user.email2fa, code);
-			// this.mailService.send(user.email2fa, user.nickname, code)
+			this.mailService.send(user.email2fa, user.nickname, code);
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
 		}
