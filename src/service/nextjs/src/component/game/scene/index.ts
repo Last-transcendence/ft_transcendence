@@ -1,5 +1,1 @@
-import Queue from './queue';
-import Main from './main';
-import Result from './result';
-
-export { Queue, Main, Result };
+export { default as MainScene } from './main';

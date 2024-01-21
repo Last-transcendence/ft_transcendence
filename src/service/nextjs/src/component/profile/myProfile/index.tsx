@@ -3,7 +3,7 @@ import { BottomButton } from '@/component/common/ButtomButton';
 import { Header } from '@/component/common/Header';
 import { useContext } from 'react';
 import AuthContext from '@/context/auth.context';
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/router';
 
 const MyProfilePage = () => {
 	const router = useRouter();

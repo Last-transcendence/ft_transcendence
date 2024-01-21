@@ -1,8 +1,8 @@
+import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 import Phaser from 'phaser';
 import { Socket } from 'socket.io-client';
-import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 
-class Main extends Phaser.Scene {
+class MainScene extends Phaser.Scene {
 	private ball!: Phaser.Physics.Arcade.Image;
 
 	private myPaddle!: Phaser.Physics.Arcade.Image;
@@ -10,8 +10,6 @@ class Main extends Phaser.Scene {
 
 	private myScore!: Phaser.GameObjects.Text;
 	private enemyScore!: Phaser.GameObjects.Text;
-
-	private readyText!: Phaser.GameObjects.Text;
 
 	private keys!: Phaser.Types.Input.Keyboard.CursorKeys;
 
@@ -21,80 +19,27 @@ class Main extends Phaser.Scene {
 	private socket!: Socket;
 	private room: string = '';
 
-	private resetFlag: boolean = true;
-
-	constructor() {
-		super({ key: 'Main', active: true });
+	constructor(navigate: AppRouterInstance, socket: Socket, room: string) {
+		super({ key: 'MainScene', active: true });
 		this.events = new Phaser.Events.EventEmitter();
-	}
-
-	init(data: { navigate: AppRouterInstance; socket: Socket; room: string }) {
-		const { navigate, socket, room } = data;
-
-		this.scene.setVisible(false);
-
 		this.navigate = navigate;
 		this.socket = socket;
 		this.room = room;
-
-		if (this.socket) {
-			this.initSocket();
-		}
-	}
-
-	initSocket() {
-		this.socket.on('start', response => {
-			this.isPlaying = true;
-			this.ball.setVelocity(response.ball.x, response.ball.y);
-		});
-		this.socket.on('move', response => {
-			this.enemyPaddle.x = 360 - response.x;
-		});
-		this.socket.on('score', response => {
-			this.enemyScore.setText(parseInt(response.score, 10).toString());
-			this.reset();
-		});
-		this.socket.on('end', response => {
-			this.socket.off('start');
-			this.socket.off('move');
-			this.socket.off('score');
-			this.socket.off('end');
-
-			setTimeout(() => {
-				console.log(response);
-				this.scene.start('Result', {
-					navigate: this.navigate,
-					socket: this.socket,
-					me: {
-						nickname: response.me.nickname,
-						profileImageURI: response.me.profileImageURI,
-						score: this.myScore.text,
-					},
-					opponent: {
-						nickname: response.opponent.nickname,
-						profileImageURI: response.opponent.profileImageURI,
-						score: this.enemyScore.text,
-					},
-				});
-			}, 1000);
-		});
 	}
 
 	reset() {
-		this.resetFlag = false;
 		this.ball.setVisible(false);
 		this.ball.setVelocity(0, 0);
 		this.ball.setPosition(this.game.canvas.width / 2, this.game.canvas.height / 2);
 		this.ball.setVisible(true);
 		this.myPaddle.setVelocity(0, 0);
 		this.enemyPaddle.setVelocity(0, 0);
-		this.readyText.setVisible(true);
+
+		// Add text "press space to ready"
 
 		this.isPlaying = false;
 
-		setTimeout(() => {
-			this.resetFlag = true;
-		}, 1000);
+		setTimeout(() => {}, 1000);
 	}
 
 	score() {
@@ -104,7 +49,7 @@ class Main extends Phaser.Scene {
 
 		this.ball.setVelocity(0, 0);
 
-		if (this.ball.y < 630) {
+		if (10 < this.ball.y) {
 			this.myScore.setText((parseInt(this.myScore.text, 10) + 1).toString());
 			this.socket.emit('score', {
 				room: this.room,
@@ -132,83 +77,86 @@ class Main extends Phaser.Scene {
 	}
 
 	initPaddle() {
-		const x: number = this.game.canvas.width / 2;
-
-		this.myPaddle = this.physics.add.image(x, 610, 'paddle');
-		this.enemyPaddle = this.physics.add.image(x, 30, 'paddle');
+		this.myPaddle = this.physics.add.image(this.game.canvas.width / 2, 610, 'paddle');
 		this.myPaddle.setImmovable(true);
+		this.enemyPaddle = this.physics.add.image(this.game.canvas.width / 2, 30, 'paddle');
 		this.enemyPaddle.setImmovable(true);
 	}
 
 	initScore() {
-		const x = this.game.canvas.width / 2;
-		const y = this.game.canvas.height / 4;
-		const textConfig: Phaser.Types.GameObjects.Text.TextStyle = {
-			fontFamily: 'Inter',
-			fontSize: '32px',
-			color: '#ffffff',
-		};
-
-		this.myScore = this.add.text(x, y * 3, '0', textConfig).setOrigin(0.5, 0.5);
-		this.enemyScore = this.add.text(x, y, '0', textConfig).setOrigin(0.5, 0.5);
+		this.myScore = this.add
+			.text(this.game.canvas.width / 2, (this.game.canvas.height / 4) * 3, '0', {
+				fontSize: '32px',
+				fontFamily: 'Inter',
+				color: '#FFFFFF',
+			})
+			.setOrigin(0.5, 0.5);
+		this.enemyScore = this.add
+			.text(this.game.canvas.width / 2, this.game.canvas.height / 4, '0', {
+				fontSize: '32px',
+				fontFamily: 'Inter',
+				color: '#FFFFFF',
+			})
+			.setOrigin(0.5, 0.5);
 	}
 
-	initReadyText() {
-		const x: number = this.game.canvas.width / 2;
-		const y: number = this.game.canvas.height / 2 - 80;
-		const textConfig: Phaser.Types.GameObjects.Text.TextStyle = {
-			fontFamily: 'Inter',
-			fontSize: '24px',
-			color: '#ffffff',
-		};
-
-		this.readyText = this.add.text(x, y, 'Press space to ready', textConfig).setOrigin(0.5, 0.5);
-	}
-
-	initMiddleLine() {
-		const x: number = this.game.canvas.width / 2;
-		const y: number = this.game.canvas.height / 2;
-		const xWidth: number = this.game.canvas.width;
-		const yWidth: number = 1;
-		const color: number = 0xffffff;
-
-		this.add.rectangle(x, y, xWidth, yWidth, color).setOrigin(0.5, 0.5);
+	initSocket() {
+		this.socket.on('start', response => {
+			this.isPlaying = true;
+			this.ball.setVelocity(response.ball.x, response.ball.y);
+		});
+		this.socket.on('move', response => {
+			this.enemyPaddle.x = 360 - response.x;
+		});
+		this.socket.on('score', response => {
+			this.enemyScore.setText(parseInt(response.score, 10).toString());
+			this.reset();
+		});
+		this.socket.on('end', response => {
+			this.socket.off('start');
+			this.socket.off('move');
+			this.socket.off('score');
+			this.socket.off('end');
+			this.navigate.push('/');
+			//this.scene.start('EndScene', {
+			//winner: response.winner,
+			//});
+		});
 	}
 
 	create() {
-		if (this.socket) {
-			this.scene.setVisible(true);
-		}
 		this.initBall();
 		this.initPaddle();
 		this.physics.add.collider(this.ball, this.myPaddle);
 		this.physics.add.collider(this.ball, this.enemyPaddle);
 		this.initScore();
-		this.initReadyText();
-		this.initMiddleLine();
+
+		this.add
+			.rectangle(
+				this.game.canvas.width / 2,
+				this.game.canvas.height / 2,
+				this.game.canvas.width,
+				1,
+				0xffffff,
+			)
+			.setOrigin(0.5, 0.5);
 
 		if (this.input.keyboard) {
 			this.keys = this.input.keyboard.createCursorKeys();
 		}
 
+		this.initSocket();
 		this.reset();
 	}
 
 	update(time: number, delta: number) {
 		if (!this.isPlaying) {
-			if (this.room === '' || !this.resetFlag || !this.keys.space?.isDown) {
+			if (this.room === '' || !this.keys.space?.isDown) {
 				return;
 			}
-			if (!this.readyText.visible) {
-				return;
-			}
-			this.readyText.setVisible(false);
-			setTimeout(() => {
-				this.socket.emit('ready', {
-					room: this.room,
-				});
-			}, 1000);
-			return;
+			return this.socket.emit('ready', {
+				room: this.room,
+			});
 		}
 
 		if (!this.keys || !this.myPaddle || !this.enemyPaddle) {
@@ -238,4 +186,4 @@ class Main extends Phaser.Scene {
 	}
 }
 
-export default Main;
+export default MainScene;
