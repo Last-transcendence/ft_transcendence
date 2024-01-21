@@ -32,7 +32,7 @@ class UserController {
 		@UploadedFile() file: Express.Multer.File,
 	): Promise<UserModel> {
 		try {
-			updateData.file = file.filename;
+			updateData.file = file ? file.filename : req.user.profileImageURI;
 			return await this.userService.updateUserById(req.user.id, updateData);
 		}
 		catch (error) {

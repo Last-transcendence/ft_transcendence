@@ -15,7 +15,7 @@ class Create {
 	use2fa: string;
 
 	@IsOptional()
-	@IsEmail()
+	@IsString()
 	@Trim()
 	@ApiProperty({ description: 'Email used to 2fa', required: false })
 	email2fa?: string;

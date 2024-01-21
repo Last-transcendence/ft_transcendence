@@ -78,7 +78,6 @@ export class AuthController {
 	@ApiUnauthorizedResponse({ description: 'Unauthorized' })
 	async login(@Request() req, @Response({ passthrough: true }) res) {
 		try {
-			//403 error
 			const user = await this.authService.login(req.user.intraId);
 			if (user.use2fa) {
 				throw new UnauthorizedException("Try login with two factor authentication: POST /auth/2fa")
@@ -92,6 +91,7 @@ export class AuthController {
 			const cookieOption = this.cookieService.getCookieOption();
 
 			user.status = 'ONLINE';
+			await this.prismaService.user.update({ where: { id: user.id }, data: { status: 'ONLINE' } });
 			res.cookie('accessToken', jwt, cookieOption);
 			res.redirect(`${this.configService.getOrThrow('NEXTJS_URL')}/auth/login/callback`);
 		} catch (error) {
@@ -115,7 +115,8 @@ export class AuthController {
 		@UploadedFile() file: Express.Multer.File,
 	): Promise<User> {
 		try {
-			return this.authService.register(req.user.intraId, registerRequestDto, file.filename);
+			registerRequestDto.file = file ? file.filename : req.user.profileImageURI;
+			return this.authService.register(req.user.intraId, registerRequestDto);
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
 		}
@@ -159,6 +160,7 @@ export class AuthController {
 				profileImageURI: user.profileImageURI,
 			});
 			user.status = 'ONLINE';
+			await this.prismaService.user.update({ where: { id: user.id }, data: { status: 'ONLINE' } });
 			res.cookie('accessToken', jwt, cookieOption);
 			res.redirect(`${this.configService.getOrThrow('NEXTJS_URL')}/auth/login/callback`);
 		} catch (error) {
