@@ -76,7 +76,7 @@ const OpenProfileAvatar = ({ otherUserId, imgUrl }: OpenProfileAvatarProps) => {
 			<Avatar
 				alt="User Avatar"
 				onClick={handleAvatarOpen}
-				sx={{ cursor: 'pointer' }}
+				sx={{ cursor: 'pointer', width: 36, height: 36 }}
 				src={imgUrl ? imgUrl : undefined}
 			/>
 			{click && (

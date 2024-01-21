@@ -70,7 +70,9 @@ const BottomProfile = ({ otherUserId, isFriend }: BottomProfileProps) => {
 			// const data: Chatroom[] = await getFetcher('/chatroom');
 			// const chatroom: Chatroom | undefined = findUserFromDm(otherUserId, data);
 			//@todo dm 접속에 실패할 경우 처리 필요
-			chatSocket?.emit('join', { toUserId: otherUserId });
+			chatSocket?.emit('join', { toUserId: otherUserId }, (res: any) => {
+				console.log('res', res);
+			});
 			router.push(`/chat/${otherUserId}/private`);
 		} catch (error: any) {
 			console.log('dm 생성실패');

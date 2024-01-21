@@ -35,17 +35,23 @@ const CommonChatRoomPage = () => {
 		});
 	}, [params?.id]);
 
+	// @todo participant 처리되면 주석 해제
 	useEffect(() => {
 		if (!channelData || !me) return;
-		if (channelData.participant?.some((data: Participant) => data.userId === me?.id)) {
-			setChatLiveData(prev => [
-				...prev,
-				{ type: 'action', message: `${channelData?.title} 채널에 입장하셨습니다.` },
-			]);
-		} else {
-			router.push('/');
-		}
-	}, [channelData, me?.id]);
+		// if (channelData.participant?.some((data: Participant) => data.userId === me?.id)) {
+		// 	setChatLiveData(prev => [
+		// 		...prev,
+		// 		{ type: 'action', message: `${channelData?.title} 채널에 입장하셨습니다.` },
+		// ]);
+		// } else {
+		// 	router.push('/');
+		// }
+
+		setChatLiveData(prev => [
+			...prev,
+			{ type: 'action', message: `${channelData?.title} 채널에 입장하셨습니다.` },
+		]);
+	}, [channelData, me]);
 
 	const setActionMessage = useCallback((message: string) => {
 		setChatLiveData(prev => [...prev, { type: 'action', message }]);
