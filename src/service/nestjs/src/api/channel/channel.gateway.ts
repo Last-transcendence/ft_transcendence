@@ -84,11 +84,17 @@ class ChannelGateway {
 			}
 
 			socket.join(joinData.channelId);
+			this.server.to(joinData.channelId).emit('message', {
+				channelId: joinData.channelId,
+				userId: socket.user.id,
+				nickname: socket.user.nickname,
+				profileImageURI: socket.user.profileImageURI,
+			});
 			return { res: true };
 		} catch (error) {
 			console.error("An error occurred channel.gateway 'join':", error);
 			socket.emit('error', { message: 'An error occurred' });
-			return { res: false };
+			return { res: false, message: error };
 		}
 	}
 
