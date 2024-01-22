@@ -30,8 +30,8 @@ class ChatService {
 
 	async create(srcId: string, destId: string, content: string): Promise<ChatModel> {
 		try {
-			let chatRoom = await this.prismaService.chatRoom.findUnique({
-				where: { srcId_destId: { srcId, destId } },
+			let chatRoom = await this.prismaService.chatRoom.findFirst({
+				where: { srcId, destId },
 			});
 			if (!chatRoom) {
 				chatRoom = await this.chatRoomService.create(srcId, destId);

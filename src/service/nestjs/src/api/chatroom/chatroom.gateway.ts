@@ -13,6 +13,7 @@ import * as Auth from '../../common/auth';
 import * as ChatRoomDto from './dto';
 import ChatService from 'api/chat/chat.service';
 import BlockService from 'api/block/block.service';
+import { join } from 'path';
 const getCorsOrigin = () => {
     const configService = new ConfigService();
 
