@@ -1,5 +1,25 @@
-import { Controller, Get, HttpException, Param, Post, Query, Req, UseGuards, UploadedFile, UseInterceptors, Patch, Body, BadRequestException } from '@nestjs/common';
-import { ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiTags, ApiConsumes } from '@nestjs/swagger';
+import {
+	Controller,
+	Get,
+	HttpException,
+	Param,
+	Post,
+	Query,
+	Req,
+	UseGuards,
+	UploadedFile,
+	UseInterceptors,
+	Patch,
+	Body,
+	BadRequestException,
+} from '@nestjs/common';
+import {
+	ApiNotFoundResponse,
+	ApiOkResponse,
+	ApiOperation,
+	ApiTags,
+	ApiConsumes,
+} from '@nestjs/swagger';
 import UserService from './user.service';
 import * as Dto from './dto';
 import { UserModel } from 'common/model';
@@ -43,8 +63,7 @@ class UserController {
 				fs.unlinkSync(join(process.cwd(), 'upload/') + req.user.profileImageURI);
 			}
 			return await this.userService.updateUserById(req.user.id, updateData);
-		}
-		catch (error) {
+		} catch (error) {
 			throw new HttpException(error.message, error.status);
 		}
 	}

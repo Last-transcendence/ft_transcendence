@@ -12,9 +12,11 @@ import ParticipantService from 'api/participant/participant.service';
 import { plainToClass } from 'class-transformer';
 import { validate } from 'class-validator';
 import { Namespace, Socket } from 'socket.io';
+import * as Dto from './dto';
 import * as Auth from '../../common/auth';
 import * as ParticipantDto from '../participant/dto';
 import ChannelService from './channel.service';
+import UserService from 'api/user/user.service';
 
 const getCorsOrigin = () => {
 	const configService = new ConfigService();
@@ -32,6 +34,7 @@ class ChannelGateway {
 		@Inject(forwardRef(() => ParticipantService))
 		private readonly participantService: ParticipantService,
 		@Inject(forwardRef(() => BanService)) private readonly banService: BanService,
+		private readonly userService: UserService,
 	) {}
 
 	@WebSocketServer()
@@ -55,6 +58,7 @@ class ChannelGateway {
 			await this.participantService.update(newParticipant.id, { role: 'OWNER' });
 
 			socket.join(newChannel.id);
+
 			return { res: true, channelId: newChannel.id };
 		} catch (error) {
 			console.error("An error occurred channel.gateway 'create':", error);
@@ -185,6 +189,27 @@ class ChannelGateway {
 			return { res: true };
 		} catch (error) {
 			return { res: false, message: error };
+		}
+	}
+
+	@SubscribeMessage('invite')
+	@UseGuards(Auth.Guard.UserWsJwt)
+	async handleInvite(
+		@ConnectedSocket() socket: Socket,
+		@MessageBody() inviteRequestDto: Dto.Request.Invite,
+	) {
+		try {
+			if (!(await this.participantService.isParticipated(socket['user']['id']))) {
+				throw new BadRequestException('User is not a participated');
+			}
+
+			const opponent = await this.userService.findByNickname(inviteRequestDto.nickname);
+			if (!opponent || !(await this.participantService.isParticipated(opponent.id))) {
+				throw new BadRequestException('Opponent not found');
+			}
+			return { status: 'SUCCESS' };
+		} catch (error) {
+			return { status: 'ERROR', message: error };
 		}
 	}
 }

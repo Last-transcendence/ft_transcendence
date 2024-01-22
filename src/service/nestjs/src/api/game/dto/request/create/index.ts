@@ -1,36 +1,32 @@
 import { Trim } from '@miaooo/class-transformer-trim';
 import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
 import { $Enums } from '@prisma/client';
-import { IsNotEmpty, IsNumber, IsUUID } from 'class-validator';
 
 class Create {
+	@IsOptional()
 	@IsUUID()
+	@Trim()
+	@ApiProperty({ description: 'Player id' })
+	userId?: string;
+
+	@IsString()
 	@IsNotEmpty()
 	@Trim()
-	@ApiProperty({ description: 'Player 2 id' })
-	player2Id: string;
+	@ApiProperty({ description: 'Socket id' })
+	socketId: string;
 
+	@IsString()
 	@IsNotEmpty()
 	@Trim()
 	@ApiProperty({ description: 'Game mode' })
 	mode: $Enums.GameMode;
 
-	@IsNumber()
-	@IsNotEmpty()
+	@IsOptional()
+	@IsString()
 	@Trim()
-	@ApiProperty({ description: 'Player 1 score' })
-	player1Score: number;
-
-	@IsNumber()
-	@IsNotEmpty()
-	@Trim()
-	@ApiProperty({ description: 'Player 2 score' })
-	player2Score: number;
-
-	@IsNotEmpty()
-	@Trim()
-	@ApiProperty({ description: 'Game result' })
-	result: $Enums.GameResult;
+	@ApiProperty({ description: 'Ready' })
+	ready?: boolean;
 }
 
 export default Create;

@@ -51,6 +51,40 @@ class Main extends Phaser.Scene {
 			this.enemyPaddle.x = 360 - response.x;
 		});
 		this.socket.on('score', response => {
+<<<<<<< Updated upstream
+=======
+			console.log('score response ', response);
+			if (response.state === 'network-delay') {
+				this.reset(this.game.canvas.width / 2, this.game.canvas.height / 2, 0, 0);
+				this.readyText.setVisible(false);
+				this.networkDelayText.setVisible(true);
+				setTimeout(() => {
+					this.readyText.setVisible(true);
+					this.networkDelayText.setVisible(false);
+				}, 2000);
+				return;
+			}
+			if (response.state === 'confirmed') {
+				this.reset(this.game.canvas.width / 2, this.game.canvas.height / 2, 0, 0);
+				this.myScore.setText(parseInt(response.score, 10).toString());
+				return;
+			}
+			if (this.ball.y < 628) {
+				this.socket.emit('score', {
+					room: this.room,
+					score: parseInt(this.enemyScore.text, 10),
+					state: 'network-delay',
+				});
+				this.reset(this.game.canvas.width / 2, this.game.canvas.height / 2, 0, 0);
+				return;
+			}
+			this.socket.emit('score', {
+				room: this.room,
+				score: response.score,
+				state: 'confirmed',
+			});
+			this.reset(this.game.canvas.width / 2, this.game.canvas.height / 2, 0, 0);
+>>>>>>> Stashed changes
 			this.enemyScore.setText(parseInt(response.score, 10).toString());
 			this.reset();
 		});
