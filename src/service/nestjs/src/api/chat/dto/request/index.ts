@@ -1,1 +1,1 @@
-export { default as Create } from './create';
+export { default as CreateChat } from './create';
