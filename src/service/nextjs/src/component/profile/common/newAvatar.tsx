@@ -41,7 +41,11 @@ const NewAvatar = ({ sxStyle, avatarImgStyle, onClick, ...userImageData }: newAv
 				}}
 				onClick={onClick}
 			>
-				<MyImage avatarImgStyle={avatarImgStyle} {...userImageData} />
+				<MyImage
+					avatarImgStyle={avatarImgStyle}
+					image={userImageData.image || ''}
+					name={userImageData.name}
+				/>
 			</Avatar>
 		</Box>
 	);
