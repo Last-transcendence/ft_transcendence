@@ -40,10 +40,10 @@ class UserService {
 		}
 	}
 
-	async updateUserById(id: string, { use2fa, file, ...updateRequestDto}: Dto.Request.UpdateUser): Promise<User> {
+	async updateUserById(id: string,  { use2fa, file, ...updateRequestDto}: Partial<Dto.Request.UpdateUser>): Promise<User> {
 		try {
 			return await this.prismaService.user.update({ 
-				where: { id }, data: { ...updateRequestDto, profileImageURI: file, use2fa: use2fa === 'true' ? true : false},
+				where: { id }, data: { profileImageURI: file, use2fa: use2fa === 'true' ? true : false,  ...updateRequestDto },
 			});
 		} catch (error) {
 			throw new Error(error.message);

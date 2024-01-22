@@ -26,6 +26,7 @@ import {
 import { AuthService } from './service/auth.service';
 import { CookieService } from './service/cookie.service';
 import { TwoFactorService } from './service/twofactor.service';
+import PrismaService from 'common/prisma/prisma.service';
 import { ConfigService } from '@nestjs/config';
 import { User } from 'api/user/dto/response';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -46,6 +47,7 @@ export class AuthController {
 		private readonly cookieService: CookieService,
 		private readonly twoFactorService: TwoFactorService,
 		private readonly mailService: MailService,
+		private readonly prismaService: PrismaService,
         @Inject(CACHE_MANAGER) private cacheManager: Cache
 	) {}
 
@@ -80,7 +82,7 @@ export class AuthController {
 		try {
 			const user = await this.authService.login(req.user.intraId);
 			if (user.use2fa) {
-				throw new UnauthorizedException("Try login with two factor authentication: POST /auth/2fa")
+				res.redirect(`${this.configService.getOrThrow('NEXTJS_URL')}/auth/2fa`);
 			}
 			const jwt = this.cookieService.createJwt({
 				id: user.id,
@@ -162,7 +164,6 @@ export class AuthController {
 			user.status = 'ONLINE';
 			await this.prismaService.user.update({ where: { id: user.id }, data: { status: 'ONLINE' } });
 			res.cookie('accessToken', jwt, cookieOption);
-			res.redirect(`${this.configService.getOrThrow('NEXTJS_URL')}/auth/login/callback`);
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
 		}

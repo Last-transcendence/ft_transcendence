@@ -3,7 +3,6 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 class Create {
 	@IsString()
-	@IsNotEmpty()
 	@Trim()
 	@ApiProperty({ description: 'Nickname' })
 	nickname: string;

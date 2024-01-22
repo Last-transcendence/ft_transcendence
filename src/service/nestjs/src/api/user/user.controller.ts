@@ -1,4 +1,4 @@
-import { Controller, Get, HttpException, Param, Post, Query, Req, UseGuards, UploadedFile, UseInterceptors, Patch, Body } from '@nestjs/common';
+import { Controller, Get, HttpException, Param, Post, Query, Req, UseGuards, UploadedFile, UseInterceptors, Patch, Body, BadRequestException } from '@nestjs/common';
 import { ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiTags, ApiConsumes } from '@nestjs/swagger';
 import UserService from './user.service';
 import * as Dto from './dto';
@@ -32,7 +32,13 @@ class UserController {
 		@UploadedFile() file: Express.Multer.File,
 	): Promise<UserModel> {
 		try {
+			const dupNickname = await this.userService.findByNickname(updateData.nickname);
+			if (dupNickname && dupNickname.id !== req.user.id) {
+				throw new BadRequestException('Nickname is already taken');
+			}
 			updateData.file = file ? file.filename : req.user.profileImageURI;
+			updateData.email2fa = updateData.email2fa === '' ? req.user.email2fa : updateData.email2fa;
+			updateData.nickname = updateData.nickname === '' ? req.user.nickname : updateData.nickname;
 			return await this.userService.updateUserById(req.user.id, updateData);
 		}
 		catch (error) {
