@@ -12,6 +12,7 @@ import JwtAuthModule from './jwt/jwt.module';
 import FtAuthModule from './ft/ft.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { MulterConfigService } from '../../common/multer/multer.config';
+import UserService from 'api/user/user.service';
 
 @Module({
 	imports: [
@@ -36,7 +37,7 @@ import { MulterConfigService } from '../../common/multer/multer.config';
 		}),
 	],
 	controllers: [AuthController],
-	providers: [AuthService, CookieService, TwoFactorService, MailService],
+	providers: [AuthService, CookieService, TwoFactorService, MailService, UserService],
 })
 class AuthModule {}
 

@@ -26,6 +26,7 @@ import {
 import { AuthService } from './service/auth.service';
 import { CookieService } from './service/cookie.service';
 import { TwoFactorService } from './service/twofactor.service';
+import UserService from 'api/user/user.service';
 import { ConfigService } from '@nestjs/config';
 import { User } from 'api/user/dto/response';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -46,6 +47,7 @@ export class AuthController {
 		private readonly cookieService: CookieService,
 		private readonly twoFactorService: TwoFactorService,
 		private readonly mailService: MailService,
+		private readonly userService: UserService,
         @Inject(CACHE_MANAGER) private cacheManager: Cache
 	) {}
 
@@ -78,11 +80,11 @@ export class AuthController {
 	@ApiUnauthorizedResponse({ description: 'Unauthorized' })
 	async login(@Request() req, @Response({ passthrough: true }) res) {
 		try {
-			//403 error
 			const user = await this.authService.login(req.user.intraId);
 			if (user.use2fa) {
-				throw new UnauthorizedException("Try login with two factor authentication: POST /auth/2fa")
+				res.redirect(`${this.configService.getOrThrow('NEXTJS_URL')}/auth/2fa`);
 			}
+
 			const jwt = this.cookieService.createJwt({
 				id: user.id,
 				intraId: user.intraId,
@@ -91,13 +93,13 @@ export class AuthController {
 			});
 			const cookieOption = this.cookieService.getCookieOption();
 
-			user.status = 'ONLINE';
+			await this.userService.online(user.id);
 			res.cookie('accessToken', jwt, cookieOption);
 			res.redirect(`${this.configService.getOrThrow('NEXTJS_URL')}/auth/login/callback`);
 		} catch (error) {
 			res.redirect(
 				`${this.configService.getOrThrow('NEXTJS_URL')}/auth/register?nickname=${
-					req.user.nickname
+					req.user.intraId
 				}`,
 			);
 		}
@@ -115,7 +117,8 @@ export class AuthController {
 		@UploadedFile() file: Express.Multer.File,
 	): Promise<User> {
 		try {
-			return this.authService.register(req.user.intraId, registerRequestDto, file.filename);
+			registerRequestDto.file = file ? file.filename : req.user.profileImageURI;
+			return this.authService.register(req.user.intraId, registerRequestDto);
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
 		}
@@ -158,9 +161,8 @@ export class AuthController {
 				nickname: user.nickname,
 				profileImageURI: user.profileImageURI,
 			});
-			user.status = 'ONLINE';
+			await this.userService.online(user.id);
 			res.cookie('accessToken', jwt, cookieOption);
-			res.redirect(`${this.configService.getOrThrow('NEXTJS_URL')}/auth/login/callback`);
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
 		}
@@ -175,6 +177,7 @@ export class AuthController {
 		try {
 			const cookieOption = this.cookieService.getCookieOption();
 			res.clearCookie('accessToken', cookieOption);
+			await this.userService.offline(req.user.id);
 			return { message: 'Logout successfully' };
 		} catch (error) {
 			throw new HttpException(error.message, error.status);

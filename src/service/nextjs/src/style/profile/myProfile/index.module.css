@@ -1,0 +1,23 @@
+.my-profile-index__body {
+  height: 100vh;
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+}
+
+.my-profile-index__relative {
+  position: relative;
+}
+
+.my-profile-index__absolute {
+  position: absolute;
+  top: 60px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.my-profile-body__div {
+  margin-top: -30px;
+}

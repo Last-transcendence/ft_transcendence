@@ -8,9 +8,11 @@ import { Dispatch, SetStateAction } from 'react';
 import CustomSnackbar from '@/component/common/customSnackbar';
 import CustomTextField, { customTextFieldProps } from '@/component/common/customInputField';
 import { useCallback } from 'react';
-import { getFetcher, postFetcher, patchFetcher } from '@/service/api';
+import { postFetcher, patchFetcher } from '@/service/api';
 import AuthContext from '@/context/auth.context';
 import Me from '@/type/me.type';
+import { useSearchParams } from 'next/navigation';
+import Loading from '../Loading';
 
 interface EditProfileProps {
 	isModify: boolean;
@@ -19,17 +21,9 @@ interface EditProfileProps {
 	setExecSendServer: Dispatch<SetStateAction<boolean>>;
 }
 
-interface User {
-	nickname: string;
-	email2fa: string;
-	use2fa: boolean;
-	profileImageURI: string | ArrayBuffer | null;
-}
-
-interface tempUser {
-	nickname: string;
-	use2fa: boolean;
-}
+const headers = {
+	'Content-Type': 'multipart/form-data',
+};
 
 const CreatOrModifyBody = ({
 	isModify,
@@ -37,71 +31,84 @@ const CreatOrModifyBody = ({
 	execSendServer,
 	setExecSendServer,
 }: EditProfileProps) => {
-	const { setMe } = useContext(AuthContext);
+	const { setMe, me } = useContext(AuthContext);
 	const [imgFile, setImgFile] = useState<File | undefined>(undefined);
 	const [img, setImg] = useState<string | ArrayBuffer | null>(null);
 	const [userName, setUserName] = useState<string>('');
 	const [twoFATrueFalse, setTwoFATrueFalse] = useState<boolean>(false);
-	const [towFactorEmail, setTwoFactorEmail] = useState<string>('');
-	const [errorMessage, setErrorMessage] = useState<string>('');
+	const [twoFactorEmail, setTwoFactorEmail] = useState<string>('');
+	const [errorMessageNickName, setErrorMessageNickName] = useState<string>('');
+	const [errorMessageEmail, setErrorMessageEmail] = useState<string>('');
+	const [modarErrorMessage, setModarErrorMessage] = useState<string>('');
+	const params = useSearchParams();
 	const router = useRouter();
 
 	const path = isModify ? '/user/me' : '/auth/register';
 
 	useEffect(() => {
-		const fetchData = async () => {
-			try {
-				const userData = await getFetcher<User>('/user/me');
+		const fetchData = () => {
+			if (me !== null) {
+				setUserName(me.nickname);
+				setTwoFATrueFalse(me.use2fa);
+				if (me.email2fa !== undefined) setTwoFactorEmail(me.email2fa);
+				if (me.profileImageURI !== undefined) setImg(me.profileImageURI);
+			}
+		};
 
-				setUserName(userData.nickname);
-				setTwoFATrueFalse(userData.use2fa);
-				setTwoFactorEmail(userData.email2fa);
-				setImg(userData.profileImageURI);
-			} catch (error) {
-				console.log('사용자 정보를 불러오는 중 오류 발생');
+		const getNickname = () => {
+			const nick = params.get('nickname');
+			if (nick !== null) {
+				setUserName(nick);
 			}
 		};
 
 		if (isModify) {
 			fetchData();
 		}
-	}, [isModify]);
+
+		if (!isModify) {
+			getNickname();
+		}
+	}, [isModify, me, params]);
 
 	const sendToServer = useCallback(async () => {
 		const formData = new FormData();
-		const user: tempUser = {
-			nickname: userName,
-			use2fa: twoFATrueFalse,
-			// email2fa: twoFATrueFalse ? towFactorEmail : '',
-		};
-		// if (imgFile) {
-		// 	formData.append('profileImageURI', imgFile);
-		// }
-		// formData.append('User', JSON.stringify(user));
-		// formData.append('nickname', userName);
-		// formData.append('use2fa', twoFATrueFalse);
-		// if (twoFATrueFalse) {
-		// 	formData.append('email2fa', towFactorEmail);
-		// }
-		// for (let key of formData.keys()) {
-		// 	console.log(key, ':', formData.get(key));
-		// }
+		if (imgFile) {
+			formData.append('file', imgFile);
+		}
+		if (twoFATrueFalse) {
+			formData.append('email2fa', twoFactorEmail);
+		}
+		formData.append('nickname', userName);
+		formData.append('use2fa', `${twoFATrueFalse}`);
 		try {
-			// const response = await postFetcher(path, formData, {
-			// 	headers: { 'Content-Type': 'multipart/form-data' },
-			// });
-			const response =
-				isModify === false ? await postFetcher<Me>(path, user) : await patchFetcher<Me>(path, user);
-			setMe(response);
-			router.push('/');
-		} catch (error) {
-			console.log('에러발생');
-			router.push('/auth/2fa/sign');
+			const response = isModify
+				? await patchFetcher<Me>(path, formData, { headers })
+				: await postFetcher<Me>(path, formData, { headers });
+			if (isModify === true) {
+				setMe(response);
+				router.push('/');
+			} else {
+				window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/login`;
+			}
+		} catch (error: any) {
+			setErrorMessageNickName('');
+			setErrorMessageEmail('');
+			setModarErrorMessage(error.message);
 		} finally {
 			setLoading(false);
 		}
-		// }, [imgFile, userName, twoFATrueFalse, path, towFactorEmail, router, setLoading]);
-	}, [userName, twoFATrueFalse, path, router, setLoading, setMe, isModify]);
+	}, [
+		userName,
+		twoFATrueFalse,
+		path,
+		setLoading,
+		isModify,
+		imgFile,
+		twoFactorEmail,
+		router,
+		setMe,
+	]);
 
 	const userNameChecker = useCallback(() => {
 		try {
@@ -109,17 +116,24 @@ const CreatOrModifyBody = ({
 			if (userName.length > 10) throw new Error('닉네임이 너무 깁니다.');
 			if (/[!@#$%^&*(),.?":{}|<>]/.test(userName))
 				throw new Error('닉네임에 특수 문자를 넣지 마세요.');
+		} catch (error: any) {
+			setErrorMessageNickName(`*${error.message}`);
+			throw new Error(error.message);
 		} finally {
 		}
 	}, [userName]);
 
 	const towFactorEmailCheker = useCallback(() => {
 		try {
-			if (!/^[^\s@]+@[^\s@]+\.[^\s@]$/.test(towFactorEmail))
+			if (/^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[a-zA-Z0-9]+$/.test(twoFactorEmail) === false)
 				throw new Error('올바른 email 형식이 아닙니다');
+		} catch (error: any) {
+			setErrorMessageNickName('');
+			setErrorMessageEmail(`*${error.message}`);
+			throw new Error(error.message);
 		} finally {
 		}
-	}, [towFactorEmail]);
+	}, [twoFactorEmail]);
 
 	const valueCheker = useCallback(() => {
 		try {
@@ -137,7 +151,6 @@ const CreatOrModifyBody = ({
 				valueCheker();
 				sendToServer();
 			} catch (error: any) {
-				setErrorMessage(error.message);
 			} finally {
 				setExecSendServer(false);
 				setLoading(false);
@@ -157,7 +170,7 @@ const CreatOrModifyBody = ({
 			const reader = new FileReader();
 
 			reader.onerror = error => {
-				console.log('파일 읽는 도중 문제 발생');
+				setModarErrorMessage('파일 읽기에 실패했습니다');
 			};
 
 			reader.onloadend = () => {
@@ -172,7 +185,7 @@ const CreatOrModifyBody = ({
 	const handleToggleTwoFactorState = () => {
 		setTwoFATrueFalse(!twoFATrueFalse);
 		if (!twoFATrueFalse) {
-			setTwoFactorEmail(towFactorEmail);
+			setTwoFactorEmail(twoFactorEmail);
 		}
 	};
 
@@ -191,29 +204,33 @@ const CreatOrModifyBody = ({
 	const Mdify2FaValue: ModifyTwoFactorProps = {
 		checked: twoFATrueFalse,
 		onToggle: handleToggleTwoFactorState,
-		email: towFactorEmail,
+		email: twoFactorEmail,
 		onEmailChange: setTwoFactorEmail,
 	};
 
 	const handleModarClose = () => {
-		setErrorMessage('');
+		setModarErrorMessage('');
 	};
 
-	return (
+	return isModify && !me ? (
+		<Loading />
+	) : (
 		<Stack justifyContent={'space-between'} height="70%">
 			<Container maxWidth="xs">
 				<CustomSnackbar
-					open={errorMessage !== '' ? true : false}
+					open={modarErrorMessage !== '' ? true : false}
 					onClose={handleModarClose}
 					success={false}
 				>
-					{errorMessage}
+					{modarErrorMessage}
 				</CustomSnackbar>
 				<Box className={styles.boxStyle}>
-					<UserPhoto onClick={onClick} onChangePicture={handleChangePicture} imgUrl={img} />
+					<UserPhoto onClick={onClick} onChangePicture={handleChangePicture} imgUrl={img || ''} />
 					<Box width="90%" display="flex" flexDirection="column" justifyItems="flex-start">
 						<CustomTextField {...CustomTextFieldValues} />
+						<div style={{ color: 'red' }}>{errorMessageNickName}</div>
 						<Modify2FA {...Mdify2FaValue} />
+						<div style={{ color: 'red' }}>{twoFATrueFalse ? errorMessageEmail : undefined}</div>
 					</Box>
 				</Box>
 			</Container>

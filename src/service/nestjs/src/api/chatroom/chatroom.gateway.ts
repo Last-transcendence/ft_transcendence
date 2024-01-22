@@ -44,7 +44,7 @@ class ChatRoomGateway {
     async handleJoin(
         @Req() req,
         @MessageBody() joinChatRoomDto: ChatRoomDto.Request.Create,
-        @ConnectedSocket() socket: Socket,
+        @ConnectedSocket() socket,
     ) {
         try {
             const userId: string = req.user.id;
@@ -68,7 +68,7 @@ class ChatRoomGateway {
     async handleMessage(
         @Req() req,
         @MessageBody() messageDto: ChatRoomDto.Request.Message,
-        @ConnectedSocket() socket: Socket,
+        @ConnectedSocket() socket,
     ) {
         try {
             const userId: string = req.user.id;

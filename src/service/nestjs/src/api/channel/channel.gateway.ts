@@ -112,6 +112,7 @@ class ChannelGateway {
 	}
 
 	@SubscribeMessage('message')
+	@UseGuards(Auth.Guard.UserWsJwt)
 	async handleMessage(@MessageBody() data, @ConnectedSocket() socket) {
 		try {
 			const filteredMessage = this.channelService.messageFilter(
