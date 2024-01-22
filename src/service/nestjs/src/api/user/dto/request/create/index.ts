@@ -3,18 +3,19 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 class Create {
 	@IsString()
+	@IsNotEmpty()
 	@Trim()
 	@ApiProperty({ description: 'Nickname' })
 	nickname: string;
 
 	@IsOptional()
-	@IsEmail()
+	@IsString()
 	@Trim()
 	@ApiProperty({ description: 'Use 2FA' })
 	use2fa: string;
 
 	@IsOptional()
-	@IsString()
+	@IsEmail()
 	@Trim()
 	@ApiProperty({ description: 'Email used to 2fa', required: false })
 	email2fa?: string;
