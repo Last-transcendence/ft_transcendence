@@ -34,15 +34,33 @@ class GameGateway {
 	server: Namespace;
 
 	handleConnection(socket: Socket) {
-		void socket;
-		//console.log('Client connected to game namespace');
+		try {
+			console.log('Client connected to game namespace');
+			this.gameService.getBySocketId(socket.id).then(game => {
+				if (game) {
+					this.gameService.delete(game.id);
+				}
+			});
+			this.gameService.getByUserId(socket['user']['id']).then(game => {
+				if (game) {
+					this.gameService.delete(game.id);
+				}
+			});
+		} catch (error) {
+			console.error(error);
+		}
 	}
 
 	handleDisconnect(socket: Socket) {
 		try {
+			console.log('Client disconnected from game namespace');
 			this.gameService.getBySocketId(socket.id).then(game => {
 				if (game) {
-					console.log('Client disconnected from game namespace');
+					this.gameService.delete(game.id);
+				}
+			});
+			this.gameService.getByUserId(socket['user']['id']).then(game => {
+				if (game) {
 					this.gameService.delete(game.id);
 				}
 			});

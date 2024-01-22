@@ -20,6 +20,16 @@ class GameService {
 		}
 	}
 
+	async getByUserId(userId: string): Promise<GameModel> {
+		try {
+			return await this.prismaService.game.findFirst({
+				where: { userId },
+			});
+		} catch (error) {
+			throw new Error(error.message);
+		}
+	}
+
 	async create(createRequestDto: Dto.Request.Create): Promise<GameModel> {
 		try {
 			return await this.prismaService.game.create({
