@@ -142,6 +142,30 @@ class ChannelGateway {
 		}
 	}
 
+	@SubscribeMessage('leave')
+	@UseGuards(Auth.Guard.UserWsJwt)
+	async handleLeave(@MessageBody() data, @ConnectedSocket() socket) {
+		try {
+			if ((await this.participantService.isParticipated(socket.user.id)) === false) {
+				throw new Error('User is not a participant');
+			}
+
+			const participant = await this.participantService.get(socket.user.id);
+
+			socket
+				.to(participant.channelId)
+				.emit('leave', {
+					message: `${socket.user.id} has left the channel`,
+					profileImageURI: participant.userProfileImageURI,
+				});
+			socket.leave(participant.channelId);
+			this.channelService.leaveChannel(socket.user.id);
+
+			return { res: true };
+		} catch (error) {
+			console.error("An error occurred in channel.gateway 'leave':", error);
+			socket.emit('error', { message: "An error occurred in channel.gateway 'leave'" });
+
 	@SubscribeMessage('role')
 	@UseGuards(Auth.Guard.UserWsJwt)
 	async handleRole(@MessageBody() data, @ConnectedSocket() socket) {
