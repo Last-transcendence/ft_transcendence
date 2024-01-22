@@ -144,7 +144,10 @@ class ChannelGateway {
 
 			socket
 				.to(participant.channelId)
-				.emit('leave', { message: `${socket.user.id} has left the channel` });
+				.emit('leave', {
+					message: `${socket.user.id} has left the channel`,
+					profileImageURI: participant.userProfileImageURI,
+				});
 			socket.leave(participant.channelId);
 			this.channelService.leaveChannel(socket.user.id);
 
