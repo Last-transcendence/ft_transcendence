@@ -5,6 +5,8 @@ import * as Dto from './dto';
 import { UserModel } from 'common/model';
 import * as Auth from '../../common/auth';
 import { FileInterceptor } from '@nestjs/platform-express';
+import * as fs from 'fs';
+import { join } from 'path';
 @Controller('user')
 @ApiTags('user')
 class UserController {
@@ -37,6 +39,9 @@ class UserController {
 				throw new BadRequestException('Nickname is already taken');
 			}
 			updateData.file = file ? file.filename : req.user.profileImageURI;
+			if (file && fs.existsSync(join(process.cwd(), 'upload/') + req.user.profileImageURI)) {
+				fs.unlinkSync(join(process.cwd(), 'upload/') + req.user.profileImageURI);
+			}
 			return await this.userService.updateUserById(req.user.id, updateData);
 		}
 		catch (error) {
