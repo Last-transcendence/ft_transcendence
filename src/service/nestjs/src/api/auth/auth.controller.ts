@@ -84,6 +84,7 @@ export class AuthController {
 			if (user.use2fa) {
 				res.redirect(`${this.configService.getOrThrow('NEXTJS_URL')}/auth/2fa`);
 			}
+
 			const jwt = this.cookieService.createJwt({
 				id: user.id,
 				intraId: user.intraId,
@@ -98,7 +99,7 @@ export class AuthController {
 		} catch (error) {
 			res.redirect(
 				`${this.configService.getOrThrow('NEXTJS_URL')}/auth/register?nickname=${
-					req.user.nickname
+					req.user.intraId
 				}`,
 			);
 		}

@@ -1,3 +1,4 @@
+import styles from '@/style/profile/myProfile/index.module.css'
 import { Container, Box } from '@mui/material';
 import FightRecords from './fightRecords';
 import MyProfileMenu from './myProfileMenu';
@@ -33,11 +34,11 @@ const MyProfileBody = ({ name, use2fa, image }: myProfilePageProps) => {
 		<Box overflow="auto">
 			<Container maxWidth="xs" sx={{ paddingBottom: 15 }}>
 				<MyProfileMenu />
-				<ProfileAvartar name={name} image={image} />
+				{/* <ProfileAvartar name={name} image={image} /> */}
 				<UserId userName={name} />
 				<Box display="flex" flexDirection="column" alignItems="center">
 					<TwoFACheck twoFA={use2fa} />
-					<div style={{ marginTop: '-30px' }}>
+					<div className={styles['my-profile-body__div']}>
 						<Odds gameRecords={gameRecords} message={gameRecordsErrorMessage} />
 					</div>
 				</Box>
