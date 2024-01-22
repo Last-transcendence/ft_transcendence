@@ -17,7 +17,7 @@ interface ChatMsgProps {
 export const ChatMsg = ({ userData, channelId, myRole, ownerId, message }: ChatMsgProps) => {
 	return (
 		<Stack flexDirection={'row'} alignItems={'center'} gap={1}>
-			<Stack flexDirection={'row'} gap={1} alignItems={'center'} width={'100%'}>
+			<Stack flexDirection={'row'} gap={1} alignItems={'center'}>
 				<OpenProfileAvatar otherUserId={userData?.id} imgUrl={userData?.profileImageURI} />
 				{myRole && myRole !== ParticipantRole.USER ? (
 					<AdminNickMenu

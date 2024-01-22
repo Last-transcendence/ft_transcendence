@@ -19,11 +19,11 @@ const FriendList = ({ data }: { data: Friend[] | undefined }) => {
 						<div key={user?.userId}>
 							{/*@todo 문자제거.*/}
 							<UserBriefInformation
-								nickname={user?.user?.nickname}
-								condition={<FriendStatus status={user?.user?.status} />}
+								nickname={user?.nickname}
+								condition={<FriendStatus status={user?.status} />}
 								className={style['user-brief-information']}
-								userId={user?.userId}
-								imgUrl={user?.user?.profileImageURI}
+								userId={user?.id}
+								imgUrl={user?.profileImageURI}
 							/>
 						</div>
 					);
