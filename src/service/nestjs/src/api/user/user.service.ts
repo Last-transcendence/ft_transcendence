@@ -57,6 +57,30 @@ class UserService {
 			throw new Error(error.message);
 		}
 	}
+
+	async online(userId: string) {
+		try {
+			return await this.prismaService.user.update({ where: { id: userId }, data: { status: 'ONLINE' } });
+		} catch (error) {
+			throw new Error(error.message);
+		}
+	}
+
+	async offline(userId: string) {
+		try {
+			return await this.prismaService.user.update({ where: { id: userId }, data: { status: 'OFFLINE' } });
+		} catch (error) {
+			throw new Error(error.message);
+		}
+	}
+
+	async playing(userId: string) {
+		try {
+			return await this.prismaService.user.update({ where: { id: userId }, data: { status: 'PLAYING' } });
+		} catch (error) {
+			throw new Error(error.message);
+		}
+	}
 }
 
 export default UserService;
