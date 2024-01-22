@@ -7,7 +7,10 @@ export { default as Ready } from './ready';
 export { default as Move } from './move';
 export { default as Score } from './score';
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 export { default as Update } from './update';
 =======
+=======
+>>>>>>> Stashed changes
 export { default as Ball } from './ball';
 >>>>>>> Stashed changes

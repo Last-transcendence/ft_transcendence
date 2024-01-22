@@ -141,16 +141,22 @@ class GameGateway {
 			//	.emit('start', { ball: { x: randomX, y: randomY } });
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 			const player1 = Array.from(room)[0];
 			const player2 = Array.from(room)[1];
 
 			this.server.to(player1).emit('start', { ball: { x: randomX, y: randomY } });
 			this.server.to(player2).emit('start', { ball: { x: -randomX, y: -randomY } });
 =======
+=======
+>>>>>>> Stashed changes
 			this.server.to(socket.id).emit('start', { ball: { velocityX: randomX, velocityY: randomY } });
 			this.server
 				.to(opponentSocketId)
 				.emit('start', { ball: { velocityX: -randomX, velocityY: -randomY } });
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
