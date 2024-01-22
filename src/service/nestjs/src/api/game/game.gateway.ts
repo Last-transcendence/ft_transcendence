@@ -176,6 +176,12 @@ class GameGateway {
 			{
 				this.server.to(opponentSocketId).emit('score', scoreRequestDto);
 
+				console.log(scoreRequestDto);
+
+				if (scoreRequestDto.state !== 'confirmed') {
+					return;
+				}
+
 				if (parseInt(scoreRequestDto.score) === 4) {
 					this.server.sockets.get(socket.id).leave(scoreRequestDto.room);
 					this.server.sockets.get(opponentSocketId).leave(scoreRequestDto.room);

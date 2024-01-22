@@ -53,8 +53,8 @@ const GameQueuePage = () => {
 	return (
 		isInitialized && (
 			<IonPhaser
-				ref={gameRef}
 				game={game}
+				ref={gameRef}
 				initialize={isInitialized}
 				placeholder={'Loading...'}
 				className={style.container}

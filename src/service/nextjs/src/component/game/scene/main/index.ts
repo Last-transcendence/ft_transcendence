@@ -12,6 +12,7 @@ class Main extends Phaser.Scene {
 	private enemyScore!: Phaser.GameObjects.Text;
 
 	private readyText!: Phaser.GameObjects.Text;
+	private networkDelayText!: Phaser.GameObjects.Text;
 
 	private keys!: Phaser.Types.Input.Keyboard.CursorKeys;
 
@@ -45,14 +46,12 @@ class Main extends Phaser.Scene {
 	initSocket() {
 		this.socket.on('start', response => {
 			this.isPlaying = true;
-			this.ball.setVelocity(response.ball.x, response.ball.y);
+			this.ball.setVelocity(response.ball.velocityX, response.ball.velocityY);
 		});
 		this.socket.on('move', response => {
 			this.enemyPaddle.x = 360 - response.x;
 		});
 		this.socket.on('score', response => {
-<<<<<<< Updated upstream
-=======
 			console.log('score response ', response);
 			if (response.state === 'network-delay') {
 				this.reset(this.game.canvas.width / 2, this.game.canvas.height / 2, 0, 0);
@@ -84,9 +83,7 @@ class Main extends Phaser.Scene {
 				state: 'confirmed',
 			});
 			this.reset(this.game.canvas.width / 2, this.game.canvas.height / 2, 0, 0);
->>>>>>> Stashed changes
 			this.enemyScore.setText(parseInt(response.score, 10).toString());
-			this.reset();
 		});
 		this.socket.on('end', response => {
 			this.socket.off('start');
@@ -94,37 +91,34 @@ class Main extends Phaser.Scene {
 			this.socket.off('score');
 			this.socket.off('end');
 
-			setTimeout(() => {
-				console.log(response);
-				this.scene.start('Result', {
-					navigate: this.navigate,
-					socket: this.socket,
-					me: {
-						nickname: response.me.nickname,
-						profileImageURI: response.me.profileImageURI,
-						score: this.myScore.text,
-					},
-					opponent: {
-						nickname: response.opponent.nickname,
-						profileImageURI: response.opponent.profileImageURI,
-						score: this.enemyScore.text,
-					},
-				});
-			}, 1000);
+			this.scene.start('Result', {
+				navigate: this.navigate,
+				socket: this.socket,
+				me: {
+					nickname: response.me.nickname,
+					profileImageURI: response.me.profileImageURI,
+					score: this.myScore.text,
+				},
+				opponent: {
+					nickname: response.opponent.nickname,
+					profileImageURI: response.opponent.profileImageURI,
+					score: this.enemyScore.text,
+				},
+			});
 		});
 	}
 
-	reset() {
+	reset(x: number, y: number, velocityX: number, velocityY: number) {
 		this.resetFlag = false;
+		this.isPlaying = false;
+
 		this.ball.setVisible(false);
-		this.ball.setVelocity(0, 0);
-		this.ball.setPosition(this.game.canvas.width / 2, this.game.canvas.height / 2);
+		this.ball.setVelocity(velocityX, velocityY);
+		this.ball.setPosition(x, y);
 		this.ball.setVisible(true);
 		this.myPaddle.setVelocity(0, 0);
 		this.enemyPaddle.setVelocity(0, 0);
 		this.readyText.setVisible(true);
-
-		this.isPlaying = false;
 
 		setTimeout(() => {
 			this.resetFlag = true;
@@ -136,17 +130,15 @@ class Main extends Phaser.Scene {
 			return;
 		}
 
-		this.ball.setVelocity(0, 0);
+		this.reset(this.ball.x, this.ball.y, 0, 0);
 
-		if (this.ball.y < 630) {
-			this.myScore.setText((parseInt(this.myScore.text, 10) + 1).toString());
+		if (this.ball.y <= 10) {
 			this.socket.emit('score', {
 				room: this.room,
-				score: this.myScore.text,
+				score: parseInt(this.myScore.text, 10) + 1,
+				state: 'pending',
 			});
 		}
-
-		this.reset();
 	}
 
 	preload() {
@@ -199,6 +191,21 @@ class Main extends Phaser.Scene {
 		this.readyText = this.add.text(x, y, 'Press space to ready', textConfig).setOrigin(0.5, 0.5);
 	}
 
+	initNetworkDelayText() {
+		const x: number = this.game.canvas.width / 2;
+		const y: number = this.game.canvas.height / 2 - 80;
+		const textConfig: Phaser.Types.GameObjects.Text.TextStyle = {
+			fontFamily: 'Inter',
+			fontSize: '20px',
+			color: '#ffffff',
+		};
+
+		this.networkDelayText = this.add
+			.text(x, y, 'Network delay detected\n         Restart game...', textConfig)
+			.setOrigin(0.5, 0.5)
+			.setVisible(false);
+	}
+
 	initMiddleLine() {
 		const x: number = this.game.canvas.width / 2;
 		const y: number = this.game.canvas.height / 2;
@@ -219,13 +226,14 @@ class Main extends Phaser.Scene {
 		this.physics.add.collider(this.ball, this.enemyPaddle);
 		this.initScore();
 		this.initReadyText();
+		this.initNetworkDelayText();
 		this.initMiddleLine();
 
 		if (this.input.keyboard) {
 			this.keys = this.input.keyboard.createCursorKeys();
 		}
 
-		this.reset();
+		this.reset(this.game.canvas.width / 2, this.game.canvas.height / 2, 0, 0);
 	}
 
 	update(time: number, delta: number) {

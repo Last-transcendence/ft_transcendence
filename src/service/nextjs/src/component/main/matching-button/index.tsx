@@ -22,7 +22,7 @@ const MatchingButton = () => {
 					width={'75cqw'}
 					height={'75cqw'}
 					onClick={() => {
-						navigate.push('/game/queue');
+						navigate.push('/game');
 					}}
 				/>
 			</div>
