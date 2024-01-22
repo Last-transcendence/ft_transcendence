@@ -23,6 +23,7 @@ const getCorsOrigin = () => {
     namespace: '/socket/chatroom',
     cors: { origin: getCorsOrigin(), credentials: true },
 })
+@UseGuards(Auth.Guard.UserWsJwt)
 class ChatRoomGateway {
     constructor(
         private readonly chatRoomService: ChatRoomService,
@@ -40,14 +41,12 @@ class ChatRoomGateway {
     }
 
     @SubscribeMessage('join')
-    @UseGuards(Auth.Guard.UserWsJwt)
     async handleJoin(
-        @Req() req,
         @MessageBody() joinChatRoomDto: ChatRoomDto.Request.Create,
         @ConnectedSocket() socket,
     ) {
         try {
-            const userId: string = req.user.id;
+            const userId: string = socket.user.id;
             const destId: string = joinChatRoomDto.destId;
             const chatRoom = await this.chatRoomService.find(userId, destId);
             if (!chatRoom){
@@ -64,14 +63,12 @@ class ChatRoomGateway {
     }
 
     @SubscribeMessage('message')
-    @UseGuards(Auth.Guard.UserWsJwt)
     async handleMessage(
-        @Req() req,
         @MessageBody() messageDto: ChatRoomDto.Request.Message,
         @ConnectedSocket() socket,
     ) {
         try {
-            const userId: string = req.user.id;
+            const userId: string = socket.user.id;
             const destId: string = messageDto.destId;
             const isBlocked = await this.blockService.find(userId, destId);
             const chatRoomName = [userId, destId].sort().join('_');
