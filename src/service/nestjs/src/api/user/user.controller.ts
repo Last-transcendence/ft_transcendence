@@ -37,8 +37,6 @@ class UserController {
 				throw new BadRequestException('Nickname is already taken');
 			}
 			updateData.file = file ? file.filename : req.user.profileImageURI;
-			updateData.email2fa = updateData.email2fa === '' ? req.user.email2fa : updateData.email2fa;
-			updateData.nickname = updateData.nickname === '' ? req.user.nickname : updateData.nickname;
 			return await this.userService.updateUserById(req.user.id, updateData);
 		}
 		catch (error) {
