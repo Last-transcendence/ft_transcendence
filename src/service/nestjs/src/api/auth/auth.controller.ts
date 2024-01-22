@@ -80,7 +80,7 @@ export class AuthController {
 		try {
 			const user = await this.authService.login(req.user.intraId);
 			if (user.use2fa) {
-				throw new UnauthorizedException("Try login with two factor authentication: POST /auth/2fa");
+				throw new UnauthorizedException("Try login with two factor authentication: POST /auth/2fa")
 			}
 
 			const jwt = this.cookieService.createJwt({
@@ -115,8 +115,7 @@ export class AuthController {
 		@UploadedFile() file: Express.Multer.File,
 	): Promise<User> {
 		try {
-			registerRequestDto.file = file ? file.filename : "";
-			return this.authService.register(req.user.intraId, registerRequestDto);
+			return this.authService.register(req.user.intraId, registerRequestDto, file.filename);
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
 		}
@@ -129,13 +128,12 @@ export class AuthController {
 	async send2faEmail(@Req() req) {
 		try {
 			const code = await this.twoFactorService.createCode();
-			const user = await this.authService.login(req.user.intraId);
-			console.log(code);
+			const user = await this.authService.login(req.user.intraId)
 			if (!user || !user.use2fa || !user.email2fa) {
 				throw new BadRequestException("Bad request")
 			}
 			this.cacheManager.set(user.email2fa, code);
-			this.mailService.send(user.email2fa, user.nickname, code);
+			this.mailService.send(user.email2fa, user.nickname, code)
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
 		}
