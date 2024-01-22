@@ -8,7 +8,7 @@ class Create {
 	nickname: string;
 
 	@IsOptional()
-	@IsString()
+	@IsEmail()
 	@Trim()
 	@ApiProperty({ description: 'Use 2FA' })
 	use2fa: string;
