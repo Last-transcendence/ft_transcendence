@@ -80,9 +80,7 @@ export class AuthController {
 		try {
 			const user = await this.authService.login(req.user.intraId);
 			if (user.use2fa) {
-				// throw new UnauthorizedException("Try login with two factor authentication: POST /auth/2fa");
-				res.redirect(`${this.configService.getOrThrow('NEXTJS_URL')}/auth/2fa`);
-				return;
+				throw new UnauthorizedException("Try login with two factor authentication: POST /auth/2fa");
 			}
 
 			const jwt = this.cookieService.createJwt({
@@ -164,7 +162,7 @@ export class AuthController {
 			});
 			user.status = 'ONLINE';
 			res.cookie('accessToken', jwt, cookieOption);
-			// res.redirect(`${this.configService.getOrThrow('NEXTJS_URL')}/auth/login/callback`);
+			res.redirect(`${this.configService.getOrThrow('NEXTJS_URL')}/auth/login/callback`);
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
 		}
