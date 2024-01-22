@@ -22,11 +22,7 @@ const MatchingButton = () => {
 					width={'75cqw'}
 					height={'75cqw'}
 					onClick={() => {
-						socket.on('matched', response => {
-							socket.off('matched');
-							navigate.push(`/game/${response.id}`);
-						});
-						socket.emit('queue');
+						navigate.push('/game/queue');
 					}}
 				/>
 			</div>

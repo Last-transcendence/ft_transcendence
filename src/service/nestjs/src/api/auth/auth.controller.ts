@@ -78,10 +78,12 @@ export class AuthController {
 	@ApiUnauthorizedResponse({ description: 'Unauthorized' })
 	async login(@Request() req, @Response({ passthrough: true }) res) {
 		try {
+			//403 error
 			const user = await this.authService.login(req.user.intraId);
 			if (user.use2fa) {
 				throw new UnauthorizedException("Try login with two factor authentication: POST /auth/2fa")
 			}
+
 			const jwt = this.cookieService.createJwt({
 				id: user.id,
 				intraId: user.intraId,
@@ -96,7 +98,7 @@ export class AuthController {
 		} catch (error) {
 			res.redirect(
 				`${this.configService.getOrThrow('NEXTJS_URL')}/auth/register?nickname=${
-					req.user.nickname
+					req.user.intraId
 				}`,
 			);
 		}

@@ -2,6 +2,8 @@ import { Badge } from '@mui/material';
 import SmallAvatar from './smallAvatar';
 import BigAvatar from './bigAvatar';
 import AddAPhotoIcon from '@mui/icons-material/AddAPhoto';
+import Image from 'next/image';
+import { UNKNOWN_PROFILE_IMAGE_URI } from '@/common/constant';
 
 interface UserPhotoProps {
 	imgUrl: string | ArrayBuffer | null;
@@ -10,7 +12,12 @@ interface UserPhotoProps {
 }
 
 const UserPhoto = ({ imgUrl, onClick, onChangePicture }: UserPhotoProps) => {
-	return (
+	const loader = ({ src }: { src: string }): string => {
+		return `https://dev.transcendence.42seoul.kr/upload/${src}`;
+	};
+	return imgUrl === null ? (
+		<></>
+	) : (
 		<Badge
 			overlap="circular"
 			anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
@@ -20,7 +27,26 @@ const UserPhoto = ({ imgUrl, onClick, onChangePicture }: UserPhotoProps) => {
 				</SmallAvatar>
 			}
 		>
-			<BigAvatar alt="person img" src={imgUrl ? (imgUrl as string) : ''} />
+			<BigAvatar>
+				{imgUrl === '' ? (
+					<Image
+						src={UNKNOWN_PROFILE_IMAGE_URI}
+						alt={'user img'}
+						width={150}
+						height={150}
+						priority
+					/>
+				) : (
+					<Image
+						loader={loader}
+						src={imgUrl as string}
+						alt="user img"
+						width={150}
+						height={150}
+						priority
+					/>
+				)}
+			</BigAvatar>
 			<input
 				type="file"
 				id="fileInput"

@@ -10,10 +10,7 @@ const LoginBody = () => {
 				<Typography className={styles.typographyStyle} variant="h4" component="h2">
 					ft_transcendence
 				</Typography>
-				<Link
-					href={`${process.env.NEXT_PUBLIC_API_URL}/auth/ft`}
-					id={styles.loginButton}
-				>
+				<Link href={`${process.env.NEXT_PUBLIC_API_URL}/auth/ft`} id={styles.loginButton}>
 					<CustomButton fullWidth size="large">
 						42로 로그인
 					</CustomButton>
