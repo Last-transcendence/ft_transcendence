@@ -23,8 +23,8 @@ const MainPageBody = () => {
 	const [message, setMessage] = useState<string>('');
 	const [open, setOpen] = useState(false);
 	const [password, setPassword] = useState<string>('');
-	const { sockets } = useContext(SocketContext);
-	const { channelSocket } = sockets;
+	const { channelSocket, chatSocket } = useContext(SocketContext).sockets;
+	const [id, setId] = useState<string | undefined>();
 
 	/** channel api*/
 	const {
@@ -39,19 +39,34 @@ const MainPageBody = () => {
 		isLoading: isDmLoading,
 		error: dmError,
 	} = useFetchData<Chatroom[]>('/chatroom');
-
 	const navigateChannel = useCallback(
-		(channelId: string, password?: string) => {
+		(channelId: string | undefined, password?: string) => {
+			if (!channelId) return;
 			channelSocket?.emit('join', { channelId, password }, (res: any) => {
 				console.log(res);
-				if (res.enter) router.push(`/chat/${channelId}/common`);
+				if (res?.res) router.push(`/chat/${channelId}/common`);
 				else {
 					setMessage('채널 입장에 실패했습니다.');
 					setShowSnackbar(true);
 				}
 			});
 		},
-		[channelSocket, password, router],
+		[channelSocket, router],
+	);
+
+	const navigateChatroom = useCallback(
+		(toUserId: string) => {
+			chatSocket?.emit('join', { toUserId }, (res: any) => {
+				console.log(res);
+				router.push(`/chat/${toUserId}/private`);
+				// if (res.enter) router.push(`/chat/${toUserId}/private`);
+				// else {
+				// 	setMessage('DM 입장에 실패했습니다.');
+				// 	setShowSnackbar(true);
+				// }
+			});
+		},
+		[chatSocket, router],
 	);
 
 	const getView = (
@@ -63,30 +78,41 @@ const MainPageBody = () => {
 		if (!datas || error) return <div>데이터를 불러오지 못했습니다.</div>;
 		if (datas?.length === 0) return <div>데이터가 없습니다.</div>;
 
-		return datas?.map(data => (
-			<Box
-				key={data.id}
-				onClick={() =>
-					mode === 'normal'
-						? (data as Channel)?.visibility === 'PROTECTED'
-							? setOpen(true)
-							: navigateChannel(data?.id)
-						: router.push(`/chat/${data?.id}/private`)
-				}
-				style={{ textDecoration: 'none' }}
-			>
-				{/*채널이 protected일때만 비밀번호 변경 보임*/}
+		const openPasswordModal = (id: string) => {
+			setId(id);
+			setOpen(true);
+		};
+
+		return (
+			<>
 				{open && (
 					<CustomModal setIsOpened={setOpen}>
-						<Stack spacing={2}>
+						<Stack
+							spacing={2}
+							width={'100cqh'}
+							height={'100cqh'}
+							alignItems={'center'}
+							justifyContent={'center'}
+						>
+							<PositionableSnackbar
+								open={showSnackbar}
+								onClose={() => setShowSnackbar(false)}
+								message={message}
+								success={false}
+								position={'bottom'}
+								horizontal={'center'}
+							/>
 							<Typography>비밀번호를 입력해주세요. (6자리 숫자)</Typography>
 							<TextField
 								size="small"
 								value={password}
-								onChange={e => setPassword(e?.target?.value)}
+								onChange={e => {
+									if (e.target.value.length > 6) return;
+									setPassword(e.target.value.replace(/[^0-9]/g, ''));
+								}}
 							/>
 							<Stack flexDirection={'row'} gap={1}>
-								<Button variant={'contained'} onClick={() => navigateChannel(data.id, password)}>
+								<Button variant={'contained'} onClick={() => navigateChannel(id, password)}>
 									입장
 								</Button>
 								<Button variant={'contained'} onClick={() => setOpen(false)}>
@@ -96,27 +122,43 @@ const MainPageBody = () => {
 						</Stack>
 					</CustomModal>
 				)}
-				<ChattingRoom
-					title={mode === 'normal' ? (data as Channel)?.title : 'DM방입니다.'}
-					visibility={
-						mode === 'normal'
-							? ((data as Channel)?.visibility as 'PUBLIC' | 'PROTECTED')
-							: 'PRIVATE'
-					}
-				/>
-			</Box>
-		));
+				{datas?.map(data => (
+					<Box
+						key={data.id}
+						onClick={() =>
+							mode === 'normal'
+								? (data as Channel)?.visibility === 'PROTECTED'
+									? openPasswordModal(data?.id)
+									: navigateChannel(data?.id)
+								: navigateChatroom((data as Chatroom)?.destId)
+						}
+						style={{ textDecoration: 'none' }}
+					>
+						<ChattingRoom
+							title={mode === 'normal' ? (data as Channel)?.title : 'DM방입니다.'}
+							visibility={
+								mode === 'normal'
+									? ((data as Channel)?.visibility as 'PUBLIC' | 'PROTECTED')
+									: 'PRIVATE'
+							}
+						/>
+					</Box>
+				))}
+			</>
+		);
 	};
 
 	return (
 		<div className={style.container}>
 			<div>
-				<PositionableSnackbar
-					open={showSnackbar}
-					onClose={() => setShowSnackbar(false)}
-					message={message}
-					success={false}
-				/>
+				{!open && (
+					<PositionableSnackbar
+						open={showSnackbar}
+						onClose={() => setShowSnackbar(false)}
+						message={message}
+						success={false}
+					/>
+				)}
 				<ChattingModeToggle mode={mode} setMode={setMode} />
 				<div style={{ overflowY: 'scroll', overflowX: 'hidden' }}>
 					{mode === 'normal'

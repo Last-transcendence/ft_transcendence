@@ -82,11 +82,9 @@ const AdminNickMenu = ({ nickname, userId, channelId, ownerId, isMute }: NickMen
 					</MenuItem>
 				)}
 			</Menu>
-			<Stack flexDirection={'row'} gap={1}>
-				<Typography fontWeight={'bold'} sx={{ cursor: 'pointer' }} onClick={handleClick}>
-					{nickname}
-				</Typography>
-			</Stack>
+			<Typography fontWeight={'bold'} sx={{ cursor: 'pointer' }} onClick={handleClick}>
+				{nickname}
+			</Typography>
 		</>
 	);
 };
