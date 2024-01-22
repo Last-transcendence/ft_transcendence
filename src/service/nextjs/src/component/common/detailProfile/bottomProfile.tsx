@@ -66,7 +66,6 @@ const BottomProfile = ({ otherUserId, isFriend }: BottomProfileProps) => {
 
 	const dmRequest = async (): Promise<void> => {
 		try {
-			setLoading(true);
 			// const data: Chatroom[] = await getFetcher('/chatroom');
 			// const chatroom: Chatroom | undefined = findUserFromDm(otherUserId, data);
 			//@todo dm 접속에 실패할 경우 처리 필요

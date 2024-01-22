@@ -73,7 +73,7 @@ const ChatRoomLayout = ({
 	}, [currentDm]);
 
 	const sendAction = (message: string) => {
-		if (message === '') return;
+		if (message === '' || !params?.id || !me?.id) return;
 		// send message
 		socket?.emit('message', { channelId: params?.id, userId: me?.id, message }, (res: any) => {
 			console.log(res);
