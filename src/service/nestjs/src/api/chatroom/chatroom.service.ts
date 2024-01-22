@@ -28,7 +28,7 @@ class ChatRoomService {
 
 	async create(srcId: string, destId: string): Promise<ChatRoomModel> {
 		try {
-			this.prismaService.chatRoom.create({
+			await this.prismaService.chatRoom.create({
 				data: {
 					srcId: destId,
 					destId: srcId,

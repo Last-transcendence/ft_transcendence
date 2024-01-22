@@ -9,7 +9,7 @@ import * as Dto from './dto';
 @ApiTags('chat')
 @UseGuards(Auth.Guard.UserJwt)
 class ChatController {
-	constructor(private readonly chatRoomService: ChatService) {}
+	constructor(private readonly chatService: ChatService) {}
 
 	@Get()
 	@ApiOperation({ summary: 'Get chat' })
@@ -17,7 +17,7 @@ class ChatController {
 	@ApiBadRequestResponse({ description: 'Bad request' })
 	async getChat(@Req() req, @Query('destId') destId: string): Promise<ChatModel[]> {
 		try {
-			return await this.chatRoomService.get(req.user.id, destId);
+			return await this.chatService.get(req.user.id, destId);
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
 		}
@@ -27,9 +27,9 @@ class ChatController {
 	@ApiOperation({ summary: 'Create chat' })
 	@ApiOkResponse({ description: 'Create chat successfully', type: ChatModel })
 	@ApiBadRequestResponse({ description: 'Bad request' })
-	async createChat(@Req() req, @Body() chatRequestDto: Dto.Request.Create): Promise<ChatModel> {
+	async createChat(@Req() req, @Body() chatRequestDto: Dto.Request.CreateChat): Promise<ChatModel> {
 		try {
-			return await this.chatRoomService.create(
+			return await this.chatService.create(
 				req.user.id,
 				chatRequestDto.destId,
 				chatRequestDto.content,

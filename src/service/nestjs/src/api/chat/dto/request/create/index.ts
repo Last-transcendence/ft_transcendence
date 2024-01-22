@@ -2,7 +2,7 @@ import { Trim } from '@miaooo/class-transformer-trim';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString, IsUUID } from 'class-validator';
 
-class Create {
+class CreateChat {
 	@IsUUID()
 	@IsNotEmpty()
 	@Trim()
@@ -16,4 +16,4 @@ class Create {
 	content: string;
 }
 
-export default Create;
+export default CreateChat;
