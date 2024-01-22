@@ -83,9 +83,9 @@ class ChannelGateway {
 				throw new BadRequestException('Wrong password');
 			}
 
+			await this.participantService.create(joinData.channelId, socket.user.id);
 			socket.join(joinData.channelId);
 			this.server.to(joinData.channelId).emit('message', {
-				channelId: joinData.channelId,
 				userId: socket.user.id,
 				nickname: socket.user.nickname,
 				profileImageURI: socket.user.profileImageURI,
