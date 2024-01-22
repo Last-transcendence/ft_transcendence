@@ -83,12 +83,18 @@ class ChannelGateway {
 				throw new BadRequestException('Wrong password');
 			}
 
+			await this.participantService.create(joinData.channelId, socket.user.id);
 			socket.join(joinData.channelId);
+			this.server.to(joinData.channelId).emit('message', {
+				userId: socket.user.id,
+				nickname: socket.user.nickname,
+				profileImageURI: socket.user.profileImageURI,
+			});
 			return { res: true };
 		} catch (error) {
 			console.error("An error occurred channel.gateway 'join':", error);
 			socket.emit('error', { message: 'An error occurred' });
-			return { res: false };
+			return { res: false, message: error };
 		}
 	}
 
