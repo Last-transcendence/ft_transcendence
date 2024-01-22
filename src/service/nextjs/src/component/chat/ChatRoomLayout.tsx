@@ -104,17 +104,16 @@ const ChatRoomLayout = ({
 				// send DM invite (nickname, message)
 				break;
 			case 'GAME':
-				if (!nickname) return;
 				// @todo 게임 시작
 				channelSocket?.emit(
-					'game',
+					'invite',
 					{
 						channelId,
 						userId: me?.id,
-						toNickname: nickname,
+						nickname,
 					},
-					(res: any) => {
-						console.log(res);
+					(response: any) => {
+						console.log(response);
 						//성공 시 세팅
 						alert('GAME START');
 					},

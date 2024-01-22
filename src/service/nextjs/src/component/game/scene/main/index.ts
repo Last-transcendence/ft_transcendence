@@ -68,7 +68,7 @@ class Main extends Phaser.Scene {
 				this.myScore.setText(parseInt(response.score, 10).toString());
 				return;
 			}
-			if (this.ball.y < 630) {
+			if (this.ball.y < 628) {
 				this.socket.emit('score', {
 					room: this.room,
 					score: parseInt(this.enemyScore.text, 10),
