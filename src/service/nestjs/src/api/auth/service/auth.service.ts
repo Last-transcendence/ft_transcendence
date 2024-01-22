@@ -30,7 +30,7 @@ export class AuthService {
 			if (user) {
 				throw new BadRequestException('Nickname is already taken');
 			}
-			if (registerRequestDto.use2fa == 'true' && !registerRequestDto.email2fa) {
+			if (registerRequestDto.use2fa === 'true' && !registerRequestDto.email2fa) {
 				throw new BadRequestException('Email used in 2fa is empty');
 			}
 			return await this.userSerivice.create(intraId, registerRequestDto);

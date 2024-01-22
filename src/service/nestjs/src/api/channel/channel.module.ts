@@ -5,7 +5,6 @@ import ParticipantModule from 'api/participant/participant.module';
 import ChannelController from './channel.controller';
 import ChannelGateway from './channel.gateway';
 import ChannelService from './channel.service';
-import MuteService from 'api/mute/mute.service';
 
 @Module({
 	imports: [
@@ -14,7 +13,7 @@ import MuteService from 'api/mute/mute.service';
 		forwardRef(() => MuteModule),
 	],
 	controllers: [ChannelController],
-	providers: [ChannelService, ChannelGateway, MuteService],
+	providers: [ChannelService, ChannelGateway],
 	exports: [ChannelService],
 })
 class ChannelModule {}

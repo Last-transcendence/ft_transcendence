@@ -40,10 +40,10 @@ class UserService {
 		}
 	}
 
-	async updateUserById(id: string, { use2fa, file, ...updateRequestDto}: Dto.Request.UpdateUser): Promise<User> {
+	async updateUserById(id: string,  { use2fa, file, ...updateRequestDto}: Partial<Dto.Request.UpdateUser>): Promise<User> {
 		try {
 			return await this.prismaService.user.update({ 
-				where: { id }, data: { ...updateRequestDto, profileImageURI: file, use2fa: use2fa === 'true' ? true : false},
+				where: { id }, data: { profileImageURI: file, use2fa: use2fa === 'true' ? true : false,  ...updateRequestDto },
 			});
 		} catch (error) {
 			throw new Error(error.message);
@@ -53,6 +53,30 @@ class UserService {
 	async searchUserByNickname(nickname: string) {
 		try {
 			return await this.prismaService.user.findMany({ where: { nickname } });
+		} catch (error) {
+			throw new Error(error.message);
+		}
+	}
+
+	async online(userId: string) {
+		try {
+			return await this.prismaService.user.update({ where: { id: userId }, data: { status: 'ONLINE' } });
+		} catch (error) {
+			throw new Error(error.message);
+		}
+	}
+
+	async offline(userId: string) {
+		try {
+			return await this.prismaService.user.update({ where: { id: userId }, data: { status: 'OFFLINE' } });
+		} catch (error) {
+			throw new Error(error.message);
+		}
+	}
+
+	async playing(userId: string) {
+		try {
+			return await this.prismaService.user.update({ where: { id: userId }, data: { status: 'PLAYING' } });
 		} catch (error) {
 			throw new Error(error.message);
 		}

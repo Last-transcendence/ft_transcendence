@@ -9,7 +9,7 @@ export class TwoFactorService {
     constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {}
 
     async createCode() {
-        return Math.floor(10000 + Math.random() * 900000).toString();
+        return Math.floor(100000 + Math.random() * 900000).toString();
     }
 
     async confirmVerificationCode( user: User, verificationCode: string) {

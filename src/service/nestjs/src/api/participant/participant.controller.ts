@@ -1,13 +1,11 @@
 import {
 	BadRequestException,
-	Body,
 	Controller,
 	Get,
 	HttpException,
 	Inject,
 	Param,
 	ParseUUIDPipe,
-	Patch,
 	Post,
 	Query,
 	Req,
@@ -55,30 +53,6 @@ class ParticipantController {
 			}
 
 			return await this.participantService.getList(channelId);
-		} catch (error) {
-			throw new HttpException(error.message, error.status);
-		}
-	}
-
-	@Patch(':id')
-	@UseGuards(Auth.Guard.UserJwt)
-	@ApiOperation({ summary: 'Update participant' })
-	@ApiOkResponse({
-		description: 'Participant updated successfully',
-		type: Dto.Response.Participant,
-	})
-	@ApiBadRequestResponse({ description: 'Failed to update participant' })
-	async updateParticipant(
-		@Req() req,
-		@Param('id') id: string,
-		@Body() updateParticipantRequestDto: Dto.Request.Update,
-	): Promise<Dto.Response.Participant> {
-		try {
-			if (!(await this.participantService.isAuthorized(req.user.id))) {
-				throw new UnauthorizedException('User not authorized');
-			}
-
-			return await this.participantService.update(id, updateParticipantRequestDto);
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
 		}
