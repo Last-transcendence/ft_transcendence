@@ -9,8 +9,11 @@ import {
 } from '@nestjs/websockets';
 import BanService from 'api/ban/ban.service';
 import ParticipantService from 'api/participant/participant.service';
+import { plainToClass } from 'class-transformer';
+import { validate } from 'class-validator';
 import { Namespace, Socket } from 'socket.io';
 import * as Auth from '../../common/auth';
+import * as ParticipantDto from '../participant/dto';
 import ChannelService from './channel.service';
 
 const getCorsOrigin = () => {
@@ -129,6 +132,28 @@ class ChannelGateway {
 			console.error("An error occurred in channel.gateway 'message':", error);
 			socket.emit('error', { message: "An error occurred in channel.gateway 'message'" });
 			return { res: false };
+		}
+	}
+
+	@SubscribeMessage('role')
+	@UseGuards(Auth.Guard.UserWsJwt)
+	async handleRole(@MessageBody() data, @ConnectedSocket() socket) {
+		try {
+			if ((await this.participantService.isOwner(socket.user.id)) === false) {
+				throw new Error('Permission denied');
+			}
+
+			const newRole = plainToClass(ParticipantDto.Request.Update, data.role);
+			const error = await validate(newRole);
+
+			if (error.length > 0) {
+				throw new Error('Failed validation: ' + JSON.stringify(error));
+			}
+			this.participantService.update(data.toUserId, newRole);
+
+			return { res: true };
+		} catch (error) {
+			return { res: false, message: error };
 		}
 	}
 }

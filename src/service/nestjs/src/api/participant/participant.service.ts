@@ -36,6 +36,23 @@ class ParticipantService {
 		}
 	}
 
+	async isOwner(userId: string): Promise<boolean> {
+		try {
+			const participant = await this.prismaService.participant.findUnique({
+				where: { userId },
+			});
+
+			if (!participant) {
+				throw new Error('User is not participant');
+			} else if (participant.role !== 'OWNER') {
+				throw new Error('User is not the owner');
+			}
+			return true;
+		} catch (error) {
+			throw new Error(error.message);
+		}
+	}
+
 	async get(userId: string): Promise<Dto.Response.Participant> {
 		try {
 			return await this.prismaService.participant.findUnique({
