@@ -25,14 +25,12 @@ const CustomModal = ({ setIsOpened, children }: CustomModalProps) => {
 					setIsOpened(false);
 				}}
 			>
-				<div>
-					<div
-						onClick={event => {
-							event.stopPropagation();
-						}}
-					>
-						<div style={{ padding: 40 }}>{children && children}</div>
-					</div>
+				<div
+					onClick={event => {
+						event.stopPropagation();
+					}}
+				>
+					<div>{children && children}</div>
 				</div>
 			</div>,
 			document.body,
