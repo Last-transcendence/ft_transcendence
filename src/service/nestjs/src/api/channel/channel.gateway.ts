@@ -152,12 +152,10 @@ class ChannelGateway {
 
 			const participant = await this.participantService.get(socket.user.id);
 
-			socket
-				.to(participant.channelId)
-				.emit('leave', {
-					message: `${socket.user.id} has left the channel`,
-					profileImageURI: participant.userProfileImageURI,
-				});
+			socket.to(participant.channelId).emit('leave', {
+				message: `${socket.user.id} has left the channel`,
+				profileImageURI: participant.userProfileImageURI,
+			});
 			socket.leave(participant.channelId);
 			this.channelService.leaveChannel(socket.user.id);
 
@@ -165,6 +163,8 @@ class ChannelGateway {
 		} catch (error) {
 			console.error("An error occurred in channel.gateway 'leave':", error);
 			socket.emit('error', { message: "An error occurred in channel.gateway 'leave'" });
+		}
+	}
 
 	@SubscribeMessage('role')
 	@UseGuards(Auth.Guard.UserWsJwt)
