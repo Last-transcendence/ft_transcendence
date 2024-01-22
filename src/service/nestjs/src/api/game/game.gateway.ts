@@ -113,15 +113,12 @@ class GameGateway {
 				(Math.random() < 0.5 ? Math.random() * 600 + 150 : Math.random() * -600 - 150) * speed;
 			const randomY =
 				(Math.random() < 0.5 ? 1280 - Math.abs(randomX) : Math.abs(randomX) - 1280) * speed;
-			//return this.server
-			//	.to(Array.from(room)[0])
-			//	.emit('start', { ball: { x: randomX, y: randomY } });
 
 			const player1 = Array.from(room)[0];
 			const player2 = Array.from(room)[1];
 
-			this.server.to(player1).emit('start', { ball: { x: randomX, y: randomY } });
-			this.server.to(player2).emit('start', { ball: { x: -randomX, y: -randomY } });
+			this.server.to(player1).emit('start', { ball: { velocityX: randomX, velocityY: randomY } });
+			this.server.to(player2).emit('start', { ball: { velocityX: -randomX, velocityY: -randomY } });
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
 		}
@@ -157,6 +154,12 @@ class GameGateway {
 				const opponentSocketId = this.getOpponentSocketId(socket, scoreRequestDto.room);
 
 				this.server.to(opponentSocketId).emit('score', scoreRequestDto);
+
+				console.log(scoreRequestDto);
+
+				if (scoreRequestDto.state !== 'confirmed') {
+					return;
+				}
 
 				if (parseInt(scoreRequestDto.score) === 4) {
 					this.server.sockets.get(room[0]).leave(scoreRequestDto.room);

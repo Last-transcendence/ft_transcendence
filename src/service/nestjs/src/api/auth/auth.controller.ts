@@ -46,7 +46,7 @@ export class AuthController {
 		private readonly cookieService: CookieService,
 		private readonly twoFactorService: TwoFactorService,
 		private readonly mailService: MailService,
-        @Inject(CACHE_MANAGER) private cacheManager: Cache
+		@Inject(CACHE_MANAGER) private cacheManager: Cache,
 	) {}
 
 	@Get('ft')
@@ -81,7 +81,7 @@ export class AuthController {
 			//403 error
 			const user = await this.authService.login(req.user.intraId);
 			if (user.use2fa) {
-				throw new UnauthorizedException("Try login with two factor authentication: POST /auth/2fa")
+				throw new UnauthorizedException('Try login with two factor authentication: POST /auth/2fa');
 			}
 
 			const jwt = this.cookieService.createJwt({
@@ -97,9 +97,7 @@ export class AuthController {
 			res.redirect(`${this.configService.getOrThrow('NEXTJS_URL')}/auth/login/callback`);
 		} catch (error) {
 			res.redirect(
-				`${this.configService.getOrThrow('NEXTJS_URL')}/auth/register?nickname=${
-					req.user.intraId
-				}`,
+				`${this.configService.getOrThrow('NEXTJS_URL')}/auth/register?nickname=${req.user.intraId}`,
 			);
 		}
 	}
@@ -111,12 +109,13 @@ export class AuthController {
 	@ApiConsumes('multipart/form-data')
 	@UseInterceptors(FileInterceptor('file'))
 	async register(
-		@Body() registerRequestDto: Dto.Request.Register, 
+		@Body() registerRequestDto: Dto.Request.Register,
 		@Req() req,
-		@UploadedFile() file: Express.Multer.File,
+		//@UploadedFile() file: Express.Multer.File,
 	): Promise<User> {
 		try {
-			return this.authService.register(req.user.intraId, registerRequestDto, file.filename);
+			//return this.authService.register(req.user.intraId, registerRequestDto, file.filename);
+			return this.authService.register(req.user.intraId, registerRequestDto);
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
 		}
@@ -129,12 +128,12 @@ export class AuthController {
 	async send2faEmail(@Req() req) {
 		try {
 			const code = await this.twoFactorService.createCode();
-			const user = await this.authService.login(req.user.intraId)
+			const user = await this.authService.login(req.user.intraId);
 			if (!user || !user.use2fa || !user.email2fa) {
-				throw new BadRequestException("Bad request")
+				throw new BadRequestException('Bad request');
 			}
 			this.cacheManager.set(user.email2fa, code);
-			this.mailService.send(user.email2fa, user.nickname, code)
+			this.mailService.send(user.email2fa, user.nickname, code);
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
 		}

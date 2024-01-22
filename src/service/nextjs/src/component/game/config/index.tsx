@@ -4,7 +4,7 @@ const Config: GameInstance = {
 	title: 'Pong',
 	width: 360,
 	height: 640,
-	type: undefined,
+	type: 0,
 	physics: {
 		default: 'arcade',
 		arcade: {
