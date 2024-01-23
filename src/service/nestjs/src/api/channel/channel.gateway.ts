@@ -50,10 +50,8 @@ class ChannelGateway {
 	@UseGuards(Auth.Guard.UserWsJwt)
 	async handleCreate(@ConnectedSocket() socket, @MessageBody() data) {
 		try {
-			if (await this.participantService.isParticipated(socket.user.id)) {
-				const participatedChannel = await this.participantService.get(socket.user.id);
-				await this.channelService.leaveChannel(participatedChannel.id);
-			}
+			await this.channelService.leaveChannel(socket, socket.user.id);
+
 			const newChannel = await this.channelService.createChannel(data);
 			const newParticipant = await this.participantService.create({
 				channelId: newChannel.id,
@@ -79,7 +77,7 @@ class ChannelGateway {
 		try {
 			const userId = socket.user.id;
 
-			await this.channelService.leaveChannel(userId);
+			await this.channelService.leaveChannel(socket, userId);
 
 			const channel = await this.channelService.getChannel(joinData.channelId);
 			if (!channel) {
