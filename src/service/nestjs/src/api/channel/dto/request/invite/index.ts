@@ -2,24 +2,24 @@ import { Trim } from '@miaooo/class-transformer-trim';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString, IsUUID } from 'class-validator';
 
-class Create {
-	@IsNotEmpty()
+class Invite {
 	@IsUUID()
+	@IsNotEmpty()
 	@Trim()
 	@ApiProperty({ description: 'Channel id' })
 	channelId: string;
 
-	@IsNotEmpty()
 	@IsUUID()
+	@IsNotEmpty()
 	@Trim()
 	@ApiProperty({ description: 'User id' })
 	userId: string;
 
-	@IsNotEmpty()
 	@IsString()
+	@IsNotEmpty()
 	@Trim()
-	@ApiProperty({ description: 'Socket id' })
-	socketId: string;
+	@ApiProperty({ description: 'Nickname to invite' })
+	nickname: string;
 }
 
-export default Create;
+export default Invite;

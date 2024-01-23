@@ -9,12 +9,14 @@ const LoginCallBackPage = () => {
 
 	useEffect(() => {
 		axiosInstance
-			.get('/user/me', { withCredentials: true })
+			.get('/user/me')
 			.then(response => {
+				console.log(response);
 				setMe(response.data);
 				navigate.push('/');
 			})
 			.catch(err => {
+				console.error(err);
 				navigate.push('/auth/register');
 			});
 	}, [setMe, navigate]);

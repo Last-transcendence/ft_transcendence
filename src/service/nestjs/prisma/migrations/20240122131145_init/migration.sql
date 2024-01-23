@@ -53,6 +53,20 @@ CREATE TABLE "Block" (
 -- CreateTable
 CREATE TABLE "Game" (
     "id" UUID NOT NULL,
+    "userId" UUID,
+    "socketId" TEXT NOT NULL,
+    "mode" "GameMode" NOT NULL DEFAULT 'NORMAL',
+    "score" INTEGER NOT NULL DEFAULT 0,
+    "ready" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Game_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "GameHistory" (
+    "id" UUID NOT NULL,
     "player1Id" UUID NOT NULL,
     "player2Id" UUID NOT NULL,
     "mode" "GameMode" NOT NULL DEFAULT 'NORMAL',
@@ -62,7 +76,7 @@ CREATE TABLE "Game" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "Game_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "GameHistory_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -82,6 +96,7 @@ CREATE TABLE "Participant" (
     "id" UUID NOT NULL,
     "channelId" UUID NOT NULL,
     "userId" UUID NOT NULL,
+    "socketId" TEXT NOT NULL,
     "role" "ParticipantRole" NOT NULL DEFAULT 'USER',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -155,16 +170,31 @@ CREATE INDEX "blockUserId" ON "Block"("userId");
 CREATE UNIQUE INDEX "Block_userId_blockedId_key" ON "Block"("userId", "blockedId");
 
 -- CreateIndex
-CREATE INDEX "player1Id" ON "Game"("player1Id");
+CREATE UNIQUE INDEX "Game_userId_key" ON "Game"("userId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Participant_channelId_userId_key" ON "Participant"("channelId", "userId");
+CREATE UNIQUE INDEX "Game_socketId_key" ON "Game"("socketId");
+
+-- CreateIndex
+CREATE INDEX "player1Id" ON "GameHistory"("player1Id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Participant_channelId_key" ON "Participant"("channelId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Participant_userId_key" ON "Participant"("userId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Participant_socketId_key" ON "Participant"("socketId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Ban_channelId_userId_key" ON "Ban"("channelId", "userId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Mute_channelId_userId_key" ON "Mute"("channelId", "userId");
+CREATE UNIQUE INDEX "Mute_channelId_key" ON "Mute"("channelId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Mute_userId_key" ON "Mute"("userId");
 
 -- CreateIndex
 CREATE INDEX "srcId" ON "ChatRoom"("srcId");
@@ -188,10 +218,10 @@ ALTER TABLE "Block" ADD CONSTRAINT "Block_userId_fkey" FOREIGN KEY ("userId") RE
 ALTER TABLE "Block" ADD CONSTRAINT "Block_blockedId_fkey" FOREIGN KEY ("blockedId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Game" ADD CONSTRAINT "Game_player1Id_fkey" FOREIGN KEY ("player1Id") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "GameHistory" ADD CONSTRAINT "GameHistory_player1Id_fkey" FOREIGN KEY ("player1Id") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Game" ADD CONSTRAINT "Game_player2Id_fkey" FOREIGN KEY ("player2Id") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "GameHistory" ADD CONSTRAINT "GameHistory_player2Id_fkey" FOREIGN KEY ("player2Id") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Participant" ADD CONSTRAINT "Participant_channelId_fkey" FOREIGN KEY ("channelId") REFERENCES "Channel"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
