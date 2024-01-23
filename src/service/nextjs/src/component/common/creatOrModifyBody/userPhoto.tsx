@@ -2,19 +2,17 @@ import { Badge } from '@mui/material';
 import SmallAvatar from './smallAvatar';
 import BigAvatar from './bigAvatar';
 import AddAPhotoIcon from '@mui/icons-material/AddAPhoto';
-import Image from 'next/image';
+import CustomImage from '@/component/common/CustomImage';
 import { UNKNOWN_PROFILE_IMAGE_URI } from '@/common/constant';
+import { ChangeEvent } from 'react';
 
 interface UserPhotoProps {
 	imgUrl: string | ArrayBuffer | null;
 	onClick: () => void;
-	onChangePicture: (e: React.ChangeEvent<HTMLInputElement>) => void;
+	onChangePicture: (e: ChangeEvent<HTMLInputElement>) => void;
 }
 
 const UserPhoto = ({ imgUrl, onClick, onChangePicture }: UserPhotoProps) => {
-	const loader = ({ src }: { src: string }): string => {
-		return `https://dev.transcendence.42seoul.kr/upload/${src}`;
-	};
 	return imgUrl === null ? (
 		<></>
 	) : (
@@ -29,21 +27,15 @@ const UserPhoto = ({ imgUrl, onClick, onChangePicture }: UserPhotoProps) => {
 		>
 			<BigAvatar>
 				{imgUrl === '' ? (
-					<Image
-						src={UNKNOWN_PROFILE_IMAGE_URI}
+					<CustomImage
+						img={UNKNOWN_PROFILE_IMAGE_URI}
 						alt={'user img'}
-						width={150}
-						height={150}
-						priority
 					/>
 				) : (
-					<Image
-						loader={loader}
-						src={imgUrl as string}
-						alt="user img"
-						width={150}
-						height={150}
-						priority
+					<CustomImage
+					img={imgUrl as string}
+					alt={'user img'}
+					useLoader
 					/>
 				)}
 			</BigAvatar>

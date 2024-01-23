@@ -1,67 +1,66 @@
 import Avatar from '@mui/material/Avatar';
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import ProfileModar from '@/component/common/detailProfile/profileModar';
 import ProfileMenus from '@/component/common/detailProfile/profileMenus';
 import ProfilePageBody from '@/component/common/detailProfile/profilePageBody';
 import Block from '@/type/block.type';
-import User from '@/type/user.type';
+import User, { UserStatus } from '@/type/user.type';
 import { useRouter } from 'next/navigation';
 import { getFetcher } from '@/service/api';
 import AuthContext from '@/context/auth.context';
-import getFriend from '@/service/getFriend';
+import Image from 'next/image';
+import { UNKNOWN_PROFILE_IMAGE_URI } from '@/common/constant';
+import Loading from '../Loading';
+import CustomSnackbar from '../customSnackbar';
+import Friend from '@/type/friend.type';
+import CustomImage from '@/component/common/CustomImage';
 
 interface OpenProfileAvatarProps {
 	otherUserId: string;
 	imgUrl: string | undefined | null;
+	refetch?: () => void;
 }
 
-export interface otherUser {
-	img: string;
-	name: string;
-	state: string;
-	isFriend: boolean;
-}
-
-const OpenProfileAvatar = ({ otherUserId, imgUrl }: OpenProfileAvatarProps) => {
+const OpenProfileAvatar = ({ otherUserId, imgUrl, refetch }: OpenProfileAvatarProps) => {
 	const router = useRouter();
 	const { me } = useContext(AuthContext);
 	const isMe = me?.id ? me.id === otherUserId : false;
 
-	const [otherUserData, setOtherUserData] = useState<otherUser>({
-		img: '',
-		name: '',
-		state: '',
-		isFriend: false,
+	const [otherUserData, setOtherUserData] = useState<User>({
+		id: '',
+		nickname: '',
+		profileImageURI: undefined,
+		status: UserStatus.OFFLINE,
 	});
-	const [isBlockUser, setIsBlockUser] = useState<Boolean>(false);
+	const [isBlockUser, setIsBlockUser] = useState<boolean | undefined>(undefined);
+	const [isFriend, setIsFriend] = useState<Boolean | undefined>(undefined);
 	const [errorMessage, setErrorMessage] = useState<string>('');
-	const [click, setClick] = useState(false);
+	const [click, setClick] = useState<boolean>(false);
 
-	// useEffect(() => {
-	// 	const fetchData = async () => {
-	// 		try {
-	// 			const friendList = getFriend();
-	// 			const blockList = await getFetcher<Block[]>('/block');
-	// 	// 			const data = await getFetcher<User>(`/user/${otherUserId}`);
-	// 	// 			setOtherUserData({
-	// 	// 				img: data.profileImageURI,
-	// 	// 				name: data.nickname,
-	// 	// 				state: data.status,
-	// 	// 				isFriend: friendList.includes(data.nickname),
-	// 	// 			});
-	// 	// 			setIsBlockUser(blockList.some(blockedUser => blockedUser.id === otherUserId));
-	// 		} catch (error) {
-	// 			setErrorMessage(error.message);
-	// 		}
-	// 	};
-	// 	if (click === true) {
-	// 		fetchData();
-	// 	}
-	// }, [otherUserId, click]);
+	useEffect(() => {
+		const fetchData = async () => {
+			try {
+				const [friendList, blockList, userData] = await Promise.all([
+					getFetcher<Friend[]>('/friend'),
+					getFetcher<Block[]>('/block'),
+					getFetcher<User>(`/user/${otherUserId}`),
+				]);
+
+				setOtherUserData(userData);
+				setIsFriend(friendList.some(friend => friend.friendId === userData.id));
+				setIsBlockUser(blockList.some(blockedUser => blockedUser.blockedId === otherUserId));
+			} catch (error: any) {
+				setErrorMessage(error.message);
+			}
+		};
+		if (click === true) {
+			fetchData();
+		}
+	}, [otherUserId, click, isBlockUser, otherUserData.isFriend]);
 
 	const handleAvatarOpen = () => {
 		if (isMe) {
-			router.push('/profile/testDetailProfile');
+			router.push('/profile/myProfile');
 		} else {
 			setClick(true);
 		}
@@ -71,17 +70,33 @@ const OpenProfileAvatar = ({ otherUserId, imgUrl }: OpenProfileAvatarProps) => {
 		setErrorMessage('');
 	};
 
-	return (
+	return imgUrl === null ? (
+		<Loading />
+	) : (
 		<>
-			<Avatar
-				alt="User Avatar"
-				onClick={handleAvatarOpen}
-				sx={{ cursor: 'pointer' }}
-				src={imgUrl ? imgUrl : undefined}
-			/>
-			{click && (
-				<ProfileModar setClick={setClick} childMenu={<ProfileMenus />}>
-					<ProfilePageBody otherUserId={otherUserId} {...otherUserData} />
+			<CustomSnackbar
+				open={errorMessage !== '' ? true : false}
+				success={false}
+				onClose={handleSnackbarClose}
+			>
+				{errorMessage}
+			</CustomSnackbar>
+			<Avatar onClick={handleAvatarOpen} sx={{ cursor: 'pointer' }}>
+				{imgUrl === '' ? (
+					<CustomImage img={UNKNOWN_PROFILE_IMAGE_URI} alt={'user img'} />
+				) : (
+					<CustomImage
+						useLoader
+						img={imgUrl as string}
+						alt="user img"
+					/>
+				)}
+			</Avatar>
+			{click && isBlockUser !== undefined && isFriend !== undefined && (
+				<ProfileModar
+						setClick={setClick}
+						childMenu={<ProfileMenus isblock={isBlockUser} otherUserId={otherUserId} />} >
+					<ProfilePageBody userData={otherUserData} isBlock={isBlockUser} refetch={refetch} isFriend={isFriend} setIsFriend={setIsFriend} />
 				</ProfileModar>
 			)}
 		</>

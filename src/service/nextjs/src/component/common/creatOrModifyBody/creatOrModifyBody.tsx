@@ -87,9 +87,11 @@ const CreatOrModifyBody = ({
 				: await postFetcher<Me>(path, formData, { headers });
 			if (isModify === true) {
 				setMe(response);
-				router.push('/');
-			} else {
+			}
+			if (twoFATrueFalse == true) {
 				window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/login`;
+			} else {
+				router.push('/auth/login/callback');
 			}
 		} catch (error: any) {
 			setErrorMessageNickName('');

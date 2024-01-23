@@ -2,43 +2,41 @@ import { Box } from '@mui/material';
 import BottomAvatarsGrid from '@/component/common/detailProfile/bottomAvatars';
 import { avatarStyle } from '../../profile/common/newAvatar';
 import { imgStyle } from '../../profile/common/myImage';
-import { useState } from 'react';
+import { useState, Dispatch, SetStateAction } from 'react';
 import { postFetcher, getFetcher, deleteFetcher } from '@/service/api';
 import Chatroom from '@/type/chatroom.type';
 import { useRouter } from 'next/navigation';
 import CustomSnackbar from '../customSnackbar';
+import Loading from '../Loading';
 
 const sxStyle: avatarStyle = {
-	width: 50,
-	height: 50,
 	backgroundColor: '#DDDD99',
 	isHover: true,
 };
 
-const imageStyle: imgStyle = {
-	width: '50%',
-	height: '50%',
-};
-
 interface BottomProfileProps {
-	isFriend: boolean;
+	isFriend?: boolean;
+	setIsFriend: Dispatch<SetStateAction<boolean | undefined>>;
 	otherUserId: string;
+	refetch?: () => void;
 }
 
-const BottomProfile = ({ otherUserId, isFriend }: BottomProfileProps) => {
+const BottomProfile = ({ otherUserId, isFriend, setIsFriend, refetch }: BottomProfileProps) => {
 	const router = useRouter();
-	const [isFrd, setIsFrd] = useState<boolean>(isFriend);
 	const [loading, setLoading] = useState<boolean>(false);
 	const [errorMessage, setErrorMessage] = useState<string>('');
 
+	
 	const friendAdd = async (): Promise<void> => {
 		try {
 			setLoading(true);
 			const response = await postFetcher('/friend', { friendId: otherUserId });
-			setIsFrd(true);
+			if(refetch !== undefined) refetch();
+			setIsFriend(true);
 		} catch (error: any) {
-			console.log('친구추가 실패');
 			setErrorMessage(error.message);
+		} finally {
+			setLoading(false);
 		}
 	};
 
@@ -46,10 +44,12 @@ const BottomProfile = ({ otherUserId, isFriend }: BottomProfileProps) => {
 		try {
 			setLoading(true);
 			const response = await deleteFetcher(`/friend/${otherUserId}`);
-			setIsFrd(false);
+			if(refetch !== undefined) refetch();
+			setIsFriend(false);
 		} catch (error: any) {
-			console.log('친구삭제 실패');
 			setErrorMessage(error.message);
+		} finally {
+			setLoading(false);
 		}
 	};
 
@@ -64,27 +64,29 @@ const BottomProfile = ({ otherUserId, isFriend }: BottomProfileProps) => {
 
 	const makeNewChatroom = async (otherUserId: string): Promise<string> => {
 		try {
-			const newChatroom: Chatroom = await postFetcher('/chatroom', { destId: otherUserId });
-			return newChatroom.id;
-		} catch (error) {
-			throw error;
+			const newChatroom = await postFetcher<Chatroom>('/chatroom', { destId: otherUserId });
+			return newChatroom.destId;
+		} finally {
 		}
 	};
 
 	const dmRequest = async (): Promise<void> => {
 		try {
 			setLoading(true);
-			const data: Chatroom[] = await getFetcher('/chatroom');
+			const data = await getFetcher<Chatroom[]>('/chatroom');
 			const chatroom: Chatroom | undefined = findUserFromDm(otherUserId, data);
 			if (chatroom === undefined) {
 				const id = await makeNewChatroom(otherUserId);
-				await router.push(`/chat/${id}`);
+				console.log(id);
+				// router.push(`/chat/${id}`);
 			} else {
-				await router.push(`/chat/${chatroom.id}`);
+				console.log(chatroom.destId);
+				// router.push(`/chat/${chatroom.destId}`);
 			}
 		} catch (error: any) {
-			console.log('dm 생성실패');
 			setErrorMessage(error.message);
+		} finally {
+			setLoading(false);
 		}
 	};
 
@@ -93,7 +95,7 @@ const BottomProfile = ({ otherUserId, isFriend }: BottomProfileProps) => {
 			image: '/Mail.png',
 			name: 'DM',
 			sxStyle: sxStyle,
-			avatarImgStyle: imageStyle,
+			avatarImgStyle: undefined,
 			message: 'DM',
 			onClick: loading ? undefined : dmRequest,
 		},
@@ -101,16 +103,16 @@ const BottomProfile = ({ otherUserId, isFriend }: BottomProfileProps) => {
 			image: '/Add User Male.png',
 			name: '1:1 게임',
 			sxStyle: sxStyle,
-			avatarImgStyle: imageStyle,
+			avatarImgStyle: undefined,
 			message: '1:1 게임',
 		},
 		{
 			image: '/Ping Pong.png',
-			name: isFrd ? '친구 제거' : '친구 추가',
+			name: isFriend ? '친구 제거' : '친구 추가',
 			sxStyle: sxStyle,
-			avatarImgStyle: imageStyle,
-			message: isFrd ? '친구 제거' : '친구 추가',
-			onClick: loading ? undefined : isFrd ? friendAdd : friendDelete,
+			avatarImgStyle: undefined,
+			message: isFriend ? '친구 제거' : '친구 추가',
+			onClick: loading ? undefined : isFriend ? friendDelete : friendAdd,
 		},
 	];
 
@@ -119,14 +121,16 @@ const BottomProfile = ({ otherUserId, isFriend }: BottomProfileProps) => {
 		setLoading(false);
 	};
 
-	return (
+	return isFriend === undefined  ? (
+		<div></div>
+		) : (
 		<Box marginTop="20%">
 			<CustomSnackbar
 				open={errorMessage.length !== 0 ? true : false}
 				onClose={handleSnackbarClose}
 				success={false}
 			>
-				serverrror : {errorMessage}
+				{errorMessage}
 			</CustomSnackbar>
 			<BottomAvatarsGrid avatars={bottomAvatars} />
 		</Box>

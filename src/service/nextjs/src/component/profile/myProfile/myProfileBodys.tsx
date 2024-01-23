@@ -34,7 +34,7 @@ const MyProfileBody = ({ name, use2fa, image }: myProfilePageProps) => {
 		<Box overflow="auto">
 			<Container maxWidth="xs" sx={{ paddingBottom: 15 }}>
 				<MyProfileMenu />
-				{/* <ProfileAvartar name={name} image={image} /> */}
+				<ProfileAvartar name={name} image={image} />
 				<UserId userName={name} />
 				<Box display="flex" flexDirection="column" alignItems="center">
 					<TwoFACheck twoFA={use2fa} />
