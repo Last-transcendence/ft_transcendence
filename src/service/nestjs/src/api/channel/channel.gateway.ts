@@ -260,6 +260,28 @@ class ChannelGateway {
 			return { res: false, message: error };
 		}
 	}
+
+	@SubscribeMessage('ban')
+	@UseGuards(Auth.Guard.UserWsJwt)
+	async handleBan(@ConnectedSocket() socket, @MessageBody() data) {
+		try {
+			if ((await this.participantService.isAdmin(socket.user.id)) === false) {
+				throw new Error('Permission denied');
+			}
+			await this.participantService.kick(socket.user.id);
+			await this.banService.create(data.channelId, socket.user.id);
+
+			socket.leave(data.channelId);
+			this.server.to(data.channelId).emit('ban', {
+				channelId: data.channelId,
+				userId: data.toUserId,
+				nickname: data.nickname,
+			});
+			return { res: true };
+		} catch (error) {
+			return { res: false, message: error };
+		}
+	}
 }
 
 export default ChannelGateway;
