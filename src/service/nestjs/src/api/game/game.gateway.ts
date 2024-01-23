@@ -170,9 +170,32 @@ class GameGateway {
 		@MessageBody() moveRequestDto: Dto.Request.Move,
 	) {
 		try {
-			const opponentSocketId = this.getOpponentSocketId(socket, moveRequestDto.room);
+			{
+				const game = await this.gameService.getBySocketId(socket.id);
+				const opponentSocketId = this.getOpponentSocketId(socket, moveRequestDto.room);
+				const opponentGame = await this.gameService.getBySocketId(opponentSocketId);
 
-			this.server.to(opponentSocketId).emit('move', moveRequestDto);
+				if (1000 < Date.now() - opponentGame.updatedAt.getTime()) {
+					this.server.to(socket.id).emit('end', {
+						state: 'DISCONNECTED',
+					});
+					this.server.to(opponentSocketId).emit('end', {
+						state: 'DISCONNECTED',
+					});
+					this.gameService.delete(game.id);
+					this.gameService.delete(opponentGame.id);
+					this.gameService.deleteFirstHistory(game.userId, opponentGame.userId);
+					this.gameService.deleteFirstHistory(opponentGame.userId, game.userId);
+					this.userService.online(game.userId);
+					this.userService.online(opponentGame.userId);
+					return;
+				}
+			}
+			{
+				const opponentSocketId = this.getOpponentSocketId(socket, moveRequestDto.room);
+
+				this.server.to(opponentSocketId).emit('move', moveRequestDto);
+			}
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
 		}
@@ -194,8 +217,6 @@ class GameGateway {
 			{
 				this.server.to(opponentSocketId).emit('score', scoreRequestDto);
 
-				console.log(scoreRequestDto);
-
 				if (scoreRequestDto.state !== 'confirmed') {
 					return;
 				}
@@ -204,6 +225,7 @@ class GameGateway {
 					this.server.sockets.get(socket.id).leave(scoreRequestDto.room);
 					this.server.sockets.get(opponentSocketId).leave(scoreRequestDto.room);
 					this.server.to(socket.id).emit('end', {
+						state: 'RESULT',
 						me: {
 							nickname: me.nickname,
 							profileImageURI: me.profileImageURI,
@@ -214,6 +236,7 @@ class GameGateway {
 						},
 					});
 					this.server.to(opponentSocketId).emit('end', {
+						state: 'RESULT',
 						me: {
 							nickname: opponent.nickname,
 							profileImageURI: opponent.profileImageURI,
@@ -237,7 +260,7 @@ class GameGateway {
 					game.userId,
 				);
 
-				if (!player1History && !player2History) {
+				if (!player1History || player1History.result !== 'PENDING') {
 					player1History = await this.gameService.createHistory(game.userId, {
 						player2Id: opponentGame.userId,
 						mode: game.mode,
@@ -245,6 +268,12 @@ class GameGateway {
 						player2Score: 0,
 						result: 'PENDING',
 					});
+				} else {
+					this.gameService.updateHistory(player1History.id, {
+						player1Score: parseInt(scoreRequestDto.score),
+					});
+				}
+				if (!player2History || player2History.result !== 'PENDING') {
 					player2History = await this.gameService.createHistory(opponentGame.userId, {
 						player2Id: game.userId,
 						mode: game.mode,
@@ -253,9 +282,6 @@ class GameGateway {
 						result: 'PENDING',
 					});
 				} else {
-					this.gameService.updateHistory(player1History.id, {
-						player1Score: parseInt(scoreRequestDto.score),
-					});
 					this.gameService.updateHistory(player2History.id, {
 						player2Score: parseInt(scoreRequestDto.score),
 					});

@@ -253,23 +253,21 @@ class Main extends Phaser.Scene {
 			return;
 		}
 
-		if (!this.keys || !this.myPaddle || !this.enemyPaddle) {
-			return;
-		}
+		if (this.keys && this.myPaddle && this.enemyPaddle) {
+			if (this.keys.left?.isDown) {
+				this.myPaddle.setVelocityX(-400);
+			} else if (this.keys.right?.isDown) {
+				this.myPaddle.setVelocityX(400);
+			} else {
+				this.myPaddle.setVelocityX(0);
+			}
 
-		if (this.keys.left?.isDown) {
-			this.myPaddle.setVelocityX(-400);
-		} else if (this.keys.right?.isDown) {
-			this.myPaddle.setVelocityX(400);
-		} else {
-			this.myPaddle.setVelocityX(0);
+			this.myPaddle.x = Phaser.Math.Clamp(
+				this.myPaddle.x,
+				this.myPaddle.width / 2,
+				this.game.canvas.width - this.myPaddle.width / 2,
+			);
 		}
-
-		this.myPaddle.x = Phaser.Math.Clamp(
-			this.myPaddle.x,
-			this.myPaddle.width / 2,
-			this.game.canvas.width - this.myPaddle.width / 2,
-		);
 
 		this.socket.emit('move', {
 			room: this.room,
