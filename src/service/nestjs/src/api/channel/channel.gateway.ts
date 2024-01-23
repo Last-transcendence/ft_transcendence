@@ -142,8 +142,6 @@ class ChannelGateway {
 				data.message,
 			);
 			this.server.to(data.channelId).emit('message', {
-				channelId: data.channelId,
-				userId: socket.user.id,
 				message: filteredMessage,
 			});
 			return { res: true };
