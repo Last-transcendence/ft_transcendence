@@ -239,6 +239,27 @@ class ChannelGateway {
 			return { res: false, message: error };
 		}
 	}
+
+	@SubscribeMessage('kick')
+	@UseGuards(Auth.Guard.UserWsJwt)
+	async handleKick(@ConnectedSocket() socket, @MessageBody() data) {
+		try {
+			if ((await this.participantService.isAdmin(socket.user.id)) === false) {
+				throw new Error('Permission denied');
+			}
+			await this.participantService.kick(socket.user.id);
+
+			socket.leave(data.channelId);
+			this.server.to(data.channelId).emit('kick', {
+				channelId: data.channelId,
+				userId: data.toUserId,
+				nickname: data.nickname,
+			});
+			return { res: true };
+		} catch (error) {
+			return { res: false, message: error };
+		}
+	}
 }
 
 export default ChannelGateway;
