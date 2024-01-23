@@ -1,7 +1,7 @@
-import { Dispatch, ReactNode, SetStateAction, useEffect, useRef } from 'react';
+import { Dispatch, ReactNode, SetStateAction } from 'react';
 import { createPortal } from 'react-dom';
 import styles from '@/style/profile/profileModar.module.css';
-import CloseIcon from '@/component/common/hambergur-menu/icon';
+import CloseIcon from '@mui/icons-material/Close';
 
 interface ProfileModarProps {
 	setClick: Dispatch<SetStateAction<boolean>>;

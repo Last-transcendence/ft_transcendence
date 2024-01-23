@@ -1,20 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Avatar } from '@mui/material';
-import MyImage, { myImageProps, avatarImgStyle } from './myImage';
+import MyImage, { myImageProps } from './myImage';
+import CustomImage from '@/component/common/CustomImage';
 
 export interface avatarStyle {
-	width?: number;
-	height?: number;
 	backgroundColor?: string;
 	isHover?: boolean;
+	width?: number;
+	height?: number;
 }
 
-export interface newAvatarProps extends myImageProps, avatarImgStyle {
+export interface newAvatarProps extends myImageProps {
 	onClick?: () => void;
 	sxStyle?: avatarStyle;
 }
 
-const NewAvatar = ({ sxStyle, avatarImgStyle, onClick, ...userImageData }: newAvatarProps) => {
+const list = ['/Mail.png', '/Add User Male.png', '/Ping Pong.png'];
+
+const NewAvatar = ({ sxStyle, onClick, ...userImageData }: newAvatarProps) => {
 	const [hover, setHover] = useState<boolean>(false);
 	const newSxStyle = Object.assign({}, sxStyle);
 	useEffect(() => {
@@ -41,11 +44,11 @@ const NewAvatar = ({ sxStyle, avatarImgStyle, onClick, ...userImageData }: newAv
 				}}
 				onClick={onClick}
 			>
-				<MyImage
-					avatarImgStyle={avatarImgStyle}
-					image={userImageData.image || ''}
-					name={userImageData.name}
-				/>
+				{list.includes(userImageData.image as string) ? (
+					<CustomImage img={userImageData.image as string} alt={userImageData.name as string} />
+				) : (
+					<MyImage image={userImageData.image || ''} name={userImageData.name} />
+				)}
 			</Avatar>
 		</Box>
 	);
