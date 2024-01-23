@@ -55,7 +55,7 @@ class ParticipantService {
 
 	async isAdmin(userId: string): Promise<boolean> {
 		try {
-			const participant = await this.prismaService.participant.findUnique({
+			const participant = await this.prismaService.participant.findFirst({
 				where: { userId },
 			});
 
