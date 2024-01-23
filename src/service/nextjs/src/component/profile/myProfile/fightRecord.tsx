@@ -1,6 +1,5 @@
 import { Grid, Box } from '@mui/material';
 import Mydate from './fightDate';
-import { myImageProps, imgStyle } from '../common/myImage';
 import MatchPoint, { matchPointProps } from './matchPoint';
 import { avatarStyle } from '../common/newAvatar';
 import User from '@/type/user.type';
@@ -21,11 +20,6 @@ const sxStyle: avatarStyle = {
 	width: 80,
 	height: 80,
 	backgroundColor: '#99DDDD',
-};
-
-const imgStyle: imgStyle = {
-	width: '100%',
-	height: '100%',
 };
 
 const FightRecord = ({

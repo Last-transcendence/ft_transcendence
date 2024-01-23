@@ -1,34 +1,58 @@
 import { Container, Typography, Box } from '@mui/material';
 import NewIcon from '../../profile/common/newIcon';
 import BottomProfile from './bottomProfile';
-import { otherUser } from './openProfileAvatar';
+import { Dispatch, SetStateAction } from 'react';
+import Loading from '../Loading';
+import User from '@/type/user.type';
 
 const ar = {
-	image: '/Mail.png',
-	name: 'DM',
 	sxStyle: { width: 150, height: 150 },
 	imgStyle: {},
 	message: undefined,
 };
 
+interface ProfilePageBodyProps {
+	userData: User;
+	isFriend: undefined | boolean;
+	setIsFriend: Dispatch<SetStateAction<boolean | undefined>>;
+	isBlock: undefined | boolean;
+	refetch?: () => void;
+}
+
 const ProfilePageBody = ({
-	otherUserId,
-	img,
-	name,
-	state,
+	userData,
 	isFriend,
-}: { otherUserId: string } & otherUser) => {
-	return (
+	setIsFriend,
+	isBlock,
+	refetch,
+}: ProfilePageBodyProps) => {
+	return isFriend === undefined &&
+		isBlock === undefined &&
+		userData.profileImageURI === undefined ? (
+		<Loading />
+	) : (
 		<div>
 			<Container maxWidth="xs">
-				<NewIcon {...ar} image={img} />
+				<NewIcon {...ar} image={userData.profileImageURI} name={userData.nickname} />
 				<Box marginTop="10%" display="flex" flexDirection="column" alignItems="center">
-					<Typography variant="h5">{name}</Typography>
+					<Typography variant="h5">{userData.nickname}</Typography>
 					<Typography style={{ opacity: 0.5 }} variant="h6">
-						{state}
+						{userData.status}
 					</Typography>
 				</Box>
-				<BottomProfile otherUserId={otherUserId} isFriend={isFriend} />
+				{!isBlock && (
+					<BottomProfile
+						otherUserId={userData.id}
+						setIsFriend={setIsFriend}
+						isFriend={isFriend}
+						refetch={refetch}
+					/>
+				)}
+				{isBlock && (
+					<Typography variant="h5" marginTop={2} textAlign={'center'}>
+						차단된 유저입니다.
+					</Typography>
+				)}
 			</Container>
 		</div>
 	);
