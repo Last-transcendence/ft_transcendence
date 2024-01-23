@@ -8,15 +8,16 @@ import {
 	WebSocketServer,
 } from '@nestjs/websockets';
 import BanService from 'api/ban/ban.service';
+import MuteService from 'api/mute/mute.service';
 import ParticipantService from 'api/participant/participant.service';
+import UserService from 'api/user/user.service';
 import { plainToClass } from 'class-transformer';
 import { validate } from 'class-validator';
 import { Namespace, Socket } from 'socket.io';
-import * as Dto from './dto';
 import * as Auth from '../../common/auth';
 import * as ParticipantDto from '../participant/dto';
 import ChannelService from './channel.service';
-import UserService from 'api/user/user.service';
+import * as Dto from './dto';
 
 const getCorsOrigin = () => {
 	const configService = new ConfigService();
@@ -35,6 +36,7 @@ class ChannelGateway {
 		private readonly participantService: ParticipantService,
 		@Inject(forwardRef(() => BanService)) private readonly banService: BanService,
 		private readonly userService: UserService,
+		private readonly muteService: MuteService,
 	) {}
 
 	@WebSocketServer()
@@ -75,7 +77,6 @@ class ChannelGateway {
 	@UseGuards(Auth.Guard.UserWsJwt)
 	async handleJoin(@MessageBody() joinData, @ConnectedSocket() socket) {
 		try {
-			console.log(joinData.channelId);
 			const userId = socket.user.id;
 
 			await this.channelService.leaveChannel(userId);
@@ -216,6 +217,69 @@ class ChannelGateway {
 			return { status: 'SUCCESS' };
 		} catch (error) {
 			return { status: 'ERROR', message: error };
+		}
+	}
+
+	@SubscribeMessage('mute')
+	@UseGuards(Auth.Guard.UserWsJwt)
+	async handleMute(@ConnectedSocket() socket, @MessageBody() data) {
+		try {
+			if ((await this.participantService.isAdmin(socket.user.id)) === false) {
+				throw new Error('Permission denied');
+			}
+			await this.muteService.muteUser(data.channelId, data.toUserId);
+
+			this.server.to(data.channelId).emit('mute', {
+				channelId: data.channelId,
+				userId: data.toUserId,
+				nickname: data.nickname,
+			});
+			return { res: true };
+		} catch (error) {
+			return { res: false, message: error };
+		}
+	}
+
+	@SubscribeMessage('kick')
+	@UseGuards(Auth.Guard.UserWsJwt)
+	async handleKick(@ConnectedSocket() socket, @MessageBody() data) {
+		try {
+			if ((await this.participantService.isAdmin(socket.user.id)) === false) {
+				throw new Error('Permission denied');
+			}
+			await this.participantService.kick(socket.user.id);
+
+			socket.leave(data.channelId);
+			this.server.to(data.channelId).emit('kick', {
+				channelId: data.channelId,
+				userId: data.toUserId,
+				nickname: data.nickname,
+			});
+			return { res: true };
+		} catch (error) {
+			return { res: false, message: error };
+		}
+	}
+
+	@SubscribeMessage('ban')
+	@UseGuards(Auth.Guard.UserWsJwt)
+	async handleBan(@ConnectedSocket() socket, @MessageBody() data) {
+		try {
+			if ((await this.participantService.isAdmin(socket.user.id)) === false) {
+				throw new Error('Permission denied');
+			}
+			await this.participantService.kick(socket.user.id);
+			await this.banService.create(data.channelId, socket.user.id);
+
+			socket.leave(data.channelId);
+			this.server.to(data.channelId).emit('ban', {
+				channelId: data.channelId,
+				userId: data.toUserId,
+				nickname: data.nickname,
+			});
+			return { res: true };
+		} catch (error) {
+			return { res: false, message: error };
 		}
 	}
 }
