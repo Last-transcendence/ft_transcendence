@@ -5,6 +5,7 @@ import MuteService from 'api/mute/mute.service';
 import { plainToClass } from 'class-transformer';
 import { validate } from 'class-validator';
 import PrismaService from 'common/prisma/prisma.service';
+import { Socket } from 'socket.io';
 import * as Dto from './dto';
 
 @Injectable()
@@ -108,17 +109,19 @@ class ChannelService {
 		}
 	}
 
-	async leaveChannel(userId: string) {
+	async leaveChannel(socket: Socket, userId: string) {
 		try {
 			const participant = await this.prismaService.participant.findUnique({
-				where: { id: userId },
+				where: { userId: userId },
 			});
+
 			if (!participant) {
 				return;
 			}
 
+			socket.leave(participant.channelId);
 			return await this.prismaService.participant.delete({
-				where: { id: userId },
+				where: { id: participant.id },
 			});
 		} catch (error) {
 			throw new Error(error.message);
