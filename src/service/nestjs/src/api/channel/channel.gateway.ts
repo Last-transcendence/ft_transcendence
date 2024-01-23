@@ -8,10 +8,16 @@ import {
 	WebSocketServer,
 } from '@nestjs/websockets';
 import BanService from 'api/ban/ban.service';
+import MuteService from 'api/mute/mute.service';
 import ParticipantService from 'api/participant/participant.service';
+import UserService from 'api/user/user.service';
+import { plainToClass } from 'class-transformer';
+import { validate } from 'class-validator';
 import { Namespace, Socket } from 'socket.io';
 import * as Auth from '../../common/auth';
+import * as ParticipantDto from '../participant/dto';
 import ChannelService from './channel.service';
+import * as Dto from './dto';
 
 const getCorsOrigin = () => {
 	const configService = new ConfigService();
@@ -29,6 +35,8 @@ class ChannelGateway {
 		@Inject(forwardRef(() => ParticipantService))
 		private readonly participantService: ParticipantService,
 		@Inject(forwardRef(() => BanService)) private readonly banService: BanService,
+		private readonly userService: UserService,
+		private readonly muteService: MuteService,
 	) {}
 
 	@WebSocketServer()
@@ -47,11 +55,16 @@ class ChannelGateway {
 				await this.channelService.leaveChannel(participatedChannel.id);
 			}
 			const newChannel = await this.channelService.createChannel(data);
-			const newParticipant = await this.participantService.create(newChannel.id, socket.user.id);
+			const newParticipant = await this.participantService.create({
+				channelId: newChannel.id,
+				userId: socket.user.id,
+				socketId: socket.id,
+			});
 
 			await this.participantService.update(newParticipant.id, { role: 'OWNER' });
 
 			socket.join(newChannel.id);
+
 			return { res: true, channelId: newChannel.id };
 		} catch (error) {
 			console.error("An error occurred channel.gateway 'create':", error);
@@ -64,7 +77,6 @@ class ChannelGateway {
 	@UseGuards(Auth.Guard.UserWsJwt)
 	async handleJoin(@MessageBody() joinData, @ConnectedSocket() socket) {
 		try {
-			console.log(joinData.channelId);
 			const userId = socket.user.id;
 
 			await this.channelService.leaveChannel(userId);
@@ -83,12 +95,22 @@ class ChannelGateway {
 				throw new BadRequestException('Wrong password');
 			}
 
+			await this.participantService.create({
+				channelId: joinData.channelId,
+				userId: socket.user.id,
+				socketId: socket.id,
+			});
 			socket.join(joinData.channelId);
+			this.server.to(joinData.channelId).emit('message', {
+				userId: socket.user.id,
+				nickname: socket.user.nickname,
+				profileImageURI: socket.user.profileImageURI,
+			});
 			return { res: true };
 		} catch (error) {
 			console.error("An error occurred channel.gateway 'join':", error);
 			socket.emit('error', { message: 'An error occurred' });
-			return { res: false };
+			return { res: false, message: error };
 		}
 	}
 
@@ -112,6 +134,7 @@ class ChannelGateway {
 	}
 
 	@SubscribeMessage('message')
+	@UseGuards(Auth.Guard.UserWsJwt)
 	async handleMessage(@MessageBody() data, @ConnectedSocket() socket) {
 		try {
 			const filteredMessage = this.channelService.messageFilter(
@@ -120,8 +143,6 @@ class ChannelGateway {
 				data.message,
 			);
 			this.server.to(data.channelId).emit('message', {
-				channelId: data.channelId,
-				userId: socket.user.id,
 				message: filteredMessage,
 			});
 			return { res: true };
@@ -129,6 +150,136 @@ class ChannelGateway {
 			console.error("An error occurred in channel.gateway 'message':", error);
 			socket.emit('error', { message: "An error occurred in channel.gateway 'message'" });
 			return { res: false };
+		}
+	}
+
+	@SubscribeMessage('leave')
+	@UseGuards(Auth.Guard.UserWsJwt)
+	async handleLeave(@MessageBody() data, @ConnectedSocket() socket) {
+		try {
+			if ((await this.participantService.isParticipated(socket.user.id)) === false) {
+				throw new Error('User is not a participant');
+			}
+
+			const participant = await this.participantService.get(socket.user.id);
+
+			socket.to(participant.channelId).emit('leave', {
+				message: `${socket.user.id} has left the channel`,
+				profileImageURI: participant.userProfileImageURI,
+			});
+			socket.leave(participant.channelId);
+			this.channelService.leaveChannel(socket.user.id);
+
+			return { res: true };
+		} catch (error) {
+			console.error("An error occurred in channel.gateway 'leave':", error);
+			socket.emit('error', { message: "An error occurred in channel.gateway 'leave'" });
+		}
+	}
+
+	@SubscribeMessage('role')
+	@UseGuards(Auth.Guard.UserWsJwt)
+	async handleRole(@MessageBody() data, @ConnectedSocket() socket) {
+		try {
+			if ((await this.participantService.isOwner(socket.user.id)) === false) {
+				throw new Error('Permission denied');
+			}
+
+			const newRole = plainToClass(ParticipantDto.Request.Update, data.role);
+			const error = await validate(newRole);
+
+			if (error.length > 0) {
+				throw new Error('Failed validation: ' + JSON.stringify(error));
+			}
+			this.participantService.update(data.toUserId, newRole);
+
+			return { res: true };
+		} catch (error) {
+			return { res: false, message: error };
+		}
+	}
+
+	@SubscribeMessage('invite')
+	@UseGuards(Auth.Guard.UserWsJwt)
+	async handleInvite(
+		@ConnectedSocket() socket: Socket,
+		@MessageBody() inviteRequestDto: Dto.Request.Invite,
+	) {
+		try {
+			if (!(await this.participantService.isParticipated(socket['user']['id']))) {
+				throw new BadRequestException('User is not a participated');
+			}
+
+			const opponent = await this.userService.findByNickname(inviteRequestDto.nickname);
+			if (!opponent || !(await this.participantService.isParticipated(opponent.id))) {
+				throw new BadRequestException('Opponent not found');
+			}
+			return { status: 'SUCCESS' };
+		} catch (error) {
+			return { status: 'ERROR', message: error };
+		}
+	}
+
+	@SubscribeMessage('mute')
+	@UseGuards(Auth.Guard.UserWsJwt)
+	async handleMute(@ConnectedSocket() socket, @MessageBody() data) {
+		try {
+			if ((await this.participantService.isAdmin(socket.user.id)) === false) {
+				throw new Error('Permission denied');
+			}
+			await this.muteService.muteUser(data.channelId, data.toUserId);
+
+			this.server.to(data.channelId).emit('mute', {
+				channelId: data.channelId,
+				userId: data.toUserId,
+				nickname: data.nickname,
+			});
+			return { res: true };
+		} catch (error) {
+			return { res: false, message: error };
+		}
+	}
+
+	@SubscribeMessage('kick')
+	@UseGuards(Auth.Guard.UserWsJwt)
+	async handleKick(@ConnectedSocket() socket, @MessageBody() data) {
+		try {
+			if ((await this.participantService.isAdmin(socket.user.id)) === false) {
+				throw new Error('Permission denied');
+			}
+			await this.participantService.kick(socket.user.id);
+
+			socket.leave(data.channelId);
+			this.server.to(data.channelId).emit('kick', {
+				channelId: data.channelId,
+				userId: data.toUserId,
+				nickname: data.nickname,
+			});
+			return { res: true };
+		} catch (error) {
+			return { res: false, message: error };
+		}
+	}
+
+	@SubscribeMessage('ban')
+	@UseGuards(Auth.Guard.UserWsJwt)
+	async handleBan(@ConnectedSocket() socket, @MessageBody() data) {
+		try {
+			if ((await this.participantService.isAdmin(socket.user.id)) === false) {
+				throw new Error('Permission denied');
+			}
+			await this.participantService.kick(socket.user.id);
+			await this.banService.create(data.channelId, socket.user.id);
+
+			socket.leave(data.channelId);
+			this.server.to(data.channelId).emit('ban', {
+				channelId: data.channelId,
+				userId: data.toUserId,
+				nickname: data.nickname,
+			});
+			return { res: true };
+		} catch (error) {
+			return { res: false, message: error };
 		}
 	}
 }

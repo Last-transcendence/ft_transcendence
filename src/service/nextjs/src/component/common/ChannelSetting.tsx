@@ -5,20 +5,22 @@ import CreateChatVisibility from '@/component/chat/create/visibility';
 import CreateChatTitle from '@/component/chat/create/title';
 import CreateChatPassword from '@/component/chat/create/password';
 import { BottomButton } from '@/component/common/ButtomButton';
-import { Channel, ChannelVisibility } from '@/type/channel.type';
+import { ChannelVisibility } from '@/type/channel.type';
 import { Dispatch, SetStateAction, useCallback, useContext, useState } from 'react';
 import PositionableSnackbar from '@/component/common/PositionableSnackbar';
 import SocketContext from '@/context/socket.context';
 import { useRouter } from 'next/navigation';
 import useListeningChannelEvent from '@/hook/useListeningChannelEvent';
+import { ChannelInfo } from '@/type/channel-info.type';
 
 interface ChannelSettingProps {
 	isCreate: boolean;
 	setOpen?: Dispatch<SetStateAction<boolean>>;
-	channelData?: Channel;
+	channelData?: ChannelInfo;
+	channelId?: string;
 }
 
-const ChannelSetting = ({ isCreate, setOpen, channelData }: ChannelSettingProps) => {
+const ChannelSetting = ({ isCreate, setOpen, channelData, channelId }: ChannelSettingProps) => {
 	const router = useRouter();
 	const { sockets } = useContext(SocketContext);
 	const { channelSocket } = sockets;
@@ -32,12 +34,6 @@ const ChannelSetting = ({ isCreate, setOpen, channelData }: ChannelSettingProps)
 	const [message, setMessage] = useState({
 		title: '',
 		success: true,
-	});
-
-	//채널 create 시 채널 정보 리슨.
-	useListeningChannelEvent('create', res => {
-		console.log('res', res);
-		res.channelId && router.push(`/chat/${res.channelId}`);
 	});
 
 	const handleSubmit = useCallback(() => {
@@ -64,14 +60,14 @@ const ChannelSetting = ({ isCreate, setOpen, channelData }: ChannelSettingProps)
 				success: false,
 			});
 		}
-		if (title.length > 8) {
+		if (title.length > 10) {
 			setMessage({
-				title: '채널명은 8자 이내로 입력해주세요.',
+				title: '채널명은 10byte 이내로 입력해주세요.',
 				success: false,
 			});
 		}
 
-		if (message.title.length) {
+		if (message.title.length > 1) {
 			return setShowSnackbar(true);
 		}
 
@@ -85,12 +81,12 @@ const ChannelSetting = ({ isCreate, setOpen, channelData }: ChannelSettingProps)
 		if (isCreate) {
 			channelSocket?.emit('create', req, (res: any) => {
 				console.log(res);
-				res.channelId && router.push(`/chat/${res.channelId}`);
+				res.channelId && router.push(`/chat/${res.channelId}/common`);
 			});
 			//navigate
 		} else {
-			channelSocket?.emit('edit', { ...req, channelId: channelData?.id }, (res: any) => {
-				if (res) {
+			channelSocket?.emit('edit', { ...req, channelId: channelId }, (res: any) => {
+				if (res?.res) {
 					setMessage({
 						title: label + ' 성공',
 						success: true,
@@ -105,7 +101,7 @@ const ChannelSetting = ({ isCreate, setOpen, channelData }: ChannelSettingProps)
 			});
 		}
 	}, [
-		channelData?.id,
+		channelId,
 		channelSocket,
 		isCreate,
 		label,

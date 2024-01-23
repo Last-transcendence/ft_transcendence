@@ -36,6 +36,40 @@ class ParticipantService {
 		}
 	}
 
+	async isOwner(userId: string): Promise<boolean> {
+		try {
+			const participant = await this.prismaService.participant.findUnique({
+				where: { userId },
+			});
+
+			if (!participant) {
+				throw new Error('User is not participant');
+			} else if (participant.role !== 'OWNER') {
+				throw new Error('User is not the owner');
+			}
+			return true;
+		} catch (error) {
+			throw new Error(error.message);
+		}
+	}
+
+	async isAdmin(userId: string): Promise<boolean> {
+		try {
+			const participant = await this.prismaService.participant.findFirst({
+				where: { userId },
+			});
+
+			if (!participant) {
+				throw new Error('User is not participant');
+			} else if (participant.role !== 'ADMIN') {
+				throw new Error('User is not an admin');
+			}
+			return true;
+		} catch (error) {
+			throw new Error(error.message);
+		}
+	}
+
 	async get(userId: string): Promise<Dto.Response.Participant> {
 		try {
 			return await this.prismaService.participant.findUnique({
@@ -56,20 +90,17 @@ class ParticipantService {
 		}
 	}
 
-	async create(channelId: string, userId: string): Promise<Dto.Response.Participant> {
+	async create(createRequsetDto: Dto.Request.Create): Promise<Dto.Response.Participant> {
 		try {
 			const channel = await this.prismaService.channel.findUnique({
-				where: { id: channelId },
+				where: { id: createRequsetDto.channelId },
 			});
 			if (!channel) {
 				throw new NotFoundException('Channel is not found');
 			}
 
 			return await this.prismaService.participant.create({
-				data: {
-					channelId,
-					userId,
-				},
+				data: createRequsetDto,
 			});
 		} catch (error) {
 			throw new Error(error.message);

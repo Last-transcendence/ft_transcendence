@@ -17,7 +17,7 @@ const CreateChatPassword = ({ password, setPassword }: CreateChatPasswordProps) 
 				placeholder="비밀번호를 입력하세요. (6자리 숫자)"
 				value={password}
 				onChange={event => {
-					if (event.target.value.length === 6) return;
+					if (event.target.value.length > 6) return;
 					setPassword(event.target.value.replace(/[^0-9]/g, ''));
 				}}
 			/>

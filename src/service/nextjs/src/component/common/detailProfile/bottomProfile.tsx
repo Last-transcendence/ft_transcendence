@@ -2,12 +2,13 @@ import { Box } from '@mui/material';
 import BottomAvatarsGrid from '@/component/common/detailProfile/bottomAvatars';
 import { avatarStyle } from '../../profile/common/newAvatar';
 import { imgStyle } from '../../profile/common/myImage';
-import { useState, Dispatch, SetStateAction } from 'react';
+import { useState, Dispatch, SetStateAction, useContext } from 'react';
 import { postFetcher, getFetcher, deleteFetcher } from '@/service/api';
 import Chatroom from '@/type/chatroom.type';
 import { useRouter } from 'next/navigation';
 import CustomSnackbar from '../customSnackbar';
 import Loading from '../Loading';
+import SocketContext from '@/context/socket.context';
 
 const sxStyle: avatarStyle = {
 	backgroundColor: '#DDDD99',
@@ -25,6 +26,7 @@ const BottomProfile = ({ otherUserId, isFriend, setIsFriend, refetch }: BottomPr
 	const router = useRouter();
 	const [loading, setLoading] = useState<boolean>(false);
 	const [errorMessage, setErrorMessage] = useState<string>('');
+	const { chatSocket } = useContext(SocketContext).sockets;
 
 	
 	const friendAdd = async (): Promise<void> => {
@@ -72,17 +74,17 @@ const BottomProfile = ({ otherUserId, isFriend, setIsFriend, refetch }: BottomPr
 
 	const dmRequest = async (): Promise<void> => {
 		try {
-			setLoading(true);
-			const data = await getFetcher<Chatroom[]>('/chatroom');
-			const chatroom: Chatroom | undefined = findUserFromDm(otherUserId, data);
-			if (chatroom === undefined) {
-				const id = await makeNewChatroom(otherUserId);
-				console.log(id);
-				// router.push(`/chat/${id}`);
-			} else {
-				console.log(chatroom.destId);
-				// router.push(`/chat/${chatroom.destId}`);
-			}
+      setLoading(true);
+			// const data: Chatroom[] = await getFetcher<Chatroom[]>('/chatroom');
+			// const chatroom: Chatroom | undefined = findUserFromDm(otherUserId, data);
+      // if (chatroom === undefined) {
+			//	const id = await makeNewChatroom(otherUserId);
+      // }
+			//@todo dm 접속에 실패할 경우 처리 필요
+			chatSocket?.emit('join', { toUserId: otherUserId }, (res: any) => {
+				console.log('res', res);
+			});
+			router.push(`/chat/${otherUserId}/private`);
 		} catch (error: any) {
 			setErrorMessage(error.message);
 		} finally {

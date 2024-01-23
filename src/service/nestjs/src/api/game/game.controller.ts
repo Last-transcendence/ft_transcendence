@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { ApiBadRequestResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { GameModel } from 'common/model';
+import { GameHistoryModel, GameModel } from 'common/model';
 import GameService from './game.service';
 import * as Auth from '../../common/auth';
 import * as Dto from './dto';
@@ -18,7 +18,7 @@ class GameController {
 		type: GameModel,
 	})
 	@ApiBadRequestResponse({ description: 'Failed to get game history' })
-	async getHistory(@Req() req): Promise<GameModel[]> {
+	async getHistory(@Req() req): Promise<GameHistoryModel[]> {
 		return this.gameService.getHistory(req.user.id);
 	}
 
@@ -31,8 +31,8 @@ class GameController {
 	@ApiBadRequestResponse({ description: 'Failed to add game history' })
 	async createHistory(
 		@Req() req,
-		@Body() createRequestDto: Dto.Request.Create,
-	): Promise<GameModel> {
+		@Body() createRequestDto: Dto.Request.CreateHistory,
+	): Promise<GameHistoryModel> {
 		return this.gameService.createHistory(req.user.id, createRequestDto);
 	}
 }

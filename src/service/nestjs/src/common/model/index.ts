@@ -5,6 +5,7 @@ import ChatModel from './chat.model';
 import ChatRoomModel from './chatroom.model';
 import FriendModel from './friend.model';
 import GameModel from './game.model';
+import GameHistoryModel from './game-history.model';
 import MuteModel from './mute.model';
 import UserModel from './user.model';
 
@@ -16,6 +17,7 @@ export {
 	ChatRoomModel,
 	FriendModel,
 	GameModel,
+	GameHistoryModel,
 	MuteModel,
 	UserModel,
 };

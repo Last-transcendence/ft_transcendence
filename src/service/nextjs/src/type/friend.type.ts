@@ -4,11 +4,9 @@ type Friend = {
 	id: string;
 	userId: string;
 	friendId: string;
-	user: {
-		nickname: string;
-		profileImageURI: string | null;
-		status: UserStatus;
-	};
+	nickname: string;
+	profileImageURI: string | null;
+	status: UserStatus;
 };
 
 export default Friend;

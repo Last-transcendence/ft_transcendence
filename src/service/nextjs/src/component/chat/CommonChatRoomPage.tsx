@@ -1,24 +1,25 @@
-import ParticipantList, { PrivateParticipantList } from '@/component/chat/ParticipantList';
+import ParticipantList from '@/component/chat/ParticipantList';
 import { MenuHeader } from '@/component/common/Header';
 import { useParams } from 'next/navigation';
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { Participant, ParticipantRole } from '@/type/channel.type';
 import AuthContext from '@/context/auth.context';
-import useFetchData from '@/hook/useFetchData';
-import Chatroom from '@/type/chatroom.type';
 import ChatRoomLayout from '@/component/chat/ChatRoomLayout';
 import SocketContext from '@/context/socket.context';
 import useListeningChannelEvent from '@/hook/useListeningChannelEvent';
 import { ChannelInfo } from '@/type/channel-info.type';
+import { useRouter } from 'next/router';
 
 export type ChatLiveDataType = {
 	type: 'chat' | 'action' | 'help';
 	id?: string;
 	message?: string;
+	me?: boolean;
 };
 
 const CommonChatRoomPage = () => {
 	const params = useParams<{ id: string }>();
+	const router = useRouter();
 	const { me } = useContext(AuthContext);
 	const { sockets } = useContext(SocketContext);
 	const { channelSocket } = sockets;
@@ -32,7 +33,25 @@ const CommonChatRoomPage = () => {
 			console.log(res);
 			setChannelData(res);
 		});
-	}, [channelSocket, params?.id]);
+	}, [params?.id]);
+
+	// @todo participant 처리되면 주석 해제
+	useEffect(() => {
+		if (!channelData || !me) return;
+		// if (channelData.participant?.some((data: Participant) => data.userId === me?.id)) {
+		// 	setChatLiveData(prev => [
+		// 		...prev,
+		// 		{ type: 'action', message: `${channelData?.title} 채널에 입장하셨습니다.` },
+		// ]);
+		// } else {
+		// 	router.push('/');
+		// }
+
+		setChatLiveData(prev => [
+			...prev,
+			{ type: 'action', message: `${channelData?.title} 채널에 입장하셨습니다.` },
+		]);
+	}, [channelData, me]);
 
 	const setActionMessage = useCallback((message: string) => {
 		setChatLiveData(prev => [...prev, { type: 'action', message }]);
@@ -99,6 +118,7 @@ const CommonChatRoomPage = () => {
 
 	return (
 		<ChatRoomLayout
+			type={'channel'}
 			ownerId={ownerId}
 			data={channelData}
 			chatLiveData={chatLiveData}
@@ -107,12 +127,9 @@ const CommonChatRoomPage = () => {
 			<MenuHeader title={channelData?.title ?? ''} type={'chat'}>
 				<ParticipantList
 					channelId={params?.id}
-					participantData={channelData?.participant}
-					// myRole={myRole}
-					myRole={ParticipantRole.ADMIN}
-					isProtected={channelData?.visibility === 'PROTECTED'}
+					myRole={myRole}
 					ownerId={ownerId}
-					muteList={channelData?.mute ?? []}
+					channelData={channelData}
 				/>
 			</MenuHeader>
 		</ChatRoomLayout>

@@ -27,9 +27,6 @@ class Result extends Phaser.Scene {
 		this.navigate = navigate;
 		this.me = me;
 		this.opponent = opponent;
-
-		console.log('Result: me', this.me);
-		console.log('Result: opponent', this.opponent);
 	}
 
 	initSocket() {}

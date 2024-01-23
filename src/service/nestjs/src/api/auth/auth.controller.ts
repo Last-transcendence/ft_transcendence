@@ -11,7 +11,6 @@ import {
 	Delete,
 	UploadedFile,
 	UseInterceptors,
-	UnauthorizedException,
 	BadRequestException,
 } from '@nestjs/common';
 import {
@@ -48,7 +47,7 @@ export class AuthController {
 		private readonly twoFactorService: TwoFactorService,
 		private readonly mailService: MailService,
 		private readonly userService: UserService,
-        @Inject(CACHE_MANAGER) private cacheManager: Cache
+		@Inject(CACHE_MANAGER) private cacheManager: Cache,
 	) {}
 
 	@Get('ft')
@@ -98,9 +97,7 @@ export class AuthController {
 			res.redirect(`${this.configService.getOrThrow('NEXTJS_URL')}/auth/login/callback`);
 		} catch (error) {
 			res.redirect(
-				`${this.configService.getOrThrow('NEXTJS_URL')}/auth/register?nickname=${
-					req.user.intraId
-				}`,
+				`${this.configService.getOrThrow('NEXTJS_URL')}/auth/register?nickname=${req.user.intraId}`,
 			);
 		}
 	}
@@ -112,7 +109,7 @@ export class AuthController {
 	@ApiConsumes('multipart/form-data')
 	@UseInterceptors(FileInterceptor('file'))
 	async register(
-		@Body() registerRequestDto: Dto.Request.Register, 
+		@Body() registerRequestDto: Dto.Request.Register,
 		@Req() req,
 		@UploadedFile() file: Express.Multer.File,
 	): Promise<User> {
@@ -131,12 +128,12 @@ export class AuthController {
 	async send2faEmail(@Req() req) {
 		try {
 			const code = await this.twoFactorService.createCode();
-			const user = await this.authService.login(req.user.intraId)
+			const user = await this.authService.login(req.user.intraId);
 			if (!user || !user.use2fa || !user.email2fa) {
-				throw new BadRequestException("Bad request")
+				throw new BadRequestException('Bad request');
 			}
 			this.cacheManager.set(user.email2fa, code);
-			this.mailService.send(user.email2fa, user.nickname, code)
+			this.mailService.send(user.email2fa, user.nickname, code);
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
 		}
