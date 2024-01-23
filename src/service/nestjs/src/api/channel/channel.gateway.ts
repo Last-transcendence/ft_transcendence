@@ -53,7 +53,11 @@ class ChannelGateway {
 				await this.channelService.leaveChannel(participatedChannel.id);
 			}
 			const newChannel = await this.channelService.createChannel(data);
-			const newParticipant = await this.participantService.create(newChannel.id, socket.user.id);
+			const newParticipant = await this.participantService.create({
+				channelId: newChannel.id,
+				userId: socket.user.id,
+				socketId: socket.id,
+			});
 
 			await this.participantService.update(newParticipant.id, { role: 'OWNER' });
 
@@ -90,7 +94,11 @@ class ChannelGateway {
 				throw new BadRequestException('Wrong password');
 			}
 
-			await this.participantService.create(joinData.channelId, socket.user.id);
+			await this.participantService.create({
+				channelId: joinData.channelId,
+				userId: socket.user.id,
+				socketId: socket.id,
+			});
 			socket.join(joinData.channelId);
 			this.server.to(joinData.channelId).emit('message', {
 				userId: socket.user.id,

@@ -168,6 +168,7 @@ model Participant {
     id        String          @id @default(uuid()) @db.Uuid
     channelId String          @unique @db.Uuid
     userId    String          @unique @db.Uuid
+    socketId  String          @unique
     role      ParticipantRole @default(USER)
 
     // Timestamps

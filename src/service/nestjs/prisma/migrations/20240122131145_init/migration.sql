@@ -96,6 +96,7 @@ CREATE TABLE "Participant" (
     "id" UUID NOT NULL,
     "channelId" UUID NOT NULL,
     "userId" UUID NOT NULL,
+    "socketId" TEXT NOT NULL,
     "role" "ParticipantRole" NOT NULL DEFAULT 'USER',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -182,6 +183,9 @@ CREATE UNIQUE INDEX "Participant_channelId_key" ON "Participant"("channelId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Participant_userId_key" ON "Participant"("userId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Participant_socketId_key" ON "Participant"("socketId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Ban_channelId_userId_key" ON "Ban"("channelId", "userId");

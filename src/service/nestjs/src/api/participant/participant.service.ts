@@ -73,20 +73,17 @@ class ParticipantService {
 		}
 	}
 
-	async create(channelId: string, userId: string): Promise<Dto.Response.Participant> {
+	async create(createRequsetDto: Dto.Request.Create): Promise<Dto.Response.Participant> {
 		try {
 			const channel = await this.prismaService.channel.findUnique({
-				where: { id: channelId },
+				where: { id: createRequsetDto.channelId },
 			});
 			if (!channel) {
 				throw new NotFoundException('Channel is not found');
 			}
 
 			return await this.prismaService.participant.create({
-				data: {
-					channelId,
-					userId,
-				},
+				data: createRequsetDto,
 			});
 		} catch (error) {
 			throw new Error(error.message);

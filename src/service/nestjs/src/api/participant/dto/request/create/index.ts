@@ -1,19 +1,25 @@
 import { Trim } from '@miaooo/class-transformer-trim';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsUUID } from 'class-validator';
-import { IsValidPassword } from 'api/channel/decorator/is-valid-password.decorator';
+import { IsNotEmpty, IsString, IsUUID } from 'class-validator';
 
 class Create {
+	@IsNotEmpty()
 	@IsUUID()
 	@Trim()
 	@ApiProperty({ description: 'Channel id' })
 	channelId: string;
 
-	@IsString()
-	@IsValidPassword()
+	@IsNotEmpty()
+	@IsUUID()
 	@Trim()
-	@ApiProperty({ description: 'Channel password' })
-	password: string;
+	@ApiProperty({ description: 'User id' })
+	userId: string;
+
+	@IsNotEmpty()
+	@IsString()
+	@Trim()
+	@ApiProperty({ description: 'Socket id' })
+	socketId: string;
 }
 
 export default Create;

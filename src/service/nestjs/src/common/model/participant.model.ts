@@ -12,6 +12,9 @@ class ParticipantModel implements Participant {
 	@ApiProperty({ description: 'User id' })
 	userId: string;
 
+	@ApiProperty({ description: 'Socket id' })
+	socketId: string;
+
 	@ApiProperty({ description: 'Participant role' })
 	role: $Enums.ParticipantRole;
 
