@@ -53,6 +53,23 @@ class ParticipantService {
 		}
 	}
 
+	async isAdmin(userId: string): Promise<boolean> {
+		try {
+			const participant = await this.prismaService.participant.findUnique({
+				where: { userId },
+			});
+
+			if (!participant) {
+				throw new Error('User is not participant');
+			} else if (participant.role !== 'ADMIN') {
+				throw new Error('User is not an admin');
+			}
+			return true;
+		} catch (error) {
+			throw new Error(error.message);
+		}
+	}
+
 	async get(userId: string): Promise<Dto.Response.Participant> {
 		try {
 			return await this.prismaService.participant.findUnique({
