@@ -99,7 +99,7 @@ class ChannelGateway {
 				socketId: socket.id,
 			});
 			socket.join(joinData.channelId);
-			this.server.to(joinData.channelId).emit('message', {
+			this.server.to(joinData.channelId).emit('join', {
 				userId: socket.user.id,
 				nickname: socket.user.nickname,
 				profileImageURI: socket.user.profileImageURI,
