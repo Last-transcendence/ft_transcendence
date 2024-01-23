@@ -6,6 +6,8 @@ import CustomImage from '@/component/common/CustomImage';
 export interface avatarStyle {
 	backgroundColor?: string;
 	isHover?: boolean;
+	width?: number;
+	height?: number;
 }
 
 export interface newAvatarProps extends myImageProps {
@@ -43,15 +45,9 @@ const NewAvatar = ({ sxStyle, onClick, ...userImageData }: newAvatarProps) => {
 				onClick={onClick}
 			>
 				{list.includes(userImageData.image as string) ? (
-					<CustomImage
-						img={userImageData.image as string}
-						alt={userImageData.name as string}
-					/>
+					<CustomImage img={userImageData.image as string} alt={userImageData.name as string} />
 				) : (
-					<MyImage
-						image={userImageData.image || ''}
-						name={userImageData.name}
-					/>
+					<MyImage image={userImageData.image || ''} name={userImageData.name} />
 				)}
 			</Avatar>
 		</Box>

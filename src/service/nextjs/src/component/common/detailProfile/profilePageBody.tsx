@@ -11,7 +11,6 @@ const ar = {
 	message: undefined,
 };
 
-
 interface ProfilePageBodyProps {
 	userData: User;
 	isFriend: undefined | boolean;
@@ -27,8 +26,11 @@ const ProfilePageBody = ({
 	isBlock,
 	refetch,
 }: ProfilePageBodyProps) => {
-	return isFriend === undefined && isBlock === undefined && userData.profileImageURI === undefined ? (
-		<Loading /> ) : (
+	return isFriend === undefined &&
+		isBlock === undefined &&
+		userData.profileImageURI === undefined ? (
+		<Loading />
+	) : (
 		<div>
 			<Container maxWidth="xs">
 				<NewIcon {...ar} image={userData.profileImageURI} name={userData.nickname} />
@@ -38,7 +40,14 @@ const ProfilePageBody = ({
 						{userData.status}
 					</Typography>
 				</Box>
-				{!isBlock && <BottomProfile otherUserId={userData.id} setIsFriend={setIsFriend} isFriend={isFriend} refetch={refetch} />}
+				{!isBlock && (
+					<BottomProfile
+						otherUserId={userData.id}
+						setIsFriend={setIsFriend}
+						isFriend={isFriend}
+						refetch={refetch}
+					/>
+				)}
 				{isBlock && (
 					<Typography variant="h5" marginTop={2} textAlign={'center'}>
 						차단된 유저입니다.

@@ -1,4 +1,4 @@
-import styles from '@/style/profile/myProfile/index.module.css'
+import styles from '@/style/profile/myProfile/index.module.css';
 import { Container, Box } from '@mui/material';
 import FightRecords from './fightRecords';
 import MyProfileMenu from './myProfileMenu';

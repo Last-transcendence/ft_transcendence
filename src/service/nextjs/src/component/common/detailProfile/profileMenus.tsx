@@ -1,4 +1,3 @@
-
 import { KeyboardEvent, useState, useRef, SyntheticEvent } from 'react';
 import Button from '@mui/material/Button';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
@@ -46,11 +45,15 @@ const ProfileMenus = ({ otherUserId, isblock }: { otherUserId: string; isblock: 
 
 	const handleSnackbarClose = () => {
 		setErrorMessage('');
-	}
+	};
 
 	return (
 		<div>
-			<CustomSnackbar open={errorMessage === '' ? false : true} onClose={handleSnackbarClose} success={false} >
+			<CustomSnackbar
+				open={errorMessage === '' ? false : true}
+				onClose={handleSnackbarClose}
+				success={false}
+			>
 				{errorMessage}
 			</CustomSnackbar>
 			<Button ref={anchorRef} onClick={handleToggle}>

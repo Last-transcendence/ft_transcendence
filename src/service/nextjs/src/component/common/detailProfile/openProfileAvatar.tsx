@@ -8,7 +8,6 @@ import User, { UserStatus } from '@/type/user.type';
 import { useRouter } from 'next/navigation';
 import { getFetcher } from '@/service/api';
 import AuthContext from '@/context/auth.context';
-import Image from 'next/image';
 import { UNKNOWN_PROFILE_IMAGE_URI } from '@/common/constant';
 import Loading from '../Loading';
 import CustomSnackbar from '../customSnackbar';
@@ -33,7 +32,7 @@ const OpenProfileAvatar = ({ otherUserId, imgUrl, refetch }: OpenProfileAvatarPr
 		status: UserStatus.OFFLINE,
 	});
 	const [isBlockUser, setIsBlockUser] = useState<boolean | undefined>(undefined);
-	const [isFriend, setIsFriend] = useState<Boolean | undefined>(undefined);
+	const [isFriend, setIsFriend] = useState<boolean | undefined>(undefined);
 	const [errorMessage, setErrorMessage] = useState<string>('');
 	const [click, setClick] = useState<boolean>(false);
 
@@ -56,7 +55,7 @@ const OpenProfileAvatar = ({ otherUserId, imgUrl, refetch }: OpenProfileAvatarPr
 		if (click === true) {
 			fetchData();
 		}
-	}, [otherUserId, click, isBlockUser, otherUserData.isFriend]);
+	}, [otherUserId, click, isBlockUser]);
 
 	const handleAvatarOpen = () => {
 		if (isMe) {
@@ -85,18 +84,21 @@ const OpenProfileAvatar = ({ otherUserId, imgUrl, refetch }: OpenProfileAvatarPr
 				{imgUrl === '' ? (
 					<CustomImage img={UNKNOWN_PROFILE_IMAGE_URI} alt={'user img'} />
 				) : (
-					<CustomImage
-						useLoader
-						img={imgUrl as string}
-						alt="user img"
-					/>
+					<CustomImage useLoader img={imgUrl as string} alt="user img" />
 				)}
 			</Avatar>
 			{click && isBlockUser !== undefined && isFriend !== undefined && (
 				<ProfileModar
-						setClick={setClick}
-						childMenu={<ProfileMenus isblock={isBlockUser} otherUserId={otherUserId} />} >
-					<ProfilePageBody userData={otherUserData} isBlock={isBlockUser} refetch={refetch} isFriend={isFriend} setIsFriend={setIsFriend} />
+					setClick={setClick}
+					childMenu={<ProfileMenus isblock={isBlockUser} otherUserId={otherUserId} />}
+				>
+					<ProfilePageBody
+						userData={otherUserData}
+						isBlock={isBlockUser}
+						refetch={refetch}
+						isFriend={isFriend}
+						setIsFriend={setIsFriend}
+					/>
 				</ProfileModar>
 			)}
 		</>

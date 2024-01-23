@@ -27,16 +27,9 @@ const UserPhoto = ({ imgUrl, onClick, onChangePicture }: UserPhotoProps) => {
 		>
 			<BigAvatar>
 				{imgUrl === '' ? (
-					<CustomImage
-						img={UNKNOWN_PROFILE_IMAGE_URI}
-						alt={'user img'}
-					/>
+					<CustomImage img={UNKNOWN_PROFILE_IMAGE_URI} alt={'user img'} />
 				) : (
-					<CustomImage
-					img={imgUrl as string}
-					alt={'user img'}
-					useLoader
-					/>
+					<CustomImage img={imgUrl as string} alt={'user img'} useLoader />
 				)}
 			</BigAvatar>
 			<input

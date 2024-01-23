@@ -1,13 +1,11 @@
 import { Box } from '@mui/material';
 import BottomAvatarsGrid from '@/component/common/detailProfile/bottomAvatars';
 import { avatarStyle } from '../../profile/common/newAvatar';
-import { imgStyle } from '../../profile/common/myImage';
 import { useState, Dispatch, SetStateAction, useContext } from 'react';
 import { postFetcher, getFetcher, deleteFetcher } from '@/service/api';
 import Chatroom from '@/type/chatroom.type';
 import { useRouter } from 'next/navigation';
 import CustomSnackbar from '../customSnackbar';
-import Loading from '../Loading';
 import SocketContext from '@/context/socket.context';
 
 const sxStyle: avatarStyle = {
@@ -28,12 +26,11 @@ const BottomProfile = ({ otherUserId, isFriend, setIsFriend, refetch }: BottomPr
 	const [errorMessage, setErrorMessage] = useState<string>('');
 	const { chatSocket } = useContext(SocketContext).sockets;
 
-	
 	const friendAdd = async (): Promise<void> => {
 		try {
 			setLoading(true);
 			const response = await postFetcher('/friend', { friendId: otherUserId });
-			if(refetch !== undefined) refetch();
+			if (refetch !== undefined) refetch();
 			setIsFriend(true);
 		} catch (error: any) {
 			setErrorMessage(error.message);
@@ -46,7 +43,7 @@ const BottomProfile = ({ otherUserId, isFriend, setIsFriend, refetch }: BottomPr
 		try {
 			setLoading(true);
 			const response = await deleteFetcher(`/friend/${otherUserId}`);
-			if(refetch !== undefined) refetch();
+			if (refetch !== undefined) refetch();
 			setIsFriend(false);
 		} catch (error: any) {
 			setErrorMessage(error.message);
@@ -74,12 +71,12 @@ const BottomProfile = ({ otherUserId, isFriend, setIsFriend, refetch }: BottomPr
 
 	const dmRequest = async (): Promise<void> => {
 		try {
-      setLoading(true);
+			setLoading(true);
 			// const data: Chatroom[] = await getFetcher<Chatroom[]>('/chatroom');
 			// const chatroom: Chatroom | undefined = findUserFromDm(otherUserId, data);
-      // if (chatroom === undefined) {
+			// if (chatroom === undefined) {
 			//	const id = await makeNewChatroom(otherUserId);
-      // }
+			// }
 			//@todo dm 접속에 실패할 경우 처리 필요
 			chatSocket?.emit('join', { toUserId: otherUserId }, (res: any) => {
 				console.log('res', res);
@@ -123,9 +120,9 @@ const BottomProfile = ({ otherUserId, isFriend, setIsFriend, refetch }: BottomPr
 		setLoading(false);
 	};
 
-	return isFriend === undefined  ? (
+	return isFriend === undefined ? (
 		<div></div>
-		) : (
+	) : (
 		<Box marginTop="20%">
 			<CustomSnackbar
 				open={errorMessage.length !== 0 ? true : false}

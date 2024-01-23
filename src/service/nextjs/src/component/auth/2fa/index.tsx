@@ -64,7 +64,7 @@ const TwoFactorBody = () => {
 				throw new Error('인증 응답 시간이 초과되었습니다');
 			}
 			await postFetcher('/auth/2fa', { twoFaCode: password });
-			router.push('/');
+			router.push('/auth/login/callback');
 		} catch (error: any) {
 			setSnackErrorMessage(error.message);
 		} finally {

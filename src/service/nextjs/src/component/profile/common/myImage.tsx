@@ -6,15 +6,11 @@ export interface myImageProps {
 	image?: string;
 }
 
-const MyImage = ({ name, image }: myImageProps & avatarImgStyle) => {
+const MyImage = ({ name, image }: myImageProps) => {
 	return image === '' ? (
 		<CustomImage img={UNKNOWN_PROFILE_IMAGE_URI} alt={'user img'} />
 	) : (
-		<CustomImage
-			useLoader
-			img={image as string}
-			alt={name as string}
-		/>
+		<CustomImage useLoader img={image as string} alt={name as string} />
 	);
 };
 
