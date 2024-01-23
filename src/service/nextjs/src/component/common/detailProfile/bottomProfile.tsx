@@ -3,7 +3,7 @@ import BottomAvatarsGrid from '@/component/common/detailProfile/bottomAvatars';
 import { avatarStyle } from '../../profile/common/newAvatar';
 import { imgStyle } from '../../profile/common/myImage';
 import { useContext, useState } from 'react';
-import { postFetcher, getFetcher, deleteFetcher } from '@/service/api';
+import { postFetcher, deleteFetcher } from '@/service/api';
 import Chatroom from '@/type/chatroom.type';
 import { useRouter } from 'next/navigation';
 import CustomSnackbar from '../customSnackbar';
@@ -69,7 +69,7 @@ const BottomProfile = ({ otherUserId, isFriend }: BottomProfileProps) => {
 			// const data: Chatroom[] = await getFetcher('/chatroom');
 			// const chatroom: Chatroom | undefined = findUserFromDm(otherUserId, data);
 			//@todo dm 접속에 실패할 경우 처리 필요
-			chatSocket?.emit('join', { toUserId: otherUserId }, (res: any) => {
+			chatSocket?.emit('join', { destId: otherUserId }, (res: any) => {
 				console.log('res', res);
 			});
 			router.push(`/chat/${otherUserId}/private`);

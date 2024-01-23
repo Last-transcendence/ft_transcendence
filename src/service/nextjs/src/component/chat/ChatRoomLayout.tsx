@@ -50,7 +50,13 @@ const ChatRoomLayout = ({
 	//채널 메세지 수신 (한번만 등록)
 	useEffect(() => {
 		if (type === 'chatroom') return;
-		channelSocket?.on('message', res => {
+		if (!channelSocket) return;
+		console.log({ channelId: params?.id, password: '' });
+		channelSocket.emit('join', { channelId: params?.id, password: null }, (res: any) => {
+			console.log('join', res);
+		});
+		channelSocket.on('message', res => {
+			console.log('channel!!!', res);
 			if (params?.id === res.channelId)
 				setChatLiveData((prev: ChatLiveDataType[]) => [
 					...prev,
@@ -60,7 +66,38 @@ const ChatRoomLayout = ({
 		return () => {
 			channelSocket?.off('message');
 		};
-	}, []);
+	}, [channelSocket]);
+
+	//@todo 추후삭제
+	// useEffect(() => {
+	// 	chatSocket?.on('message', res => {
+	// 		console.log('res2222', res);
+	// 		setChatLiveData((prev: ChatLiveDataType[]) => [
+	// 			...prev,
+	// 			{ type: 'chat', id: res?.userId, message: res?.message },
+	// 		]);
+	// 	});
+	// 	return () => {
+	// 		chatSocket?.off('message');
+	// 	};
+	// }, [chatSocket]);
+	//
+	// useEffect(() => {
+	// 	console.log('chatSocket', chatSocket);
+	// 	if (type === 'channel') return console.log('channel return');
+	// 	if (!chatSocket) return console.log('chat socket return');
+	// 	console.log('setttttt');
+	// 	chatSocket.on('message', res => {
+	// 		console.log('res2222', res);
+	// 		setChatLiveData((prev: ChatLiveDataType[]) => [
+	// 			...prev,
+	// 			{ type: 'chat', id: res?.userId, message: res?.message },
+	// 		]);
+	// 	});
+	// 	return () => {
+	// 		chatSocket?.off('message');
+	// 	};
+	// }, [chatSocket, setChatLiveData, type]);
 
 	//DM 메세지 세팅
 	useEffect(() => {
@@ -72,21 +109,32 @@ const ChatRoomLayout = ({
 		]);
 	}, [currentDm]);
 
-	const sendAction = (message: string) => {
-		if (message === '' || !params?.id || !me?.id) return;
-		// send message
-		socket?.emit('message', { channelId: params?.id, userId: me?.id, message }, (res: any) => {
-			console.log(res);
-			console.log('message', message);
-			//성공 시 세팅
-			if (res?.res) {
-				setChatLiveData((prev: ChatLiveDataType[]) => [
-					...prev,
-					{ type: 'chat', id: me?.id, message: message, me: true },
-				]);
-			}
-		});
-	};
+	const sendAction = useCallback(
+		(message: string) => {
+			if (message === '' || !params?.id || !me?.id) return;
+			const req =
+				type === 'channel'
+					? {
+							channelId: params?.id,
+							userId: me?.id,
+							message: message,
+						}
+					: { destId: params?.id, message };
+
+			console.log('req', req);
+			// send message
+			(type === 'channel' ? channelSocket : chatSocket)?.emit('message', req, (res: any) => {
+				//성공 시 세팅
+				if (res?.res) {
+					setChatLiveData((prev: ChatLiveDataType[]) => [
+						...prev,
+						{ type: 'chat', id: me?.id, message: message, me: true },
+					]);
+				}
+			});
+		},
+		[me?.id, params?.id, setChatLiveData, socket, type],
+	);
 
 	const commandAction = (
 		type: CommandType,
@@ -131,6 +179,8 @@ const ChatRoomLayout = ({
 		},
 		[data?.participant],
 	);
+
+	console.log('chatLiveData', chatLiveData);
 
 	return (
 		<Stack width={'100%'} height={'100%'}>

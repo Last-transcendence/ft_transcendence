@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useState } from 'react';
 import style from '../../../style/main/body/index.module.css';
 import ChattingRoom from './chatting-room';
 import ChattingModeToggle from './chatting-mode';
@@ -8,7 +8,7 @@ import { Box, Button, Skeleton, Stack, TextField, Typography } from '@mui/materi
 import { useRouter } from 'next/navigation';
 import PositionableSnackbar from '@/component/common/PositionableSnackbar';
 import Chatroom from '@/type/chatroom.type';
-import { Channel, ChannelVisibility } from '@/type/channel.type';
+import { Channel } from '@/type/channel.type';
 import useFetchData from '@/hook/useFetchData';
 import { AxiosError } from 'axios';
 import SocketContext from '@/context/socket.context';
@@ -39,9 +39,9 @@ const MainPageBody = () => {
 		isLoading: isDmLoading,
 		error: dmError,
 	} = useFetchData<Chatroom[]>('/chatroom');
+
 	const navigateChannel = useCallback(
 		(channelId: string | undefined, password?: string) => {
-			if (!channelId) return;
 			channelSocket?.emit('join', { channelId, password }, (res: any) => {
 				console.log(res);
 				if (res?.res) router.push(`/chat/${channelId}/common`);
@@ -55,10 +55,11 @@ const MainPageBody = () => {
 	);
 
 	const navigateChatroom = useCallback(
-		(toUserId: string) => {
-			chatSocket?.emit('join', { toUserId }, (res: any) => {
+		(destId: string) => {
+			if (!chatSocket) return;
+			chatSocket.emit('join', { destId }, (res: any) => {
 				console.log(res);
-				router.push(`/chat/${toUserId}/private`);
+				router.push(`/chat/${destId}/private`);
 				// if (res.enter) router.push(`/chat/${toUserId}/private`);
 				// else {
 				// 	setMessage('DM 입장에 실패했습니다.');

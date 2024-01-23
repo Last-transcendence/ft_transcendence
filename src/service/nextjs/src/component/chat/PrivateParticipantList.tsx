@@ -7,11 +7,11 @@ import style from '@/style/friend/list/index.module.css';
 import UserBriefInformation from '@/component/common/user/bried-information';
 
 interface PrivateParticipantListProps {
-	id: string;
+	id?: string;
 }
 
-const PrivateParticipantList = async ({ id }: PrivateParticipantListProps) => {
-	const { data: otherUserData } = useFetchData<User>(`/user/${id}`);
+const PrivateParticipantList = ({ id }: PrivateParticipantListProps) => {
+	const { data: otherUserData } = useFetchData<User>(id ? `/user/${id}` : null);
 	const { me } = useContext(AuthContext);
 
 	return (
@@ -21,13 +21,13 @@ const PrivateParticipantList = async ({ id }: PrivateParticipantListProps) => {
 				<div className={style.container}>
 					<div>참여 목록</div>
 					<div>
-						<div>
+						<Stack gap={1}>
 							{me && (
 								<UserBriefInformation
 									nickname={me?.nickname}
 									condition={me?.status}
 									className={style['user-brief-information']}
-									userId={me!.id}
+									userId={me?.id}
 									imgUrl={me?.profileImageURI}
 								/>
 							)}
@@ -36,11 +36,11 @@ const PrivateParticipantList = async ({ id }: PrivateParticipantListProps) => {
 									nickname={otherUserData?.nickname}
 									condition={otherUserData?.status}
 									className={style['user-brief-information']}
-									userId={otherUserData!.id}
+									userId={otherUserData?.id}
 									imgUrl={otherUserData?.profileImageURI}
 								/>
 							)}
-						</div>
+						</Stack>
 					</div>
 				</div>
 			</Stack>

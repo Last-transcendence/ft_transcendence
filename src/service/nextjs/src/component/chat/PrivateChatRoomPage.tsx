@@ -1,7 +1,6 @@
 import { useParams } from 'next/navigation';
 import useFetchData from '@/hook/useFetchData';
-import Chatroom from '@/type/chatroom.type';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import ChatRoomLayout from '@/component/chat/ChatRoomLayout';
 import { MenuHeader } from '@/component/common/Header';
 import PrivateParticipantList from '@/component/chat/PrivateParticipantList';
@@ -11,21 +10,22 @@ const PrivateChatRoomPage = () => {
 	const params = useParams<{ id: string }>();
 	//chat 기록 받아오기
 	const { data: chatData } = useFetchData<any[]>(
-		params?.id ? `/chatroom/chat?destId=${params?.id}` : null,
+		params?.id ? `/chatroom/chat?destId=${params.id}` : null,
 	);
 	const [chatLiveData, setChatLiveData] = useState<ChatLiveDataType[]>([]);
 
+	console.log('chatData', chatData);
 	//@todo chatData를 기본데이터로 세팅
-	useEffect(() => {
-		// if (!chatData) return;
-		// setChatLiveData(
-		// 	chatData?.map(data => ({
-		// 		type: 'chat',
-		// 		id: data?.userId,
-		// 		message: data?.message,
-		// 	})),
-		// );
-	}, [chatData]);
+	// useEffect(() => {
+	// 	if (!chatData) return;
+	// 	setChatLiveData(
+	// 		chatData?.map(data => ({
+	// 			type: 'chat',
+	// 			id: data?.userId,
+	// 			message: data?.message,
+	// 		})),
+	// 	);
+	// }, [chatData]);
 
 	return (
 		<ChatRoomLayout chatLiveData={chatLiveData} setChatLiveData={setChatLiveData} type={'chatroom'}>

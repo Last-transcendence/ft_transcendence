@@ -2,11 +2,11 @@ import { createContext, Dispatch, ReactNode, SetStateAction, useEffect, useState
 import { io, Socket } from 'socket.io-client';
 
 const connect = (namespace: string) => {
-	//alert(`Socket connected on ${namespace}`);
+	alert(`Socket connected on ${namespace}`);
 };
 
 const disconnect = (namespace: string) => {
-	//alert(`Socket disconnected on ${namespace}`);
+	alert(`Socket disconnected on ${namespace}`);
 };
 
 const initSocket = (namespace: string): Socket => {
