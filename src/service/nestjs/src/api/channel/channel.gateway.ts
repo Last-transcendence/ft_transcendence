@@ -17,6 +17,7 @@ import * as Auth from '../../common/auth';
 import * as ParticipantDto from '../participant/dto';
 import ChannelService from './channel.service';
 import UserService from 'api/user/user.service';
+import GameService from 'api/game/game.service';
 
 const getCorsOrigin = () => {
 	const configService = new ConfigService();
@@ -28,6 +29,7 @@ const getCorsOrigin = () => {
 	namespace: '/socket/channel',
 	cors: { origin: getCorsOrigin(), credentials: true },
 })
+@UseGuards(Auth.Guard.UserWsJwt)
 class ChannelGateway {
 	constructor(
 		private readonly channelService: ChannelService,
@@ -35,6 +37,7 @@ class ChannelGateway {
 		private readonly participantService: ParticipantService,
 		@Inject(forwardRef(() => BanService)) private readonly banService: BanService,
 		private readonly userService: UserService,
+		private readonly gameService: GameService,
 	) {}
 
 	@WebSocketServer()
@@ -45,21 +48,19 @@ class ChannelGateway {
 	}
 
 	@SubscribeMessage('create')
-	@UseGuards(Auth.Guard.UserWsJwt)
 	async handleCreate(@ConnectedSocket() socket, @MessageBody() data) {
 		try {
 			if (await this.participantService.isParticipated(socket.user.id)) {
-				const participatedChannel = await this.participantService.get(socket.user.id);
-				await this.channelService.leaveChannel(participatedChannel.id);
+				await this.channelService.leaveChannel(socket.user.id);
 			}
+
 			const newChannel = await this.channelService.createChannel(data);
-			const newParticipant = await this.participantService.create({
+			await this.participantService.create({
 				channelId: newChannel.id,
 				userId: socket.user.id,
 				socketId: socket.id,
+				role: 'OWNER',
 			});
-
-			await this.participantService.update(newParticipant.id, { role: 'OWNER' });
 
 			socket.join(newChannel.id);
 
@@ -72,19 +73,17 @@ class ChannelGateway {
 	}
 
 	@SubscribeMessage('join')
-	@UseGuards(Auth.Guard.UserWsJwt)
 	async handleJoin(@MessageBody() joinData, @ConnectedSocket() socket) {
 		try {
-			console.log(joinData.channelId);
-			const userId = socket.user.id;
-
-			await this.channelService.leaveChannel(userId);
+			if (await this.participantService.isParticipated(socket.user.id)) {
+				await this.channelService.leaveChannel(socket.user.id);
+			}
 
 			const channel = await this.channelService.getChannel(joinData.channelId);
 			if (!channel) {
 				throw new BadRequestException('Channel not found');
 			}
-			if (await this.banService.isBanned(userId, joinData.channelId)) {
+			if (await this.banService.isBanned(socket.user.id, joinData.channelId)) {
 				throw new BadRequestException('User is banned');
 			}
 			if (
@@ -99,12 +98,15 @@ class ChannelGateway {
 				userId: socket.user.id,
 				socketId: socket.id,
 			});
+
 			socket.join(joinData.channelId);
+
 			this.server.to(joinData.channelId).emit('message', {
 				userId: socket.user.id,
 				nickname: socket.user.nickname,
 				profileImageURI: socket.user.profileImageURI,
 			});
+
 			return { res: true };
 		} catch (error) {
 			console.error("An error occurred channel.gateway 'join':", error);
@@ -208,16 +210,73 @@ class ChannelGateway {
 	) {
 		try {
 			if (!(await this.participantService.isParticipated(socket['user']['id']))) {
-				throw new BadRequestException('User is not a participated');
+				throw new BadRequestException('User is not participated');
 			}
 
 			const opponent = await this.userService.findByNickname(inviteRequestDto.nickname);
 			if (!opponent || !(await this.participantService.isParticipated(opponent.id))) {
 				throw new BadRequestException('Opponent not found');
 			}
+
 			return { status: 'SUCCESS' };
 		} catch (error) {
-			return { status: 'ERROR', message: error };
+			return {
+				message: error.message,
+				status: error.status,
+			};
+		}
+	}
+
+	@SubscribeMessage('invite/response')
+	@UseGuards(Auth.Guard.UserWsJwt)
+	async handleInviteResponse(
+		@ConnectedSocket() socket: Socket,
+		@MessageBody() inviteResponseRequestDto: Dto.Request.InviteResponse,
+	) {
+		try {
+			if (inviteResponseRequestDto.response === 'REJECT') {
+				return { status: 'SUCCESS' };
+			}
+
+			if (!(await this.participantService.isParticipated(socket['user']['id']))) {
+				throw new BadRequestException('User is not participated');
+			}
+
+			const opponent = await this.userService.get(inviteResponseRequestDto.userId);
+			if (!opponent || !(await this.participantService.isParticipated(opponent.id))) {
+				throw new BadRequestException('Opponent not found');
+			}
+
+			const participant = await this.participantService.get(socket['user']['id']);
+			const opponentParticipant = await this.participantService.get(opponent.id);
+
+			await this.gameService.create({
+				socketId: participant.socketId,
+				mode: inviteResponseRequestDto.mode,
+			});
+			await this.gameService.create({
+				socketId: opponentParticipant.socketId,
+				mode: inviteResponseRequestDto.mode,
+			});
+
+			// game play 중이면 channel에서 leave?
+			const socket1 = this.server.sockets.get(participant.socketId);
+			const socket2 = this.server.sockets.get(opponentParticipant.socketId);
+			const gameRoomId = await this.gameService.createRoom();
+
+			socket1.join(gameRoomId);
+			socket2.join(gameRoomId);
+
+			// event 명 무엇으로 할지 고민
+			this.server.to(participant.socketId).emit('matched', { room: gameRoomId });
+			this.server.to(opponentParticipant.socketId).emit('matched', { room: gameRoomId });
+
+			return { status: 'SUCCESS' };
+		} catch (error) {
+			return {
+				message: error.message,
+				status: error.status,
+			};
 		}
 	}
 }

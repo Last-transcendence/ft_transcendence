@@ -110,13 +110,6 @@ class ChannelService {
 
 	async leaveChannel(userId: string) {
 		try {
-			const participant = await this.prismaService.participant.findUnique({
-				where: { id: userId },
-			});
-			if (!participant) {
-				return;
-			}
-
 			return await this.prismaService.participant.delete({
 				where: { id: userId },
 			});

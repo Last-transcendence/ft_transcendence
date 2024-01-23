@@ -14,6 +14,9 @@ export class Participant {
 	@ApiProperty({ description: 'User uuid' })
 	userId: string;
 
+	@ApiProperty({ description: 'Socket id' })
+	socketId: string;
+
 	@ApiProperty({ description: 'User nickname' })
 	userNickname?: string | null;
 
