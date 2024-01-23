@@ -48,8 +48,8 @@ class ChatRoomService {
 
 	async find(srcId: string, destId: string): Promise<ChatRoomModel> {
 		try {
-			return await this.prismaService.chatRoom.findUnique({
-				where: { srcId_destId: { srcId, destId } },
+			return await this.prismaService.chatRoom.findFirst({
+				where: { srcId, destId },
 			});
 		} catch (error) {
 			throw new Error(error.message);
