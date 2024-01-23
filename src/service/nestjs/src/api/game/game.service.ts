@@ -141,6 +141,25 @@ class GameService {
 			throw new Error(error.message);
 		}
 	}
+
+	async deleteFirstHistory(player1Id: string, player2Id: string): Promise<GameHistoryModel> {
+		try {
+			const history = await this.prismaService.gameHistory.findFirst({
+				where: {
+					player1Id,
+					player2Id,
+				},
+			});
+
+			return await this.prismaService.gameHistory.delete({
+				where: {
+					id: history.id,
+				},
+			});
+		} catch (error) {
+			throw new Error(error.message);
+		}
+	}
 }
 
 export default GameService;
