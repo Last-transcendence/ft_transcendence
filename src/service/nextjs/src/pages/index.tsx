@@ -6,6 +6,7 @@ import FriendPage from '@/component/friend';
 import { BottomButton } from '@/component/common/ButtomButton';
 import Link from 'next/link';
 import { MenuHeader } from '@/component/common/Header';
+import IsWithAuth from '@/component/common/accessControl/IsWithAuth';
 
 const MainPage = () => {
 	return (
@@ -33,4 +34,4 @@ const MainPage = () => {
 	);
 };
 
-export default MainPage;
+export default IsWithAuth(MainPage);
