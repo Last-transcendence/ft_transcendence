@@ -93,11 +93,22 @@ class ChannelGateway {
 				throw new BadRequestException('Wrong password');
 			}
 
-			await this.participantService.create({
-				channelId: joinData.channelId,
-				userId,
-				socketId: socket.id,
-			});
+			const participant = await this.participantService.get(userId);
+			if (participant) {
+				const newSocketId = plainToClass(ParticipantDto.Request.Update, { socketId: socket.id });
+				const error = await validate(newSocketId);
+
+				if (error.length > 0) {
+					throw new Error('Failed validation: ' + JSON.stringify(error));
+				}
+				await this.participantService.update(participant.id, newSocketId);
+			} else {
+				await this.participantService.create({
+					channelId: joinData.channelId,
+					userId: userId,
+					socketId: socket.id,
+				});
+			}
 
 			socket.join(joinData.channelId);
 			this.server.to(joinData.channelId).emit('join', {
@@ -169,7 +180,6 @@ class ChannelGateway {
 				message: `${socket.user.id} has left the channel`,
 				profileImageURI: participant.userProfileImageURI,
 			});
-			socket.leave(participant.channelId);
 			await this.channelService.leaveChannel(socket, socket.user.id);
 
 			return { res: true };
@@ -193,7 +203,7 @@ class ChannelGateway {
 			if (error.length > 0) {
 				throw new Error('Failed validation: ' + JSON.stringify(error));
 			}
-			this.participantService.update(data.toUserId, newRole);
+			await this.participantService.update(data.toUserId, newRole);
 
 			return { res: true };
 		} catch (error) {
