@@ -172,9 +172,10 @@ export class AuthController {
 	@ApiBadRequestResponse({ description: 'Bad request' })
 	async logout(@Req() req, @Response({ passthrough: true }) res) {
 		try {
+			const user = await this.userService.findByIntraId(req.user.intraId);
+			await this.userService.offline(user.id);
 			const cookieOption = this.cookieService.getCookieOption();
 			res.clearCookie('accessToken', cookieOption);
-			await this.userService.offline(req.user.id);
 			return { message: 'Logout successfully' };
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
