@@ -272,7 +272,6 @@ class GameGateway {
 						player2Score: 0,
 						result: 'PENDING',
 					});
-					console.log('player1 history', player1History);
 				} else {
 					this.gameService.updateHistory(player1History.id, {
 						player1Score: parseInt(scoreRequestDto.score),
