@@ -10,7 +10,7 @@ const FriendPage = () => {
 	return (
 		<div className={style.container}>
 			<AddFriend friendList={data} refetch={refetch} />
-			<FriendList data={data} />
+			<FriendList data={data} refetch={refetch} />
 		</div>
 	);
 };
