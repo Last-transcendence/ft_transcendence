@@ -22,9 +22,10 @@ class BlockService {
 		}
 	}
 
-	async find(userId: string, blockedId: string): Promise<BlockModel> {
+	async find(userId: string, destId: string): Promise<BlockModel> {
 		try {
-			return await this.prismaService.block.findFirst({ where: { userId, blockedId } });
+			const blockList =  await this.prismaService.block.findMany({ where: { userId: destId } });
+			return blockList.find((block) => block.blockedId === userId);
 		} catch (error) {
 			throw new Error(error.message);
 		}
