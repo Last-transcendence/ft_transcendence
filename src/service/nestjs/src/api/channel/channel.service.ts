@@ -115,13 +115,13 @@ class ChannelService {
 		}
 	}
 
-	async leaveChannel(socket: Socket, userId: string) {
+	async leaveChannel(socket: Socket, channelId: string, userId: string) {
 		try {
 			const participant = await this.prismaService.participant.findFirst({
 				where: { userId: userId },
 			});
 
-			if (!participant) {
+			if (!participant || channelId === participant.channelId) {
 				return;
 			}
 
