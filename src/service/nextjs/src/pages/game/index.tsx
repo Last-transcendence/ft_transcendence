@@ -48,13 +48,14 @@ const GameQueuePage = () => {
 						new Scene.Queue(navigate, socket, gameRoomId),
 						new Scene.Main(),
 						new Scene.Result(),
+						new Scene.Disconnected(),
 					],
 				});
 			});
 
 			return () => destroy({ gameRef, setGame, setIsInitialized });
 		}
-	}, [navigate, socket]);
+	}, [navigate, socket, gameRoomId]);
 
 	return (
 		isInitialized && (
