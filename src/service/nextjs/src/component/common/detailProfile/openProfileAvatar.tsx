@@ -69,7 +69,7 @@ const OpenProfileAvatar = ({ otherUserId, imgUrl, refetch }: OpenProfileAvatarPr
 		setErrorMessage('');
 	};
 
-	return imgUrl === null ? (
+	return imgUrl === undefined ? (
 		<Loading />
 	) : (
 		<>
@@ -81,7 +81,7 @@ const OpenProfileAvatar = ({ otherUserId, imgUrl, refetch }: OpenProfileAvatarPr
 				{errorMessage}
 			</CustomSnackbar>
 			<Avatar onClick={handleAvatarOpen} sx={{ cursor: 'pointer' }}>
-				{imgUrl === '' ? (
+				{imgUrl === '' || imgUrl === null ? (
 					<CustomImage img={UNKNOWN_PROFILE_IMAGE_URI} alt={'user img'} />
 				) : (
 					<CustomImage useLoader img={imgUrl as string} alt="user img" />

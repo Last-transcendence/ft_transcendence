@@ -16,7 +16,7 @@ const FriendList = ({ data, refetch }: { data: Friend[] | undefined; refetch: ()
 			{data && data?.length ? (
 				data.map(user => {
 					return (
-						<div key={user?.userId}>
+						<div key={user?.id}>
 							{/*@todo 문자제거.*/}
 							<UserBriefInformation
 								nickname={user?.nickname}

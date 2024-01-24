@@ -78,7 +78,7 @@ const BottomProfile = ({ otherUserId, isFriend, setIsFriend, refetch }: BottomPr
 			//	const id = await makeNewChatroom(otherUserId);
 			// }
 			//@todo dm 접속에 실패할 경우 처리 필요
-			chatSocket?.emit('join', { toUserId: otherUserId }, (res: any) => {
+			chatSocket?.emit('join', { destId: otherUserId }, (res: any) => {
 				console.log('res', res);
 			});
 			router.push(`/chat/${otherUserId}/private`);
