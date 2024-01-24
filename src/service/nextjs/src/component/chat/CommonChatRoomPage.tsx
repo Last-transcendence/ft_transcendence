@@ -28,6 +28,7 @@ const CommonChatRoomPage = () => {
 	const [chatLiveData, setChatLiveData] = useState<ChatLiveDataType[]>([]);
 	//채널 입장 메세지 두 번 찍혀서 방지
 	const [channelLoading, setChannelLoading] = useState<boolean>(false);
+
 	//채널 정보 받아오기
 	const [inviteResponse, setInviteResponse] = useState<{
 		channelId: string;
@@ -40,28 +41,25 @@ const CommonChatRoomPage = () => {
 	useEffect(() => {
 		if (!params?.id) return;
 		channelSocket?.emit('info', { channelId: params?.id }, (res: any) => {
-			console.log(res);
+			console.log('info res', res);
 			setChannelData(res);
 		});
 	}, [params?.id]);
 
-	// @todo participant 처리되면 주석 해제
 	useEffect(() => {
 		if (!channelData) return;
-		// if (channelData.participant?.some((data: Participant) => data.userId === me?.id)) {
-		// 	setChatLiveData(prev => [
-		// 		...prev,
-		// 		{ type: 'action', message: `${channelData?.title} 채널에 입장하셨습니다.` },
-		// ]);
-		// } else {
-		// 	router.push('/');
-		// }
-		if (channelLoading) return;
-		setChatLiveData(prev => [
-			...prev,
-			{ type: 'action', message: `${channelData?.title} 채널에 입장하셨습니다.` },
-		]);
-		setChannelLoading(true);
+		if (channelData.participant?.some((data: Participant) => data.userId === me?.id)) {
+			if (channelLoading) return;
+			setChatLiveData(prev => [
+				...prev,
+				{ type: 'action', message: `${channelData?.title} 채널에 입장하셨습니다.` },
+				{ type: 'help' },
+			]);
+			setChannelLoading(true);
+		} else {
+			alert('채널에 참여하고 있지 않습니다.');
+			router.push('/');
+		}
 	}, [channelData, me]);
 
 	const setActionMessage = useCallback((message: string) => {
@@ -75,9 +73,16 @@ const CommonChatRoomPage = () => {
 		});
 	}, []);
 
+	const getNickname = useCallback((userId: string) => {
+		const participant: Participant | undefined = channelData?.participant?.find(
+			data => data.id === userId,
+		);
+		return participant?.user?.nickname;
+	}, []);
+
 	//이용자 참여
 	useListeningChannelEvent('join', (res: any) => {
-		console.log(res);
+		console.log('on join', res);
 		setChannelData(prev => {
 			if (!prev) return prev;
 			return { ...prev, participant: [...prev?.participant, res] };
@@ -88,8 +93,8 @@ const CommonChatRoomPage = () => {
 	//이용자 퇴장
 	useListeningChannelEvent('leave', (res: any) => {
 		console.log(res);
-		removeParticipant(res?.id);
 		setActionMessage(`${res?.nickname}님이 나가셨습니다.`);
+		removeParticipant(res?.id);
 	});
 
 	const responseInvite = useCallback(
@@ -115,11 +120,11 @@ const CommonChatRoomPage = () => {
 	//이용자 뮤트
 	useListeningChannelEvent('mute', (res: any) => {
 		console.log(res);
+		setActionMessage(`${res?.nickname}님이 뮤트되었습니다.`);
 		setChannelData(prev => {
 			if (!prev) return prev;
 			return { ...prev, mute: [...prev?.mute, res?.id] };
 		});
-		setActionMessage(`${res?.nickname}님이 뮤트되었습니다.`);
 	});
 
 	//이용자 차단

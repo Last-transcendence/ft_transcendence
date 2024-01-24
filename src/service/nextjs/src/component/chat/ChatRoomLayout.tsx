@@ -1,12 +1,12 @@
 import { useParams } from 'next/navigation';
 import {
 	Dispatch,
+	LegacyRef,
 	ReactNode,
 	SetStateAction,
 	useCallback,
 	useContext,
 	useEffect,
-	useMemo,
 } from 'react';
 import { Stack } from '@mui/material';
 import { ChatMsg, HelpMsg, StatusMsg } from '@/component/chat/Message';
@@ -51,9 +51,6 @@ const ChatRoomLayout = ({
 		if (type === 'chatroom') return;
 		if (!channelSocket) return;
 		console.log({ channelId: params?.id, password: '' });
-		channelSocket.emit('join', { channelId: params?.id, password: null }, (res: any) => {
-			console.log('join', res);
-		});
 		channelSocket.on('message', res => {
 			console.log('channel!!!', res);
 			if (params?.id === res.channelId)
@@ -147,7 +144,7 @@ const ChatRoomLayout = ({
 		<Stack width={'100%'} height={'100%'}>
 			{/*헤더 영역*/}
 			<div>{children}</div>
-			<Stack padding={2} spacing={1} sx={{ overflowY: 'scroll' }} height={'100%'}>
+			<Stack padding={2} spacing={1} sx={{ overflowY: 'auto' }} height={'100%'}>
 				{chatLiveData?.map((chat: any, index: number) => {
 					if (chat.type === 'chat') {
 						const userData = getUser(chat?.id);
@@ -161,8 +158,8 @@ const ChatRoomLayout = ({
 								message={chat?.message}
 							/>
 						);
-					} else if (chat.type === 'help') return <HelpMsg />;
-					else if (chat.type === 'action') return <StatusMsg message={chat?.message} />;
+					} else if (chat.type === 'help') return <HelpMsg key={index} />;
+					else if (chat.type === 'action') return <StatusMsg message={chat?.message} key={index} />;
 				})}
 			</Stack>
 			{/*@todo 연결이 완료되어야 채팅을 보낼 수 있도록 설정 */}

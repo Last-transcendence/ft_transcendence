@@ -98,11 +98,11 @@ const AddFriend = ({
 			) : (
 				<div className={style['user-container']}>
 					{searchData.map(user => (
-						<div key={user.id}>
+						<div key={user?.id}>
 							<UserBriefInformation
 								nickname={user?.nickname}
 								className={style['user-brief-information']}
-								userId={user.id}
+								userId={user?.id}
 								imgUrl={user?.profileImageURI}
 								refetch={refetch}
 							/>
