@@ -9,6 +9,7 @@ import SocketContext from '@/context/socket.context';
 import useListeningChannelEvent from '@/hook/useListeningChannelEvent';
 import { ChannelInfo } from '@/type/channel-info.type';
 import { useRouter } from 'next/router';
+import CustomConfirmModal from '../common/CustomConfirmModal';
 
 export type ChatLiveDataType = {
 	type: 'chat' | 'action' | 'help';
@@ -29,6 +30,14 @@ const CommonChatRoomPage = () => {
 	const [channelLoading, setChannelLoading] = useState<boolean>(false);
 
 	//채널 정보 받아오기
+	const [inviteResponse, setInviteResponse] = useState<{
+		channelId: string;
+		userId: string;
+		nickname: string;
+		mode: 'NORMAL' | 'HARD';
+	} | null>(null);
+	const [isOpened, setIsOpened] = useState<boolean>(false);
+
 	useEffect(() => {
 		if (!params?.id) return;
 		channelSocket?.emit('info', { channelId: params?.id }, (res: any) => {
@@ -88,6 +97,26 @@ const CommonChatRoomPage = () => {
 		removeParticipant(res?.id);
 	});
 
+	const responseInvite = useCallback(
+		(inviteResponse: any, response: 'ACCEPT' | 'REJECT') => {
+			channelSocket?.emit('invite/response', { ...inviteResponse, response }, (res: any) => {
+				console.log(res);
+			});
+		},
+		[channelSocket],
+	);
+
+	// 이용자 게임 초대
+	useListeningChannelEvent('invite', (res: any) => {
+		setIsOpened(true);
+		setInviteResponse(res);
+	});
+
+	// 이용자 게임 초대 후 매치 성공
+	useListeningChannelEvent('invite/matched', (res: any) => {
+		router.push(`/game?gameRoomId=${res?.room}`);
+	});
+
 	//이용자 뮤트
 	useListeningChannelEvent('mute', (res: any) => {
 		console.log(res);
@@ -124,22 +153,37 @@ const CommonChatRoomPage = () => {
 	}, [channelData?.participant]);
 
 	return (
-		<ChatRoomLayout
-			type={'channel'}
-			ownerId={ownerId}
-			data={channelData}
-			chatLiveData={chatLiveData}
-			setChatLiveData={setChatLiveData}
-		>
-			<MenuHeader title={channelData?.title ?? ''} type={'chat'}>
-				<ParticipantList
-					channelId={params?.id}
-					myRole={myRole}
-					ownerId={ownerId}
-					channelData={channelData}
+		<>
+			<ChatRoomLayout
+				type={'channel'}
+				ownerId={ownerId}
+				data={channelData}
+				chatLiveData={chatLiveData}
+				setChatLiveData={setChatLiveData}
+			>
+				<MenuHeader title={channelData?.title ?? ''} type={'chat'}>
+					<ParticipantList
+						channelId={params?.id}
+						myRole={myRole}
+						ownerId={ownerId}
+						channelData={channelData}
+					/>
+				</MenuHeader>
+			</ChatRoomLayout>
+			{isOpened && (
+				<CustomConfirmModal
+					setIsOpened={setIsOpened}
+					title={`${inviteResponse?.nickname}님이 게임에 초대하셨습니다.`}
+					content="수락하시겠습니까?"
+					onConfirm={() => {
+						responseInvite(inviteResponse, 'ACCEPT');
+					}}
+					onCancel={() => {
+						responseInvite(inviteResponse, 'REJECT');
+					}}
 				/>
-			</MenuHeader>
-		</ChatRoomLayout>
+			)}
+		</>
 	);
 };
 

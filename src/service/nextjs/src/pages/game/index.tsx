@@ -7,7 +7,7 @@ import {
 	useRef,
 	useState,
 } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { GameInstance, IonPhaser } from '@ion-phaser/react';
 import Config from '@/component/game/config';
 import style from '@/style/game/index.module.css';
@@ -29,6 +29,8 @@ const destroy = (props: {
 
 const GameQueuePage = () => {
 	const navigate = useRouter();
+	const searchParam = useSearchParams();
+	const gameRoomId = searchParam.get('gameRoomId');
 	const gameRef = useRef<HTMLIonPhaserElement>(null);
 	const [game, setGame] = useState<GameInstance | undefined>(undefined);
 	const [isInitialized, setIsInitialized] = useState(false);
@@ -42,7 +44,11 @@ const GameQueuePage = () => {
 			import('@/component/game/scene').then(Scene => {
 				setGame({
 					...Config,
-					scene: [new Scene.Queue(navigate, socket), new Scene.Main(), new Scene.Result()],
+					scene: [
+						new Scene.Queue(navigate, socket, gameRoomId),
+						new Scene.Main(),
+						new Scene.Result(),
+					],
 				});
 			});
 

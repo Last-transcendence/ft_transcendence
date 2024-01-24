@@ -1,6 +1,6 @@
 import { Trim } from '@miaooo/class-transformer-trim';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
+import { IsDate, IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
 import { $Enums } from '@prisma/client';
 
 class Create {
@@ -27,6 +27,12 @@ class Create {
 	@Trim()
 	@ApiProperty({ description: 'Ready' })
 	ready?: boolean;
+
+	@IsOptional()
+	@IsDate()
+	@Trim()
+	@ApiProperty({ description: 'UpdatedAt' })
+	updatedAt?: Date;
 }
 
 export default Create;
