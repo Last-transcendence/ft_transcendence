@@ -8,7 +8,6 @@ import {
 	useState,
 } from 'react';
 import SocketContext from '@/context/socket.context';
-import CustomConfirmModal from '@/component/common/CustomConfirmModal';
 import Snackbar from '@mui/material/Snackbar';
 import { useRouter } from 'next/router';
 import { useParams } from 'next/navigation';
@@ -42,14 +41,6 @@ export const ListenProvider = (props: { children: ReactNode }) => {
 		channelId: '',
 		srcId: '',
 		message: '',
-	});
-	const [open, setOpen] = useState<boolean>(false);
-	const [message, setMessage] = useState<{
-		title: string;
-		content: string;
-	}>({
-		title: '',
-		content: '',
 	});
 	const [toastOpen, setToastOpen] = useState<boolean>(false);
 	const [toastMessage, setToastMessage] = useState<string>('');
@@ -85,40 +76,40 @@ export const ListenProvider = (props: { children: ReactNode }) => {
 				}
 			});
 
-			(sockets.chatSocket as any).on('game', (res: any) => {
-				setMessage({
-					title: '게임 초대',
-					content: `${res?.nickname}님이 1:1 게임을 초대했습니다`,
-				});
-				setOpen(true);
-			});
+			// (sockets.chatSocket as any).on('game', (res: any) => {
+			// 	setMessage({
+			// 		title: '게임 초대',
+			// 		content: `${res?.nickname}님이 1:1 게임을 초대했습니다`,
+			// 	});
+			// 	setOpen(true);
+			// });
 		}
 		return () => {
 			if (sockets?.chatSocket) {
 				(sockets.chatSocket as any).off('message');
-				(sockets.chatSocket as any).off('game');
+				// (sockets.chatSocket as any).off('game');
 			}
 		};
 	}, [friendDatas, params?.id, router.pathname, sockets]);
 
 	return (
 		<>
-			{open && (
-				<CustomConfirmModal
-					setIsOpened={setOpen}
-					onConfirm={() => {
-						setOpen(false);
-						//게임 승낙
-						sockets.channelSocket?.emit('game');
-					}}
-					onCancel={() => {
-						setOpen(false);
-						//게임 거절
-					}}
-					title={message.title}
-					content={message.content}
-				/>
-			)}
+			{/*{open && (*/}
+			{/*	<CustomConfirmModal*/}
+			{/*		setIsOpened={setOpen}*/}
+			{/*		onConfirm={() => {*/}
+			{/*			setOpen(false);*/}
+			{/*			//게임 승낙*/}
+			{/*			sockets.channelSocket?.emit('game');*/}
+			{/*		}}*/}
+			{/*		onCancel={() => {*/}
+			{/*			setOpen(false);*/}
+			{/*			//게임 거절*/}
+			{/*		}}*/}
+			{/*		title={message.title}*/}
+			{/*		content={message.content}*/}
+			{/*	/>*/}
+			{/*)}*/}
 			<Snackbar
 				anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
 				open={toastOpen}

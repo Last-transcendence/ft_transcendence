@@ -23,19 +23,26 @@ export interface Channel {
 
 interface CommonInterface {
 	id: string;
-	channelId: string;
 	userId: string;
-	createdAt: Date;
-	updatedAt: Date;
-	// Refer to
-	channel: Channel;
-	user: User;
+	nickname: string;
+	profileImageURI: string;
 }
 
 export interface Participant extends CommonInterface {
 	role: ParticipantRole;
+	user: any;
 }
 
 export interface Ban extends CommonInterface {}
 
-export interface Mute extends CommonInterface {}
+export interface Mute {
+	id?: string;
+	userId: string;
+}
+
+export type AdminActionType = 'kick' | 'ban' | 'mute' | 'admin';
+export type ChannelSocketResponse = {
+	channelId: string;
+	userId: string;
+	nickname: string;
+};

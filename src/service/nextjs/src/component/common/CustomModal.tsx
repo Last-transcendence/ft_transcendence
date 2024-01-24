@@ -7,9 +7,10 @@ import style from '../../style/common/custom-modal/index.module.css';
 interface CustomModalProps {
 	setIsOpened: Dispatch<SetStateAction<boolean>>;
 	children?: ReactNode;
+	halfHeight?: boolean;
 }
 
-const CustomModal = ({ setIsOpened, children }: CustomModalProps) => {
+const CustomModal = ({ setIsOpened, children, halfHeight }: CustomModalProps) => {
 	const [isClient, setIsClient] = useState(false);
 	useEffect(() => {
 		setIsClient(true);
@@ -19,7 +20,7 @@ const CustomModal = ({ setIsOpened, children }: CustomModalProps) => {
 		isClient &&
 		createPortal(
 			<div
-				className={style.container}
+				className={halfHeight ? style.half_container : style.container}
 				onClick={() => {
 					setIsOpened(false);
 				}}
