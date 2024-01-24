@@ -5,9 +5,10 @@ import UserService from '../user/user.service';
 import BlockService from 'api/block/block.service';
 import ChatService from 'api/chat/chat.service';
 import ChatRoomGateway from './chatroom.gateway';
+import MuteService from 'api/mute/mute.service';
 @Module({
 	controllers: [ChatRoomController],
-	providers: [ChatRoomService, UserService, BlockService, ChatService, ChatRoomGateway],
+	providers: [ChatRoomService, UserService, BlockService, ChatService, ChatRoomGateway, MuteService],
 	exports: [ChatRoomService],
 })
 class ChatRoomModule {}
