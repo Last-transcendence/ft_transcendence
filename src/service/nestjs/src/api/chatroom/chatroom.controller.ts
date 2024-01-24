@@ -18,9 +18,14 @@ class ChatRoomController {
 	@ApiOperation({ summary: 'Get chat room' })
 	@ApiOkResponse({ description: 'Get chat room successfully', type: ChatRoomModel })
 	@ApiBadRequestResponse({ description: 'Bad request' })
-	async getChatRoom(@Req() req): Promise<ChatRoomModel[]> {
+	async getChatRoom(@Req() req): Promise<Dto.Response.ChatRoom[]> {
 		try {
-			return await this.chatRoomService.get(req.user.id);
+			const chatRooms = await this.chatRoomService.get(req.user.id);
+			for (let chatRoom of chatRooms as Dto.Response.ChatRoom[]) {
+				const destUser = await this.userService.get(chatRoom.destId);
+				chatRoom.destNickname = destUser.nickname;
+			}
+			return chatRooms as Dto.Response.ChatRoom[];
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
 		}
