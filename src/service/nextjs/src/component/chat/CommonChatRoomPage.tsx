@@ -2,7 +2,12 @@ import ParticipantList from '@/component/chat/ParticipantList';
 import { MenuHeader } from '@/component/common/Header';
 import { useParams } from 'next/navigation';
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { Participant, ParticipantRole } from '@/type/channel.type';
+import {
+	AdminActionType,
+	ChannelSocketResponse,
+	Participant,
+	ParticipantRole,
+} from '@/type/channel.type';
 import AuthContext from '@/context/auth.context';
 import ChatRoomLayout from '@/component/chat/ChatRoomLayout';
 import SocketContext from '@/context/socket.context';
@@ -62,6 +67,16 @@ const CommonChatRoomPage = () => {
 		}
 	}, [channelData, me]);
 
+	const getNickname = useCallback(
+		(userId: string) => {
+			const participant: Participant | undefined = channelData?.participant?.find(
+				data => data.userId === userId,
+			);
+			return participant?.user?.nickname;
+		},
+		[channelData?.participant],
+	);
+
 	const setActionMessage = useCallback((message: string) => {
 		setChatLiveData(prev => [...prev, { type: 'action', message }]);
 	}, []);
@@ -73,27 +88,27 @@ const CommonChatRoomPage = () => {
 		});
 	}, []);
 
-	const getNickname = useCallback((userId: string) => {
-		const participant: Participant | undefined = channelData?.participant?.find(
-			data => data.id === userId,
-		);
-		return participant?.user?.nickname;
-	}, []);
-
 	//이용자 참여
 	useListeningChannelEvent('join', (res: any) => {
 		console.log('on join', res);
 		setChannelData(prev => {
 			if (!prev) return prev;
-			return { ...prev, participant: [...prev?.participant, res] };
+			if (prev?.participant?.some(data => data.id === res?.id)) return prev;
+			return {
+				...prev,
+				participant: [
+					...prev?.participant,
+					{ ...res, role: 'USER', user: { nickname: res?.nickname } },
+				],
+			};
 		});
 		setActionMessage(`${res?.nickname}님이 들어오셨습니다.`);
 	});
 
 	//이용자 퇴장
 	useListeningChannelEvent('leave', (res: any) => {
-		console.log(res);
-		setActionMessage(`${res?.nickname}님이 나가셨습니다.`);
+		console.log('leave res', res);
+		setActionMessage(`${getNickname(res.id)}님이 나가셨습니다.`);
 		removeParticipant(res?.id);
 	});
 
@@ -105,6 +120,43 @@ const CommonChatRoomPage = () => {
 		},
 		[channelSocket],
 	);
+
+	const adminAction = useCallback((action: AdminActionType, nickname: string, id: string) => {
+		if (!id) return;
+		if (!nickname) return;
+		switch (action) {
+			case 'kick':
+				setActionMessage(`${nickname}님이 킥되었습니다.`);
+				removeParticipant(id);
+				break;
+			case 'ban':
+				setActionMessage(`${nickname}님이 밴되었습니다.`);
+				removeParticipant(id);
+				break;
+			case 'mute':
+				setActionMessage(`${nickname}님이 뮤트되었습니다.`);
+				setChannelData((prev: ChannelInfo | undefined): ChannelInfo | undefined => {
+					if (!prev || !prev?.mute) return prev;
+					return { ...prev, mute: [...prev?.mute, { userId: id }] };
+				});
+				break;
+			case 'admin':
+				setActionMessage(`${nickname}님이 어드민으로 임명되었습니다.`);
+				setChannelData((prev: ChannelInfo | undefined) => {
+					if (!prev) return prev;
+					return {
+						...prev,
+						participant: prev?.participant?.map((data: Participant) => {
+							if (data.userId === id) return { ...data, role: ParticipantRole.ADMIN };
+							return data;
+						}),
+					};
+				});
+				break;
+			default:
+				break;
+		}
+	}, []);
 
 	// 이용자 게임 초대
 	useListeningChannelEvent('invite', (res: any) => {
@@ -119,29 +171,29 @@ const CommonChatRoomPage = () => {
 
 	//이용자 뮤트
 	useListeningChannelEvent('mute', (res: any) => {
-		console.log(res);
-		setActionMessage(`${res?.nickname}님이 뮤트되었습니다.`);
-		setChannelData(prev => {
-			if (!prev) return prev;
-			return { ...prev, mute: [...prev?.mute, res?.id] };
-		});
+		console.log('mute res', res);
+		adminAction('mute', res?.nickname, res?.id);
 	});
 
 	//이용자 차단
 	useListeningChannelEvent('ban', (res: any) => {
-		console.log(res);
-		removeParticipant(res?.id);
-		setActionMessage(`${res?.nickname}님이 밴되었습니다.`);
+		if (res?.userId === me?.id) {
+			alert('채널에서 밴되었습니다.');
+			router.push('/');
+		}
+		adminAction('ban', res?.nickname, res?.id);
 	});
 
 	useListeningChannelEvent('kick', (res: any) => {
-		console.log(res);
-		removeParticipant(res?.id);
-		setActionMessage(`${res?.nickname}님이 킥되었습니다.`);
+		if (res?.userId === me?.id) {
+			alert('채널에서 킥되었습니다.');
+			router.push('/');
+		}
+		adminAction('kick', res?.nickname, res?.id);
 	});
 
 	const myRole = useMemo(() => {
-		const myData = channelData?.participant?.find((data: Participant) => data.id === me?.id);
+		const myData = channelData?.participant?.find((data: Participant) => data.userId === me?.id);
 		return myData?.role;
 	}, [channelData?.participant, me?.id]);
 
@@ -149,7 +201,7 @@ const CommonChatRoomPage = () => {
 		const ownerData = channelData?.participant?.find(
 			(data: Participant) => data.role === ParticipantRole.OWNER,
 		);
-		return ownerData?.id;
+		return ownerData?.userId;
 	}, [channelData?.participant]);
 
 	return (
@@ -160,6 +212,7 @@ const CommonChatRoomPage = () => {
 				data={channelData}
 				chatLiveData={chatLiveData}
 				setChatLiveData={setChatLiveData}
+				adminAction={adminAction}
 			>
 				<MenuHeader title={channelData?.title ?? ''} type={'chat'}>
 					<ParticipantList

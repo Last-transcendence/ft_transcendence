@@ -3,6 +3,8 @@ import '@/style/globals.css';
 import { Global, css } from '@emotion/react';
 import Layout from '@/component/common/Layout';
 import ContextProvider from '@/context';
+import { theme } from '@/style/theme';
+import { ThemeProvider } from '@mui/material/styles';
 
 const globalStyles = css`
 	body {
@@ -24,11 +26,13 @@ export default function App({ Component, pageProps }: AppProps) {
 	return (
 		<>
 			<Global styles={globalStyles} />
-			<Layout>
-				<ContextProvider>
-					<Component {...pageProps} />
-				</ContextProvider>
-			</Layout>
+			<ThemeProvider theme={theme}>
+				<Layout>
+					<ContextProvider>
+						<Component {...pageProps} />
+					</ContextProvider>
+				</Layout>
+			</ThemeProvider>
 		</>
 	);
 }

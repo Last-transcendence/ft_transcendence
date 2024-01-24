@@ -1,16 +1,16 @@
 import { useParams } from 'next/navigation';
 import {
 	Dispatch,
-	LegacyRef,
 	ReactNode,
 	SetStateAction,
 	useCallback,
 	useContext,
 	useEffect,
+	useRef,
 } from 'react';
 import { Stack } from '@mui/material';
 import { ChatMsg, HelpMsg, StatusMsg } from '@/component/chat/Message';
-import { ParticipantRole } from '@/type/channel.type';
+import { AdminActionType, ParticipantRole } from '@/type/channel.type';
 import SendChat from '@/component/chat/SendChat';
 import SocketContext from '@/context/socket.context';
 import AuthContext from '@/context/auth.context';
@@ -29,6 +29,7 @@ interface ChatRoomLayoutProps {
 	chatLiveData: ChatLiveDataType[];
 	setChatLiveData: Dispatch<SetStateAction<ChatLiveDataType[]>>;
 	otherUserData?: User;
+	adminAction?: (action: AdminActionType, nickname: string, id: string) => void;
 }
 
 const ChatRoomLayout = ({
@@ -40,19 +41,19 @@ const ChatRoomLayout = ({
 	chatLiveData,
 	setChatLiveData,
 	otherUserData,
+	adminAction,
 }: ChatRoomLayoutProps) => {
 	const params = useParams<{ id: string }>();
 	const { channelSocket, chatSocket } = useContext(SocketContext).sockets;
 	const { me } = useContext(AuthContext);
 	const { currentDm } = useContext(ListenContext);
+	const scrollRef = useRef<HTMLDivElement>(null);
 
 	//채널 메세지 수신 (한번만 등록)
 	useEffect(() => {
 		if (type === 'chatroom') return;
 		if (!channelSocket) return;
-		console.log({ channelId: params?.id, password: '' });
 		channelSocket.on('message', res => {
-			console.log('channel!!!', res);
 			if (params?.id === res.channelId)
 				setChatLiveData((prev: ChatLiveDataType[]) => [
 					...prev,
@@ -86,10 +87,8 @@ const ChatRoomLayout = ({
 						}
 					: { destId: params?.id, message };
 
-			console.log('req', req);
 			// send message
 			(type === 'channel' ? channelSocket : chatSocket)?.emit('message', req, (res: any) => {
-				//성공 시 세팅
 				if (res?.res) {
 					setChatLiveData((prev: ChatLiveDataType[]) => [
 						...prev,
@@ -140,11 +139,17 @@ const ChatRoomLayout = ({
 		[data?.participant, me, otherUserData, type],
 	);
 
+	useEffect(() => {
+		if (scrollRef.current) {
+			scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+		}
+	}, [chatLiveData]);
+
 	return (
 		<Stack width={'100%'} height={'100%'}>
 			{/*헤더 영역*/}
 			<div>{children}</div>
-			<Stack padding={2} spacing={1} sx={{ overflowY: 'auto' }} height={'100%'}>
+			<Stack ref={scrollRef} padding={2} spacing={1} sx={{ overflowY: 'scroll' }} height={'100%'}>
 				{chatLiveData?.map((chat: any, index: number) => {
 					if (chat.type === 'chat') {
 						const userData = getUser(chat?.id);
@@ -156,6 +161,7 @@ const ChatRoomLayout = ({
 								channelId={params?.id}
 								ownerId={ownerId}
 								message={chat?.message}
+								adminAction={adminAction}
 							/>
 						);
 					} else if (chat.type === 'help') return <HelpMsg key={index} />;

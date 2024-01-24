@@ -6,15 +6,7 @@ interface SVGIconProps {
 
 const MatchingButtonIcon = ({ width, height, onClick }: SVGIconProps) => {
 	return (
-		<svg
-			width={width}
-			height={height}
-			viewBox="0 0 62 62"
-			fill="none"
-			xmlns="http://www.w3.org/2000/svg"
-			xmlnsXlink="http://www.w3.org/1999/xlink"
-			onClick={onClick}
-		>
+		<svg width={width} height={height} viewBox="0 0 62 62" fill="none" onClick={onClick}>
 			<rect width="62" height="62" fill="url(#pattern0)" style={{ mixBlendMode: 'overlay' }} />
 			<defs>
 				<pattern id="pattern0" patternContentUnits="objectBoundingBox" width="1" height="1">

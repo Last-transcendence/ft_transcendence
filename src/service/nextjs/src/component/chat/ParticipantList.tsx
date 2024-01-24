@@ -49,7 +49,7 @@ const ParticipantList = ({ myRole, ownerId, channelData, channelId }: Participan
 		(userId: string) => {
 			if (!userId) return false;
 			if (!channelData?.mute || channelData?.mute.length == 0) return false;
-			return channelData?.mute?.some((data: Mute) => data.id === userId);
+			return channelData?.mute?.some((data: Mute) => data?.id === userId);
 		},
 		[channelData?.mute],
 	);
@@ -63,6 +63,7 @@ const ParticipantList = ({ myRole, ownerId, channelData, channelId }: Participan
 		});
 	}, [channelId, channelSocket, me?.id, router]);
 
+	console.log('myRole', myRole, 'ownerId', ownerId);
 	return (
 		<div>
 			{/*채널이 protected일때만 비밀번호 변경 보임*/}
@@ -84,7 +85,7 @@ const ParticipantList = ({ myRole, ownerId, channelData, channelId }: Participan
 							<UserBriefInformation
 								key={index}
 								nickname={
-									myRole !== ParticipantRole.USER ? (
+									myRole !== 'USER' ? (
 										<AdminNickMenu
 											nickname={data?.user?.nickname}
 											userId={data?.userId}
