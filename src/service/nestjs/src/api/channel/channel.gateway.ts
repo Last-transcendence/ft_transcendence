@@ -135,12 +135,13 @@ class ChannelGateway {
 	@UseGuards(Auth.Guard.UserWsJwt)
 	async handleMessage(@MessageBody() data, @ConnectedSocket() socket) {
 		try {
-			const filteredMessage = this.channelService.messageFilter(
+			const filteredMessage = await this.channelService.messageFilter(
 				data.channelId,
 				data.userId,
 				data.message,
 			);
 			this.server.to(data.channelId).emit('message', {
+				userId: data.userId,
 				message: filteredMessage,
 			});
 			return { res: true };
