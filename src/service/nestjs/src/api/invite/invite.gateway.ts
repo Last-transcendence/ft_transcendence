@@ -62,8 +62,8 @@ class InviteGateway {
 	) {
 		try {
 			const userId: string = socket.user.id;
-			const destId: string = messageDto.destId;
-            const destUser = await this.userService.findByNickname(destId);
+			const destNickname: string = messageDto.destNickname;
+            const destUser = await this.userService.findByNickname(destNickname);
             if (!destUser) {
                 throw new BadRequestException('destUser not found');
             }
@@ -71,15 +71,15 @@ class InviteGateway {
             if (!channelInfo) {
                 throw new BadRequestException('channel not found');
             }
-			const isBlocked = await this.blockService.find(userId, destId);
+			const isBlocked = await this.blockService.find(userId, destUser.id);
 			if (isBlocked) {
 				throw new BadRequestException('Blocked user');
 			}
 
 			socket.to('invite').emit('invite', {
 				srcId: userId,
-				destId: destId,
-				destNickname: socket.user.nickname,
+				destId: destUser.id,
+				destNickname: destUser.nickname,
                 channelId: messageDto.channelId,
                 channelTitle: channelInfo.title,
             });

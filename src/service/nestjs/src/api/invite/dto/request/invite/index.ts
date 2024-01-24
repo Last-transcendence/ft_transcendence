@@ -3,11 +3,11 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsUUID, IsString } from 'class-validator';
 
 class Invite {
-	@IsUUID()
+	@IsString()
 	@IsNotEmpty()
 	@Trim()
 	@ApiProperty({ description: 'ChatRoom destination user id' })
-	destId: string;
+	destNickname: string;
 
 	@IsUUID()
 	@IsNotEmpty()
