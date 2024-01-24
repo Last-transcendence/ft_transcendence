@@ -1,4 +1,5 @@
 import CreatUserBody from '@/component/auth/register';
+import IsWithNotAuth from '@/component/common/accessControl/IsWithNotAuth';
 
 const CreatPage = () => {
 	return (
@@ -8,4 +9,4 @@ const CreatPage = () => {
 	);
 };
 
-export default CreatPage;
+export default IsWithNotAuth(CreatPage);

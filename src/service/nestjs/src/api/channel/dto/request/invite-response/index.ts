@@ -3,7 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString, IsUUID } from 'class-validator';
 import { $Enums } from '@prisma/client';
 
-class Invite {
+class InviteResponse {
 	@IsNotEmpty()
 	@IsUUID()
 	@Trim()
@@ -19,14 +19,14 @@ class Invite {
 	@IsNotEmpty()
 	@IsString()
 	@Trim()
-	@ApiProperty({ description: 'Nickname to invite' })
-	nickname: string;
+	@ApiProperty({ description: 'Game mode' })
+	mode: $Enums.GameMode;
 
 	@IsNotEmpty()
 	@IsString()
 	@Trim()
-	@ApiProperty({ description: 'Game mode' })
-	mode: $Enums.GameMode;
+	@ApiProperty({ description: 'Response' })
+	response: 'ACCEPT' | 'REJECT';
 }
 
-export default Invite;
+export default InviteResponse;
