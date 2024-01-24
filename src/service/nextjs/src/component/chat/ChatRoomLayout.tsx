@@ -106,6 +106,7 @@ const ChatRoomLayout = ({
 		nickname?: string,
 		message?: string,
 		channelId?: string,
+		mode?: string,
 	) => {
 		switch (type) {
 			case 'HELP':
@@ -118,19 +119,12 @@ const ChatRoomLayout = ({
 				break;
 			case 'GAME':
 				// @todo 게임 시작
-				channelSocket?.emit(
-					'invite',
-					{
-						channelId,
-						userId: me?.id,
-						nickname,
-					},
-					(response: any) => {
-						console.log(response);
-						//성공 시 세팅
-						alert('GAME START');
-					},
-				);
+				channelSocket?.emit('invite', {
+					channelId,
+					userId: me?.id,
+					nickname,
+					mode,
+				});
 				break;
 			default:
 				break;
