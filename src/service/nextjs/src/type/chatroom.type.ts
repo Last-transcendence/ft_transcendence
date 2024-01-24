@@ -4,6 +4,7 @@ type Chatroom = {
 	destId: string;
 	createdAt: string;
 	updatedAt: string;
+	nickname?: string;
 };
 
 export default Chatroom;

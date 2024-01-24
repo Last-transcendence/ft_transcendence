@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useContext, useState } from 'react';
+import { useCallback, useContext, useMemo, useState } from 'react';
 import style from '../../../style/main/body/index.module.css';
 import ChattingRoom from './chatting-room';
 import ChattingModeToggle from './chatting-mode';
@@ -10,9 +10,10 @@ import PositionableSnackbar from '@/component/common/PositionableSnackbar';
 import Chatroom from '@/type/chatroom.type';
 import { Channel } from '@/type/channel.type';
 import useFetchData from '@/hook/useFetchData';
-import { AxiosError } from 'axios';
+import axios, { AxiosError } from 'axios';
 import SocketContext from '@/context/socket.context';
 import CustomModal from '@/component/common/CustomModal';
+import FriendType from '@/type/friend.type';
 
 export type ChattingMode = 'normal' | 'private';
 
@@ -40,8 +41,11 @@ const MainPageBody = () => {
 		error: dmError,
 	} = useFetchData<Chatroom[]>('/chatroom');
 
+	const { data: friendList } = useFetchData<FriendType[]>('/friend');
 	const navigateChannel = useCallback(
 		(channelId: string | undefined, password?: string) => {
+			if (!channelSocket) return;
+			console.log('channelId, password', channelId, password);
 			channelSocket?.emit('join', { channelId, password }, (res: any) => {
 				console.log(res);
 				if (res?.res) router.push(`/chat/${channelId}/common`);
@@ -68,6 +72,14 @@ const MainPageBody = () => {
 			});
 		},
 		[chatSocket, router],
+	);
+
+	const getUserNickname = useCallback(
+		(userId: string) => {
+			const user = friendList?.find((data: FriendType) => data.id === userId);
+			return user?.nickname ?? '';
+		},
+		[friendList],
 	);
 
 	const getView = (
@@ -136,7 +148,11 @@ const MainPageBody = () => {
 						style={{ textDecoration: 'none' }}
 					>
 						<ChattingRoom
-							title={mode === 'normal' ? (data as Channel)?.title : 'DM방입니다.'}
+							title={
+								mode === 'normal'
+									? (data as Channel)?.title
+									: `${getUserNickname((data as Chatroom)?.destId)}님과의 대화`
+							}
 							visibility={
 								mode === 'normal'
 									? ((data as Channel)?.visibility as 'PUBLIC' | 'PROTECTED')

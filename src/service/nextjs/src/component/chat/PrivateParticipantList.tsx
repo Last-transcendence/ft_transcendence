@@ -7,11 +7,10 @@ import style from '@/style/friend/list/index.module.css';
 import UserBriefInformation from '@/component/common/user/bried-information';
 
 interface PrivateParticipantListProps {
-	id?: string;
+	otherUserData?: User;
 }
 
-const PrivateParticipantList = ({ id }: PrivateParticipantListProps) => {
-	const { data: otherUserData } = useFetchData<User>(id ? `/user/${id}` : null);
+const PrivateParticipantList = ({ otherUserData }: PrivateParticipantListProps) => {
 	const { me } = useContext(AuthContext);
 
 	return (

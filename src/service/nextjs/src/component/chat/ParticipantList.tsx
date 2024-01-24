@@ -86,14 +86,14 @@ const ParticipantList = ({ myRole, ownerId, channelData, channelId }: Participan
 								nickname={
 									myRole !== ParticipantRole.USER ? (
 										<AdminNickMenu
-											nickname={data?.user.nickname}
+											nickname={data?.user?.nickname}
 											userId={data?.userId}
 											channelId={channelId}
 											ownerId={ownerId}
 											isMute={isMute(data?.userId)}
 										/>
 									) : (
-										<NickMenu nickname={data?.user.nickname} />
+										<NickMenu nickname={data?.user?.nickname} />
 									)
 								}
 								condition={<ChatStatus status={data?.role} />}

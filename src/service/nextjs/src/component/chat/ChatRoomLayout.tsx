@@ -16,6 +16,7 @@ import SocketContext from '@/context/socket.context';
 import AuthContext from '@/context/auth.context';
 import { ChatLiveDataType } from '@/component/chat/CommonChatRoomPage';
 import ListenContext from '@/context/listen.context';
+import User from '@/type/user.type';
 
 export type CommandType = 'DM' | 'GAME' | 'HELP';
 
@@ -27,6 +28,7 @@ interface ChatRoomLayoutProps {
 	ownerId?: string | undefined;
 	chatLiveData: ChatLiveDataType[];
 	setChatLiveData: Dispatch<SetStateAction<ChatLiveDataType[]>>;
+	otherUserData?: User;
 }
 
 const ChatRoomLayout = ({
@@ -37,15 +39,12 @@ const ChatRoomLayout = ({
 	ownerId,
 	chatLiveData,
 	setChatLiveData,
+	otherUserData,
 }: ChatRoomLayoutProps) => {
 	const params = useParams<{ id: string }>();
 	const { channelSocket, chatSocket } = useContext(SocketContext).sockets;
 	const { me } = useContext(AuthContext);
 	const { currentDm } = useContext(ListenContext);
-	const socket = useMemo(() => {
-		if (type === 'channel') return channelSocket;
-		else return chatSocket;
-	}, [channelSocket, chatSocket, type]);
 
 	//채널 메세지 수신 (한번만 등록)
 	useEffect(() => {
@@ -68,44 +67,13 @@ const ChatRoomLayout = ({
 		};
 	}, [channelSocket]);
 
-	//@todo 추후삭제
-	// useEffect(() => {
-	// 	chatSocket?.on('message', res => {
-	// 		console.log('res2222', res);
-	// 		setChatLiveData((prev: ChatLiveDataType[]) => [
-	// 			...prev,
-	// 			{ type: 'chat', id: res?.userId, message: res?.message },
-	// 		]);
-	// 	});
-	// 	return () => {
-	// 		chatSocket?.off('message');
-	// 	};
-	// }, [chatSocket]);
-	//
-	// useEffect(() => {
-	// 	console.log('chatSocket', chatSocket);
-	// 	if (type === 'channel') return console.log('channel return');
-	// 	if (!chatSocket) return console.log('chat socket return');
-	// 	console.log('setttttt');
-	// 	chatSocket.on('message', res => {
-	// 		console.log('res2222', res);
-	// 		setChatLiveData((prev: ChatLiveDataType[]) => [
-	// 			...prev,
-	// 			{ type: 'chat', id: res?.userId, message: res?.message },
-	// 		]);
-	// 	});
-	// 	return () => {
-	// 		chatSocket?.off('message');
-	// 	};
-	// }, [chatSocket, setChatLiveData, type]);
-
-	//DM 메세지 세팅
+	//DM 메세지 수신
 	useEffect(() => {
 		if (type === 'channel') return;
 		if (!currentDm?.message || currentDm?.message === '') return;
 		setChatLiveData((prev: ChatLiveDataType[]) => [
 			...prev,
-			{ type: 'chat', id: currentDm?.userId, message: currentDm?.message },
+			{ type: 'chat', id: currentDm?.srcId, message: currentDm?.message },
 		]);
 	}, [currentDm]);
 
@@ -133,7 +101,7 @@ const ChatRoomLayout = ({
 				}
 			});
 		},
-		[me?.id, params?.id, setChatLiveData, socket, type],
+		[me?.id, params?.id, setChatLiveData, type],
 	);
 
 	const commandAction = (
@@ -174,12 +142,12 @@ const ChatRoomLayout = ({
 
 	const getUser = useCallback(
 		(id: string) => {
-			return data?.participant?.find((user: any) => user?.id === id);
+			if (me?.id === id) return me;
+			if (type === 'channel') return data?.participant?.find((user: any) => user?.userId === id);
+			return otherUserData;
 		},
-		[data?.participant],
+		[data?.participant, me, otherUserData, type],
 	);
-
-	console.log('chatLiveData', chatLiveData);
 
 	return (
 		<Stack width={'100%'} height={'100%'}>
@@ -188,7 +156,7 @@ const ChatRoomLayout = ({
 			<Stack padding={2} spacing={1} sx={{ overflowY: 'scroll' }} height={'100%'}>
 				{chatLiveData?.map((chat: any, index: number) => {
 					if (chat.type === 'chat') {
-						const userData = chat?.me ? me : getUser(chat?.id);
+						const userData = getUser(chat?.id);
 						return (
 							<ChatMsg
 								userData={userData}

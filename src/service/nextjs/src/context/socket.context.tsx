@@ -2,11 +2,11 @@ import { createContext, Dispatch, ReactNode, SetStateAction, useEffect, useState
 import { io, Socket } from 'socket.io-client';
 
 const connect = (namespace: string) => {
-	alert(`Socket connected on ${namespace}`);
+	// alert(`Socket connected on ${namespace}`);
 };
 
 const disconnect = (namespace: string) => {
-	alert(`Socket disconnected on ${namespace}`);
+	// alert(`Socket disconnected on ${namespace}`);
 };
 
 const initSocket = (namespace: string): Socket => {
@@ -49,6 +49,7 @@ export const SocketProvider = (props: { children: ReactNode }) => {
 		channelSocket: null,
 		gameSocket: null,
 	});
+	const [socketLoading, setSocketLoading] = useState<boolean>(false);
 
 	useEffect(() => {
 		if (!sockets.chatSocket) {
@@ -69,8 +70,12 @@ export const SocketProvider = (props: { children: ReactNode }) => {
 				gameSocket: initSocket('game'),
 			});
 		}
+		if (sockets.chatSocket && sockets.channelSocket && sockets.gameSocket) {
+			setSocketLoading(true);
+		}
 	}, [sockets]);
 
+	if (!socketLoading) return <></>;
 	return (
 		<>
 			<SocketContext.Provider value={{ sockets, setSocket }}>{children}</SocketContext.Provider>

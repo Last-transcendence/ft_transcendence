@@ -12,10 +12,12 @@ import CustomConfirmModal from '@/component/common/CustomConfirmModal';
 import Snackbar from '@mui/material/Snackbar';
 import { useRouter } from 'next/router';
 import { useParams } from 'next/navigation';
+import useFetchData from '@/hook/useFetchData';
+import FriendType from '@/type/friend.type';
 
 type DmType = {
 	channelId: string;
-	userId: string;
+	srcId: string;
 	message: string;
 };
 
@@ -25,7 +27,7 @@ const ListenContext = createContext<{
 }>({
 	currentDm: {
 		channelId: '',
-		userId: '',
+		srcId: '',
 		message: '',
 	},
 	setCurrentDm: () => {},
@@ -38,7 +40,7 @@ export const ListenProvider = (props: { children: ReactNode }) => {
 	const { sockets } = useContext(SocketContext);
 	const [currentDm, setCurrentDm] = useState<DmType>({
 		channelId: '',
-		userId: '',
+		srcId: '',
 		message: '',
 	});
 	const [open, setOpen] = useState<boolean>(false);
@@ -51,28 +53,38 @@ export const ListenProvider = (props: { children: ReactNode }) => {
 	});
 	const [toastOpen, setToastOpen] = useState<boolean>(false);
 	const [toastMessage, setToastMessage] = useState<string>('');
+	const { data: friendDatas } = useFetchData<FriendType[]>('/friend');
 
-	//@todo 제대로 작동할지 예상이 안가서, 소켓 테스트 후 주석 해제하겠습니다.
 	useEffect(() => {
 		//게임 중이면 무시
 		if (sockets?.chatSocket) {
+			if (friendDatas) {
+				console.log('dmDatas', friendDatas);
+				friendDatas?.forEach(data => {
+					(sockets.chatSocket as any).emit('join', { destId: data?.id }, (res: any) => {
+						console.log('join', res);
+					});
+				});
+			}
+
 			(sockets.chatSocket as any).on('message', (res: any) => {
-				console.log('dm message', res);
 				if (router.pathname.includes('game')) return;
 				if (!res?.message || res.message === '') return;
 				//DM방에 있을때, 해당 DM방에서 보낸 메세지면 setCurrentDm
 				if (router.pathname.includes('private')) {
-					console.log('params res', params?.id, res?.userId);
-					if (params?.id && params?.id === res?.userId) {
-						console.log('dm res!!', res);
+					console.log('params res', params?.id, res?.srcId);
+					if (params?.id && params?.id === res?.srcId) {
+						console.log(params.id, res.srcId);
 						setCurrentDm(res);
-					} else {
-						const message = res?.message.slice(0, 8);
-						setToastMessage(`${res?.nickname}: ${message}`);
-						setToastOpen(true);
 					}
+				} else {
+					console.log('toast', res?.srcNickname, res?.message);
+					const message = res?.message.slice(0, 8);
+					setToastMessage(`${res?.srcNickname}: ${message}`);
+					setToastOpen(true);
 				}
 			});
+
 			(sockets.chatSocket as any).on('game', (res: any) => {
 				setMessage({
 					title: '게임 초대',
@@ -87,7 +99,7 @@ export const ListenProvider = (props: { children: ReactNode }) => {
 				(sockets.chatSocket as any).off('game');
 			}
 		};
-	}, [params?.id, router.pathname, sockets.chatSocket]);
+	}, [friendDatas, params?.id, router.pathname, sockets]);
 
 	return (
 		<>
