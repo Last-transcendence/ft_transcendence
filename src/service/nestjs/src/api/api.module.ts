@@ -12,6 +12,7 @@ import MuteModule from './mute/mute.module';
 import ParticipantModule from './participant/participant.module';
 import TestModule from './test/test.module';
 import UserModule from './user/user.module';
+import InviteModule from './invite/invite.module';
 
 @Module({
 	imports: [
@@ -28,6 +29,7 @@ import UserModule from './user/user.module';
 		ParticipantModule,
 		UserModule,
 		TestModule,
+		InviteModule,
 	],
 })
 class ApiModule {}
