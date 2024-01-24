@@ -47,18 +47,20 @@ class Queue extends Phaser.Scene {
 			this.socket.off('matched');
 
 			setTimeout(() => {
-				this.scene.start('Main', {
-					navigate: this.navigate,
-					socket: this.socket,
-					room: response.room,
-				});
+				if (this.scene) {
+					this.scene.start('Main', {
+						navigate: this.navigate,
+						socket: this.socket,
+						room: response.room,
+					});
+				}
 			}, 1000);
 		});
 		this.socket.emit('queue');
 	}
 
 	create() {
-		if (this.gameRoomId) {
+		if (this.gameRoomId && this.scene) {
 			this.scene.start('Main', {
 				navigate: this.navigate,
 				socket: this.socket,

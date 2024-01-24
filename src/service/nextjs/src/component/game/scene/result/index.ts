@@ -20,12 +20,31 @@ class Result extends Phaser.Scene {
 		this.events = new Phaser.Events.EventEmitter();
 	}
 
-	preload() {}
+	preload() {
+		if (this.me && this.me.profileImageURI) {
+			this.load.image(
+				`${this.me.profileImageURI}`,
+				'https://dev.transcendence.42seoul.kr/upload/' + this.me.profileImageURI,
+			);
+		}
+		if (this.opponent && this.opponent.profileImageURI) {
+			this.load.image(
+				`${this.opponent.profileImageURI}`,
+				'https://dev.transcendence.42seoul.kr/upload/' + this.opponent.profileImageURI,
+			);
+		}
+		this.load.image(
+			'defaultProfileImage',
+			'https://dev.transcendence.42seoul.kr/upload/unknown_user.png',
+		);
+	}
 
 	init(data: { navigate: AppRouterInstance; me: UserData; opponent: UserData }) {
 		const { navigate, me, opponent } = data;
 
-		this.scene.setVisible(false);
+		if (this.scene) {
+			this.scene.setVisible(false);
+		}
 
 		this.navigate = navigate;
 		this.me = me;
@@ -48,15 +67,21 @@ class Result extends Phaser.Scene {
 	initUserData(user: UserData, x: number) {
 		const { nickname, profileImageURI, score } = user;
 		const y = this.game.renderer.height / 2;
+
 		const textConfig: Phaser.Types.GameObjects.Text.TextStyle = {
 			fontFamily: 'Inter',
 			fontSize: '24px',
 			color: '#ffffff',
 		};
-
 		this.add.text(x, y - 100, nickname, textConfig).setOrigin(0.5);
-		this.add.image(x, y, profileImageURI).setOrigin(0.5);
 		this.add.text(x, y + 100, score.toString(), textConfig).setOrigin(0.5);
+
+		const circle = this.add.circle(x, y, 50, 0xffffff);
+		const mask = circle.createGeometryMask();
+		const profileImage = this.add.image(x, y, profileImageURI || 'defaultProfileImage');
+		const ratio = 100 / Math.max(profileImage.width, profileImage.height);
+		profileImage.setMask(mask);
+		profileImage.setScale(ratio);
 	}
 
 	initButton() {
@@ -88,7 +113,7 @@ class Result extends Phaser.Scene {
 	}
 
 	create() {
-		if (this.navigate && this.me && this.opponent) {
+		if (this.navigate && this.me && this.opponent && this.scene) {
 			this.scene.setVisible(true);
 		}
 		if (this.me && this.opponent) {
