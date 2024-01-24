@@ -262,17 +262,10 @@ class GameGateway {
 
 			// database
 			{
-				let player1History = await this.gameService.getFirstHistory(
-					game.userId,
-					opponentGame.userId,
-				);
-				let player2History = await this.gameService.getFirstHistory(
-					opponentGame.userId,
-					game.userId,
-				);
-
+				let player1History = await this.gameService.getFirstHistory(game.id);
 				if (!player1History || player1History.result !== 'PENDING') {
-					player1History = await this.gameService.createHistory(game.userId, {
+					player1History = await this.gameService.createHistory(game.id, {
+						player1Id: game.userId,
 						player2Id: opponentGame.userId,
 						mode: game.mode,
 						player1Score: parseInt(scoreRequestDto.score),
@@ -284,8 +277,11 @@ class GameGateway {
 						player1Score: parseInt(scoreRequestDto.score),
 					});
 				}
+
+				let player2History = await this.gameService.getFirstHistory(game.id);
 				if (!player2History || player2History.result !== 'PENDING') {
-					player2History = await this.gameService.createHistory(opponentGame.userId, {
+					player2History = await this.gameService.createHistory(game.id, {
+						player1Id: opponentGame.userId,
 						player2Id: game.userId,
 						mode: game.mode,
 						player1Score: 0,

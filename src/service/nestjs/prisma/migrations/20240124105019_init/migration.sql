@@ -67,6 +67,7 @@ CREATE TABLE "Game" (
 -- CreateTable
 CREATE TABLE "GameHistory" (
     "id" UUID NOT NULL,
+    "gameId" UUID NOT NULL,
     "player1Id" UUID NOT NULL,
     "player2Id" UUID NOT NULL,
     "mode" "GameMode" NOT NULL DEFAULT 'NORMAL',
@@ -177,9 +178,6 @@ CREATE UNIQUE INDEX "Game_socketId_key" ON "Game"("socketId");
 
 -- CreateIndex
 CREATE INDEX "player1Id" ON "GameHistory"("player1Id");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Participant_channelId_key" ON "Participant"("channelId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Participant_userId_key" ON "Participant"("userId");

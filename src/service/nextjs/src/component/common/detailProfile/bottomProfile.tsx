@@ -11,6 +11,8 @@ import SocketContext from '@/context/socket.context';
 const sxStyle: avatarStyle = {
 	backgroundColor: '#DDDD99',
 	isHover: true,
+	width: 60,
+	height: 60,
 };
 
 interface BottomProfileProps {

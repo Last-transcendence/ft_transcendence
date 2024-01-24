@@ -33,12 +33,10 @@ class BanService {
 
 	async isBanned(channelId: string, userId: string): Promise<boolean> {
 		try {
-			const ban = await this.prismaService.ban.findUnique({
+			const ban = await this.prismaService.ban.findFirst({
 				where: {
-					channelId_userId: {
-						channelId,
-						userId,
-					},
+					channelId,
+					userId,
 				},
 			});
 

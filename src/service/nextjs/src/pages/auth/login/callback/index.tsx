@@ -11,7 +11,6 @@ const LoginCallBackPage = () => {
 		axiosInstance
 			.get('/user/me')
 			.then(response => {
-				console.log(response);
 				setMe(response.data);
 				navigate.push('/');
 			})

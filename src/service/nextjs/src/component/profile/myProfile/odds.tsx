@@ -5,7 +5,7 @@ const Odds = ({ gameRecords, message }: { gameRecords: Game[]; message: string }
 		let count = 0;
 		if (message.length === 0) {
 			gameRecords.map(item => {
-				if (item.result === 1) {
+				if (item.result === 'WIN') {
 					count++;
 				}
 			});

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, forwardRef, Inject } from '@nestjs/common';
 import { MessageBody } from '@nestjs/websockets';
 import { $Enums } from '@prisma/client';
 import MuteService from 'api/mute/mute.service';
@@ -12,6 +12,7 @@ import * as Dto from './dto';
 class ChannelService {
 	constructor(
 		private readonly prismaService: PrismaService,
+		@Inject(forwardRef(() => MuteService))
 		private readonly muteService: MuteService,
 	) {}
 
