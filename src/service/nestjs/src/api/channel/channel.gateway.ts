@@ -170,7 +170,7 @@ class ChannelGateway {
 				profileImageURI: participant.userProfileImageURI,
 			});
 			socket.leave(participant.channelId);
-			await this.channelService.leaveChannel(socket, data.channelId, socket.user.id);
+			await this.channelService.leaveChannel(socket, socket.user.id);
 
 			return { res: true };
 		} catch (error) {
