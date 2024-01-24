@@ -93,11 +93,16 @@ class ChannelGateway {
 				throw new BadRequestException('Wrong password');
 			}
 
-			await this.participantService.create({
-				channelId: joinData.channelId,
-				userId,
-				socketId: socket.id,
-			});
+			const existingParticipant = await this.participantService.get(userId);
+			if (existingParticipant) {
+				await this.participantService.updateParticipant(existingParticipant.id, socket.id);
+			} else {
+				await this.participantService.create({
+					channelId: joinData.channelId,
+					userId: userId,
+					socketId: socket.id,
+				});
+			}
 
 			socket.join(joinData.channelId);
 			this.server.to(joinData.channelId).emit('join', {
@@ -169,7 +174,6 @@ class ChannelGateway {
 				message: `${socket.user.id} has left the channel`,
 				profileImageURI: participant.userProfileImageURI,
 			});
-			socket.leave(participant.channelId);
 			await this.channelService.leaveChannel(socket, socket.user.id);
 
 			return { res: true };

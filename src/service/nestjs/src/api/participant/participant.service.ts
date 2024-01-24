@@ -127,10 +127,8 @@ class ParticipantService {
 			throw new Error(error.message);
 		}
 	}
-	async update(
-		id: string,
-		updateParticipantDto: Dto.Request.Update,
-	): Promise<Dto.Response.Participant> {
+
+	async updateParticipant(id: string, socketId: string): Promise<Dto.Response.Participant> {
 		try {
 			const participant = await this.prismaService.participant.findUnique({
 				where: { id },
@@ -141,7 +139,9 @@ class ParticipantService {
 
 			return await this.prismaService.participant.update({
 				where: { id },
-				data: updateParticipantDto,
+				data: {
+					socketId: socketId,
+				},
 			});
 		} catch (error) {
 			throw new Error(error.message);
