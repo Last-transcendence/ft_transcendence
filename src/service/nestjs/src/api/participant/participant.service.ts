@@ -45,7 +45,7 @@ class ParticipantService {
 			if (!participant) {
 				throw new Error('User is not participant');
 			} else if (participant.role !== 'OWNER') {
-				throw new Error('User is not the owner');
+				return false;
 			}
 			return true;
 		} catch (error) {
@@ -130,7 +130,7 @@ class ParticipantService {
 
 	async kick(id: string): Promise<Dto.Response.Participant> {
 		try {
-			const participant = await this.prismaService.participant.findUnique({
+			const participant = await this.prismaService.participant.findFirst({
 				where: { id },
 			});
 			if (!participant) {
@@ -139,6 +139,23 @@ class ParticipantService {
 
 			return await this.prismaService.participant.delete({
 				where: { id },
+			});
+		} catch (error) {
+			throw new Error(error.message);
+		}
+	}
+
+	async kickByUserId(userId: string): Promise<Dto.Response.Participant> {
+		try {
+			const participant = await this.prismaService.participant.findFirst({
+				where: { userId },
+			});
+			if (!participant) {
+				throw new BadRequestException('Participant not found');
+			}
+
+			return await this.prismaService.participant.delete({
+				where: { id: participant.id },
 			});
 		} catch (error) {
 			throw new Error(error.message);
