@@ -53,6 +53,12 @@ class ChannelService {
 						select: {
 							id: true,
 							userId: true,
+							role: true,
+							user: {
+								select: {
+									nickname: true,
+								},
+							},
 						},
 					},
 					mute: {

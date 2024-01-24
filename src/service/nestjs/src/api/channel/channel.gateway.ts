@@ -99,7 +99,7 @@ class ChannelGateway {
 				socketId: socket.id,
 			});
 			socket.join(joinData.channelId);
-			this.server.to(joinData.channelId).emit('message', {
+			this.server.to(joinData.channelId).emit('join', {
 				userId: socket.user.id,
 				nickname: socket.user.nickname,
 				profileImageURI: socket.user.profileImageURI,
@@ -135,12 +135,13 @@ class ChannelGateway {
 	@UseGuards(Auth.Guard.UserWsJwt)
 	async handleMessage(@MessageBody() data, @ConnectedSocket() socket) {
 		try {
-			const filteredMessage = this.channelService.messageFilter(
+			const filteredMessage = await this.channelService.messageFilter(
 				data.channelId,
 				data.userId,
 				data.message,
 			);
 			this.server.to(data.channelId).emit('message', {
+				userId: data.userId,
 				message: filteredMessage,
 			});
 			return { res: true };
