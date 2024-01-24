@@ -1,6 +1,7 @@
 import { Trim } from '@miaooo/class-transformer-trim';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, IsUUID } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
+import { $Enums } from '@prisma/client';
 
 class Create {
 	@IsNotEmpty()
@@ -20,6 +21,12 @@ class Create {
 	@Trim()
 	@ApiProperty({ description: 'Socket id' })
 	socketId: string;
+
+	@IsOptional()
+	@IsString()
+	@Trim()
+	@ApiProperty({ description: 'Role' })
+	role?: $Enums.ParticipantRole = 'USER';
 }
 
 export default Create;

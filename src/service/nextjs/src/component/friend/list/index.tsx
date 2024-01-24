@@ -14,7 +14,7 @@ interface FriendListProps {
 	data: Friend[] | undefined; 
 	refetch: () => void;
 	blockRefetch: () => void;
-}
+
 
 const FriendList = ({ data, refetch, blockRefetch }: FriendListProps) => {
 	return (
@@ -23,7 +23,7 @@ const FriendList = ({ data, refetch, blockRefetch }: FriendListProps) => {
 			{data && data?.length ? (
 				data.map(user => {
 					return (
-						<div key={user?.userId}>
+						<div key={user?.id}>
 							{/*@todo 문자제거.*/}
 							<UserBriefInformation
 								nickname={user?.nickname}
@@ -33,6 +33,7 @@ const FriendList = ({ data, refetch, blockRefetch }: FriendListProps) => {
 								imgUrl={user?.profileImageURI}
 								refetch={refetch}
 								blockRefetch={blockRefetch}
+
 							/>
 						</div>
 					);

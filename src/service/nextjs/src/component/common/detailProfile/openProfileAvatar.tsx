@@ -80,7 +80,7 @@ const OpenProfileAvatar = ({ otherUserId, imgUrl, refetch, blockRefetch }: OpenP
 				{errorMessage}
 			</CustomSnackbar>
 			<Avatar onClick={handleAvatarOpen} sx={{ cursor: 'pointer' }}>
-				{imgUrl === null ? (
+				{imgUrl === '' || !imgUrl ? (
 					<CustomImage img={UNKNOWN_PROFILE_IMAGE_URI} alt={'user img'} />
 				) : (
 					<CustomImage useLoader img={imgUrl as string} alt="user img" />

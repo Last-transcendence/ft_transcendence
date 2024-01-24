@@ -1,12 +1,12 @@
 import { useParams } from 'next/navigation';
 import {
 	Dispatch,
+	LegacyRef,
 	ReactNode,
 	SetStateAction,
 	useCallback,
 	useContext,
 	useEffect,
-	useMemo,
 } from 'react';
 import { Stack } from '@mui/material';
 import { ChatMsg, HelpMsg, StatusMsg } from '@/component/chat/Message';
@@ -16,6 +16,7 @@ import SocketContext from '@/context/socket.context';
 import AuthContext from '@/context/auth.context';
 import { ChatLiveDataType } from '@/component/chat/CommonChatRoomPage';
 import ListenContext from '@/context/listen.context';
+import User from '@/type/user.type';
 
 export type CommandType = 'DM' | 'GAME' | 'HELP';
 
@@ -27,6 +28,7 @@ interface ChatRoomLayoutProps {
 	ownerId?: string | undefined;
 	chatLiveData: ChatLiveDataType[];
 	setChatLiveData: Dispatch<SetStateAction<ChatLiveDataType[]>>;
+	otherUserData?: User;
 }
 
 const ChatRoomLayout = ({
@@ -37,20 +39,20 @@ const ChatRoomLayout = ({
 	ownerId,
 	chatLiveData,
 	setChatLiveData,
+	otherUserData,
 }: ChatRoomLayoutProps) => {
 	const params = useParams<{ id: string }>();
 	const { channelSocket, chatSocket } = useContext(SocketContext).sockets;
 	const { me } = useContext(AuthContext);
 	const { currentDm } = useContext(ListenContext);
-	const socket = useMemo(() => {
-		if (type === 'channel') return channelSocket;
-		else return chatSocket;
-	}, [channelSocket, chatSocket, type]);
 
 	//채널 메세지 수신 (한번만 등록)
 	useEffect(() => {
 		if (type === 'chatroom') return;
-		channelSocket?.on('message', res => {
+		if (!channelSocket) return;
+		console.log({ channelId: params?.id, password: '' });
+		channelSocket.on('message', res => {
+			console.log('channel!!!', res);
 			if (params?.id === res.channelId)
 				setChatLiveData((prev: ChatLiveDataType[]) => [
 					...prev,
@@ -60,33 +62,44 @@ const ChatRoomLayout = ({
 		return () => {
 			channelSocket?.off('message');
 		};
-	}, []);
+	}, [channelSocket]);
 
-	//DM 메세지 세팅
+	//DM 메세지 수신
 	useEffect(() => {
 		if (type === 'channel') return;
 		if (!currentDm?.message || currentDm?.message === '') return;
 		setChatLiveData((prev: ChatLiveDataType[]) => [
 			...prev,
-			{ type: 'chat', id: currentDm?.userId, message: currentDm?.message },
+			{ type: 'chat', id: currentDm?.srcId, message: currentDm?.message },
 		]);
 	}, [currentDm]);
 
-	const sendAction = (message: string) => {
-		if (message === '' || !params?.id || !me?.id) return;
-		// send message
-		socket?.emit('message', { channelId: params?.id, userId: me?.id, message }, (res: any) => {
-			console.log(res);
-			console.log('message', message);
-			//성공 시 세팅
-			if (res?.res) {
-				setChatLiveData((prev: ChatLiveDataType[]) => [
-					...prev,
-					{ type: 'chat', id: me?.id, message: message, me: true },
-				]);
-			}
-		});
-	};
+	const sendAction = useCallback(
+		(message: string) => {
+			if (message === '' || !params?.id || !me?.id) return;
+			const req =
+				type === 'channel'
+					? {
+							channelId: params?.id,
+							userId: me?.id,
+							message: message,
+						}
+					: { destId: params?.id, message };
+
+			console.log('req', req);
+			// send message
+			(type === 'channel' ? channelSocket : chatSocket)?.emit('message', req, (res: any) => {
+				//성공 시 세팅
+				if (res?.res) {
+					setChatLiveData((prev: ChatLiveDataType[]) => [
+						...prev,
+						{ type: 'chat', id: me?.id, message: message, me: true },
+					]);
+				}
+			});
+		},
+		[me?.id, params?.id, setChatLiveData, type],
+	);
 
 	const commandAction = (
 		type: CommandType,
@@ -126,19 +139,21 @@ const ChatRoomLayout = ({
 
 	const getUser = useCallback(
 		(id: string) => {
-			return data?.participant?.find((user: any) => user?.id === id);
+			if (me?.id === id) return me;
+			if (type === 'channel') return data?.participant?.find((user: any) => user?.userId === id);
+			return otherUserData;
 		},
-		[data?.participant],
+		[data?.participant, me, otherUserData, type],
 	);
 
 	return (
 		<Stack width={'100%'} height={'100%'}>
 			{/*헤더 영역*/}
 			<div>{children}</div>
-			<Stack padding={2} spacing={1} sx={{ overflowY: 'scroll' }} height={'100%'}>
+			<Stack padding={2} spacing={1} sx={{ overflowY: 'auto' }} height={'100%'}>
 				{chatLiveData?.map((chat: any, index: number) => {
 					if (chat.type === 'chat') {
-						const userData = chat?.me ? me : getUser(chat?.id);
+						const userData = getUser(chat?.id);
 						return (
 							<ChatMsg
 								userData={userData}
@@ -149,8 +164,8 @@ const ChatRoomLayout = ({
 								message={chat?.message}
 							/>
 						);
-					} else if (chat.type === 'help') return <HelpMsg />;
-					else if (chat.type === 'action') return <StatusMsg message={chat?.message} />;
+					} else if (chat.type === 'help') return <HelpMsg key={index} />;
+					else if (chat.type === 'action') return <StatusMsg message={chat?.message} key={index} />;
 				})}
 			</Stack>
 			{/*@todo 연결이 완료되어야 채팅을 보낼 수 있도록 설정 */}

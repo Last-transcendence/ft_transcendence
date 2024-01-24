@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { MessageBody } from '@nestjs/websockets';
 import { $Enums } from '@prisma/client';
-import MuteService from 'api/mute/mute.service';
 import { plainToClass } from 'class-transformer';
 import { validate } from 'class-validator';
-import PrismaService from 'common/prisma/prisma.service';
 import { Socket } from 'socket.io';
+import MuteService from 'api/mute/mute.service';
+import PrismaService from 'common/prisma/prisma.service';
 import * as Dto from './dto';
 
 @Injectable()
@@ -53,6 +53,12 @@ class ChannelService {
 						select: {
 							id: true,
 							userId: true,
+							role: true,
+							user: {
+								select: {
+									nickname: true,
+								},
+							},
 						},
 					},
 					mute: {
@@ -109,17 +115,18 @@ class ChannelService {
 		}
 	}
 
-	async leaveChannel(socket: Socket, userId: string) {
+	async leaveChannel(socket: Socket, channelId: string, userId: string) {
 		try {
-			const participant = await this.prismaService.participant.findUnique({
+			const participant = await this.prismaService.participant.findFirst({
 				where: { userId: userId },
 			});
 
-			if (!participant) {
+			if (!participant || channelId === participant.channelId) {
 				return;
 			}
 
 			socket.leave(participant.channelId);
+
 			return await this.prismaService.participant.delete({
 				where: { id: participant.id },
 			});

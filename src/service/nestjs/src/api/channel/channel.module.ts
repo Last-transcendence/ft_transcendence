@@ -6,6 +6,7 @@ import ChannelController from './channel.controller';
 import ChannelGateway from './channel.gateway';
 import ChannelService from './channel.service';
 import UserModule from 'api/user/user.module';
+import GameModule from 'api/game/game.module';
 
 @Module({
 	imports: [
@@ -13,6 +14,7 @@ import UserModule from 'api/user/user.module';
 		forwardRef(() => BanModule),
 		forwardRef(() => MuteModule),
 		UserModule,
+		GameModule,
 	],
 	controllers: [ChannelController],
 	providers: [ChannelService, ChannelGateway],

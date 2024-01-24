@@ -19,10 +19,10 @@ const NickMenu = ({ nickname }: { nickname: string }) => {
 	return (
 		<>
 			<Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
-				<MenuItem>{nickname}</MenuItem>
+				<MenuItem>{nickname + '임시 닉네임'}</MenuItem>
 			</Menu>
 			<Typography fontWeight={'bold'} sx={{ cursor: 'pointer' }} onClick={handleClick}>
-				{nickname}
+				{nickname + '임시 닉네임'}
 			</Typography>
 		</>
 	);
