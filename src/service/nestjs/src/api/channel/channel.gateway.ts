@@ -333,8 +333,8 @@ class ChannelGateway {
 			});
 			return { res: true };
 		} catch (error) {
-			console.error('An error occurred in channel.gateway:', error); // 에러 메시지 출력
-			socket.emit('error', { message: 'An error occurred in channel.gateway' }); // 에러 메시지 전달
+			console.error('An error occurred in channel.gateway:', error);
+			socket.emit('error', { message: 'An error occurred in channel.gateway' });
 			return { res: false, message: error };
 		}
 	}
