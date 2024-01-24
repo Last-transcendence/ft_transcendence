@@ -283,7 +283,10 @@ class ChannelGateway {
 	@UseGuards(Auth.Guard.UserWsJwt)
 	async handleMute(@ConnectedSocket() socket, @MessageBody() data) {
 		try {
-			if ((await this.participantService.isAdmin(socket.user.id)) === false) {
+			if ((await this.participantService.isAuthorized(socket.user.id)) === false) {
+				throw new Error('Permission denied');
+			}
+			if ((await this.participantService.isOwner(data.toUserId)) === true) {
 				throw new Error('Permission denied');
 			}
 			await this.muteService.muteUser(data.channelId, data.toUserId);
@@ -303,7 +306,10 @@ class ChannelGateway {
 	@UseGuards(Auth.Guard.UserWsJwt)
 	async handleKick(@ConnectedSocket() socket, @MessageBody() data) {
 		try {
-			if ((await this.participantService.isAdmin(socket.user.id)) === false) {
+			if ((await this.participantService.isAuthorized(socket.user.id)) === false) {
+				throw new Error('Permission denied');
+			}
+			if ((await this.participantService.isOwner(data.toUserId)) === true) {
 				throw new Error('Permission denied');
 			}
 			await this.participantService.kick(socket.user.id);
@@ -324,7 +330,10 @@ class ChannelGateway {
 	@UseGuards(Auth.Guard.UserWsJwt)
 	async handleBan(@ConnectedSocket() socket, @MessageBody() data) {
 		try {
-			if ((await this.participantService.isAdmin(socket.user.id)) === false) {
+			if ((await this.participantService.isAuthorized(socket.user.id)) === false) {
+				throw new Error('Permission denied');
+			}
+			if ((await this.participantService.isOwner(data.toUserId)) === true) {
 				throw new Error('Permission denied');
 			}
 			await this.participantService.kick(socket.user.id);
