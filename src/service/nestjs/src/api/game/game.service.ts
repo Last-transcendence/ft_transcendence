@@ -55,8 +55,25 @@ class GameService {
 
 	async delete(id: string): Promise<GameModel> {
 		try {
-			return await this.prismaService.game.delete({
+			const game = await this.prismaService.game.findFirst({
 				where: { id },
+			});
+			if (!game) {
+				return null;
+			}
+
+			return await this.prismaService.game.delete({
+				where: { id: game.id },
+			});
+		} catch (error) {
+			throw new Error(error.message);
+		}
+	}
+
+	async deleteByUserId(userId: string): Promise<void> {
+		try {
+			await this.prismaService.game.deleteMany({
+				where: { userId },
 			});
 		} catch (error) {
 			throw new Error(error.message);
@@ -142,19 +159,17 @@ class GameService {
 		}
 	}
 
-	async deleteFirstHistory(player1Id: string, player2Id: string): Promise<GameHistoryModel> {
+	async deleteFirstHistory(userId: string): Promise<GameHistoryModel> {
 		try {
 			const history = await this.prismaService.gameHistory.findFirst({
-				where: {
-					player1Id,
-					player2Id,
-				},
+				where: { player1Id: userId },
 			});
+			if (!history) {
+				return null;
+			}
 
 			return await this.prismaService.gameHistory.delete({
-				where: {
-					id: history.id,
-				},
+				where: { id: history.id },
 			});
 		} catch (error) {
 			throw new Error(error.message);

@@ -93,9 +93,12 @@ class Main extends Phaser.Scene {
 			this.socket.off('score');
 			this.socket.off('end');
 
+			console.log('end', response);
+
 			if (response.state === 'DISCONNECTED') {
-				// this.scene.start('Disconnected', {});
-				this.navigate.push('/');
+				this.scene.start('Disconnected', {
+					navigate: this.navigate,
+				});
 				return;
 			}
 
@@ -245,6 +248,12 @@ class Main extends Phaser.Scene {
 	}
 
 	update(time: number, delta: number) {
+		if (this.socket && time % 100 < delta) {
+			this.socket.emit('connected', { room: this.room }, (response: any) => {
+				//console.log(response.updatedAt);
+			});
+		}
+
 		if (!this.isPlaying) {
 			if (this.room === '' || !this.resetFlag || !this.keys.space?.isDown) {
 				return;

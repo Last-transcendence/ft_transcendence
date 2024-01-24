@@ -12,6 +12,9 @@ class Result extends Phaser.Scene {
 	private me!: UserData;
 	private opponent!: UserData;
 
+	private title!: Phaser.GameObjects.Text;
+	private button!: Phaser.GameObjects.Text;
+
 	constructor() {
 		super({ key: 'Result', active: true });
 		this.events = new Phaser.Events.EventEmitter();
@@ -29,8 +32,6 @@ class Result extends Phaser.Scene {
 		this.opponent = opponent;
 	}
 
-	initSocket() {}
-
 	initTitle(win: boolean) {
 		const x = this.game.renderer.width / 2;
 		const y = this.game.renderer.height / 8;
@@ -41,7 +42,7 @@ class Result extends Phaser.Scene {
 		};
 		const result = win ? 'You Win!' : 'You Lose!';
 
-		this.add.text(x, y, result, textConfig).setOrigin(0.5);
+		this.title = this.add.text(x, y, result, textConfig).setOrigin(0.5);
 	}
 
 	initUserData(user: UserData, x: number) {
@@ -67,10 +68,20 @@ class Result extends Phaser.Scene {
 			color: '#ffffff',
 		};
 
-		this.add
+		this.button = this.add
 			.text(x, y, 'Back to home', textConfig)
 			.setOrigin(0.5)
 			.setInteractive()
+			.on('pointerover', () => {
+				this.input.setDefaultCursor('pointer');
+				this.button.setBackgroundColor('#ffffff');
+				this.button.setColor('#000000');
+			})
+			.on('pointerout', () => {
+				this.input.setDefaultCursor('default');
+				this.button.setBackgroundColor('#000000');
+				this.button.setColor('#ffffff');
+			})
 			.on('pointerdown', () => {
 				this.navigate.push('/');
 			});

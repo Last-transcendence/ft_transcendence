@@ -35,13 +35,8 @@ class GameGateway {
 
 	handleConnection(socket: Socket) {
 		try {
-			console.log('Client connected to game namespace');
+			//console.log('Client connected to game namespace');
 			this.gameService.getBySocketId(socket.id).then(game => {
-				if (game) {
-					this.gameService.delete(game.id);
-				}
-			});
-			this.gameService.getByUserId(socket['user']['id']).then(game => {
 				if (game) {
 					this.gameService.delete(game.id);
 				}
@@ -57,11 +52,15 @@ class GameGateway {
 			this.gameService.getBySocketId(socket.id).then(game => {
 				if (game) {
 					this.gameService.delete(game.id);
+					this.gameService.deleteFirstHistory(game.userId);
+					this.userService.online(game.userId);
 				}
 			});
 			this.gameService.getByUserId(socket['user']['id']).then(game => {
 				if (game) {
 					this.gameService.delete(game.id);
+					this.gameService.deleteFirstHistory(game.userId);
+					this.userService.online(game.userId);
 				}
 			});
 		} catch (error) {
@@ -122,6 +121,38 @@ class GameGateway {
 		}
 	}
 
+	@SubscribeMessage('connected')
+	async handleConnectedEvent(
+		@ConnectedSocket() socket: Socket,
+		@MessageBody() connectedRequestDto: Dto.Request.Connected,
+	) {
+		let game = await this.gameService.getBySocketId(socket.id);
+
+		try {
+			if (!game.userId) {
+				await this.gameService.deleteByUserId(socket['user']['id']);
+				game = await this.gameService.update(game.id, { userId: socket['user']['id'] });
+			}
+			await this.gameService.update(game.id, { updatedAt: new Date() });
+
+			const opponentSocketId = this.getOpponentSocketId(socket, connectedRequestDto.room);
+			const opponentGame = await this.gameService.getBySocketId(opponentSocketId);
+
+			void opponentGame;
+
+			return { status: 'SUCCESS' };
+		} catch (error) {
+			this.server.to(socket.id).emit('end', {
+				state: 'DISCONNECTED',
+			});
+			this.gameService.delete(game.id);
+			this.gameService.deleteFirstHistory(game.userId);
+			this.userService.online(game.userId);
+
+			return { status: 'DISCONNECTED' };
+		}
+	}
+
 	@SubscribeMessage('ready')
 	async handleReadyEvent(
 		@ConnectedSocket() socket: Socket,
@@ -129,9 +160,6 @@ class GameGateway {
 	) {
 		try {
 			let game = await this.gameService.getBySocketId(socket.id);
-			if (!game.userId) {
-				game = await this.gameService.update(game.id, { userId: socket['user']['id'] });
-			}
 			if (!game.ready) {
 				game = await this.gameService.update(game.id, { ready: true });
 			}
@@ -171,35 +199,9 @@ class GameGateway {
 		@MessageBody() moveRequestDto: Dto.Request.Move,
 	) {
 		try {
-			{
-				const game = await this.gameService.getBySocketId(socket.id);
-				const opponentSocketId = this.getOpponentSocketId(socket, moveRequestDto.room);
-				const opponentGame = await this.gameService.getBySocketId(opponentSocketId);
+			const opponentSocketId = this.getOpponentSocketId(socket, moveRequestDto.room);
 
-				await this.gameService.update(game.id, { updatedAt: new Date() });
-
-				if (1000 < Date.now() - opponentGame.updatedAt.getTime()) {
-					this.server.to(socket.id).emit('end', {
-						state: 'DISCONNECTED',
-					});
-					this.server.to(opponentSocketId).emit('end', {
-						state: 'DISCONNECTED',
-					});
-					this.gameService.delete(game.id);
-					this.gameService.delete(opponentGame.id);
-					this.gameService.deleteFirstHistory(game.userId, opponentGame.userId);
-					this.gameService.deleteFirstHistory(opponentGame.userId, game.userId);
-					this.userService.online(game.userId);
-					this.userService.online(opponentGame.userId);
-
-					return { status: 'DISCONNECTED' };
-				}
-			}
-			{
-				const opponentSocketId = this.getOpponentSocketId(socket, moveRequestDto.room);
-
-				this.server.to(opponentSocketId).emit('move', moveRequestDto);
-			}
+			this.server.to(opponentSocketId).emit('move', moveRequestDto);
 
 			return { status: 'SUCCESS' };
 		} catch (error) {
