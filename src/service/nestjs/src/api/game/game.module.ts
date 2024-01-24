@@ -8,6 +8,7 @@ import UserModule from 'api/user/user.module';
 	imports: [UserModule],
 	providers: [GameService, GameGateway],
 	controllers: [GameController],
+	exports: [GameService],
 })
 class GameModule {}
 

@@ -7,7 +7,7 @@ import {
 	WebSocketGateway,
 	WebSocketServer,
 } from '@nestjs/websockets';
-import { HttpException, UseGuards } from '@nestjs/common';
+import { UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as Auth from '../../common/auth';
 import * as Dto from './dto';
@@ -97,17 +97,8 @@ class GameGateway {
 			const player1 = clients[0];
 			const player2 = clients[1];
 
-			const game = await this.gameService.create({
-				socketId: player1,
-				mode: 'HARD',
-			});
-			const opponentGame = await this.gameService.create({
-				socketId: player2,
-				mode: 'HARD',
-			});
-
-			console.log('game', game);
-			console.log('opponentGame', opponentGame);
+			await this.gameService.create({ socketId: player1, mode: 'HARD' });
+			await this.gameService.create({ socketId: player2, mode: 'HARD' });
 
 			const socket1 = this.server.sockets.get(player1);
 			const socket2 = this.server.sockets.get(player2);
@@ -121,8 +112,13 @@ class GameGateway {
 
 			this.server.to(player1).emit('matched', { room: gameRoomId });
 			this.server.to(player2).emit('matched', { room: gameRoomId });
+
+			return { status: 'SUCCESS' };
 		} catch (error) {
-			throw new HttpException(error.message, error.status);
+			return {
+				message: error.message,
+				status: error.status,
+			};
 		}
 	}
 
@@ -159,8 +155,13 @@ class GameGateway {
 			this.server
 				.to(opponentSocketId)
 				.emit('start', { ball: { velocityX: -randomX, velocityY: -randomY } });
+
+			return { status: 'SUCCESS' };
 		} catch (error) {
-			throw new HttpException(error.message, error.status);
+			return {
+				message: error.message,
+				status: error.status,
+			};
 		}
 	}
 
@@ -188,7 +189,8 @@ class GameGateway {
 					this.gameService.deleteFirstHistory(opponentGame.userId, game.userId);
 					this.userService.online(game.userId);
 					this.userService.online(opponentGame.userId);
-					return;
+
+					return { status: 'DISCONNECTED' };
 				}
 			}
 			{
@@ -196,8 +198,13 @@ class GameGateway {
 
 				this.server.to(opponentSocketId).emit('move', moveRequestDto);
 			}
+
+			return { status: 'SUCCESS' };
 		} catch (error) {
-			throw new HttpException(error.message, error.status);
+			return {
+				message: error.message,
+				status: error.status,
+			};
 		}
 	}
 
@@ -218,7 +225,7 @@ class GameGateway {
 				this.server.to(opponentSocketId).emit('score', scoreRequestDto);
 
 				if (scoreRequestDto.state !== 'confirmed') {
-					return;
+					return { status: 'PENDING' };
 				}
 
 				if (parseInt(scoreRequestDto.score) === 4) {
@@ -299,8 +306,13 @@ class GameGateway {
 					this.userService.online(opponent.id);
 				}
 			}
+
+			return { status: 'SUCCESS' };
 		} catch (error) {
-			throw new HttpException(error.message, error.status);
+			return {
+				message: error.message,
+				status: error.status,
+			};
 		}
 	}
 }
