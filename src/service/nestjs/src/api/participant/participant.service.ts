@@ -92,7 +92,7 @@ class ParticipantService {
 
 	async create(createRequsetDto: Dto.Request.Create): Promise<Dto.Response.Participant> {
 		try {
-			const channel = await this.prismaService.channel.findUnique({
+			const channel = await this.prismaService.channel.findFirst({
 				where: { id: createRequsetDto.channelId },
 			});
 			if (!channel) {
