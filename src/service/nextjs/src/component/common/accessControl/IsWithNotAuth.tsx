@@ -9,17 +9,15 @@ const IsWithNotAuth = <P extends object>(Destination: ComponentType<P>) => {
 		const router = useRouter();
 
 		useEffect(() => {
-			const asccessControl = async () => {
-				try {
-					await getFetcher('user/me');
+			getFetcher('/user/me')
+				.then(response => {
+					console.log(response);
 					alert('잘못된 접근입니다.');
 					router.push('/');
-				} catch (error: any) {
+				})
+				.catch(error => {
 					setOn(true);
-				}
-			};
-
-			asccessControl();
+				});
 		}, [router]);
 
 		if (on === true) {

@@ -49,7 +49,6 @@ const FightRecord = ({
 		loadRecordData();
 	}, [mode, result, player1Id, player2Id, player1Score, player2Score, createdAt]);
 
-	console.log(result);
 	return recordData !== undefined &&
 		recordData.player1 !== undefined &&
 		recordData.player2 &&

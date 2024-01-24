@@ -1,20 +1,18 @@
 import UserBriefInformation from '@/component/common/user/bried-information';
 import style from '../../../style/friend/list/index.module.css';
 import FriendStatus from './status';
-import User, { UserStatus } from '@/type/user.type';
 import { Skeleton, Typography } from '@mui/material';
 import Friend from '@/type/friend.type';
-import Block from '@/type/block.type';
 
 const Title = () => {
 	return <Typography>친구 목록</Typography>;
 };
 
 interface FriendListProps {
-	data: Friend[] | undefined; 
+	data: Friend[] | undefined;
 	refetch: () => void;
 	blockRefetch: () => void;
-
+}
 
 const FriendList = ({ data, refetch, blockRefetch }: FriendListProps) => {
 	return (
@@ -33,7 +31,6 @@ const FriendList = ({ data, refetch, blockRefetch }: FriendListProps) => {
 								imgUrl={user?.profileImageURI}
 								refetch={refetch}
 								blockRefetch={blockRefetch}
-
 							/>
 						</div>
 					);

@@ -2,7 +2,7 @@ import style from '../../../style/friend/add/index.module.css';
 import SearchFriend from './search';
 import UserBriefInformation from '@/component/common/user/bried-information';
 import { Skeleton, Typography } from '@mui/material';
-import User, { UserStatus } from '@/type/user.type';
+import User from '@/type/user.type';
 import { useCallback, useState, useContext } from 'react';
 // import { getFetcher } from '@/component/api/getFetcher';
 // import Friend from '@/type/friend.type';

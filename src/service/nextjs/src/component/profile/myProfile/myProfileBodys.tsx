@@ -39,13 +39,18 @@ const MyProfileBody = ({ name, use2fa, image }: myProfilePageProps) => {
 				<UserId userName={name} />
 				<Box display="flex" flexDirection="column" alignItems="center">
 					<TwoFACheck twoFA={use2fa} />
-					{gameRecords === undefined ? (<></>) : (
-					<div className={styles['my-profile-body__div']}>
-						<Odds gameRecords={gameRecords} message={gameRecordsErrorMessage} />
-					</div>)}
+					{gameRecords === undefined ? (
+						<></>
+					) : (
+						<div className={styles['my-profile-body__div']}>
+							<Odds gameRecords={gameRecords} message={gameRecordsErrorMessage} />
+						</div>
+					)}
 				</Box>
-				{gameRecords === undefined ? (<></>) : (
-				<FightRecords fightRecords={gameRecords.slice(0, 5)} message={gameRecordsErrorMessage} />
+				{gameRecords === undefined ? (
+					<></>
+				) : (
+					<FightRecords fightRecords={gameRecords.slice(0, 5)} message={gameRecordsErrorMessage} />
 				)}
 			</Container>
 		</Box>
