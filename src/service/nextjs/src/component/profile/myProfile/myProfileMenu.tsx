@@ -18,7 +18,7 @@ const MyProfileMenu = () => {
 			if (loading === true) return;
 			setLoading(true);
 			const response = await deleteFetcher('/auth/logout');
-			await router.push('/auth/login');
+			router.push('/auth/login');
 		} catch (error: any) {
 			setErrorMessage(error.message);
 		} finally {

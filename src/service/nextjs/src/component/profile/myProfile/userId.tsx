@@ -1,8 +1,8 @@
 import { Typography, Box } from '@mui/material';
 
 const UserId = ({ userName }: { userName: string | undefined }) => (
-	<Box display="flex" flexDirection="column" alignItems="center">
-		<Typography variant="h3">{userName}</Typography>
+	<Box display="flex" flexDirection="column" alignItems="center" marginTop={2}>
+		<Typography variant="h4">{userName}</Typography>
 	</Box>
 );
 

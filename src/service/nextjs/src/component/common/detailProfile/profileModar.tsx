@@ -7,9 +7,10 @@ interface ProfileModarProps {
 	setClick: Dispatch<SetStateAction<boolean>>;
 	children: ReactNode;
 	childMenu: ReactNode;
+	blockRefetch?: () => void;
 }
 
-const ProfileModar = ({ setClick, children, childMenu }: ProfileModarProps) => {
+const ProfileModar = ({ setClick, children, childMenu, blockRefetch }: ProfileModarProps) => {
 	return createPortal(
 		<div className={styles.container}>
 			<div>

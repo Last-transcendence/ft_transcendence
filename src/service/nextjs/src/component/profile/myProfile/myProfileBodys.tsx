@@ -16,13 +16,14 @@ export interface myProfilePageProps extends myImageProps {
 }
 
 const MyProfileBody = ({ name, use2fa, image }: myProfilePageProps) => {
-	const [gameRecords, setGameRecords] = useState<Game[]>([]);
+	const [gameRecords, setGameRecords] = useState<Game[] | undefined>(undefined);
 	const [gameRecordsErrorMessage, setGameRecordsErrorMessage] = useState<string>('');
 
 	useEffect(() => {
 		const roadGameRecord = async () => {
 			try {
-				setGameRecords(await getFetcher<Game[]>('/game/history'));
+				const gameData = await getFetcher<Game[]>('/game/history');
+				setGameRecords(gameData);
 			} catch (error) {
 				setGameRecordsErrorMessage('데이터를 로드할 수 없습니다.');
 			}
@@ -38,11 +39,19 @@ const MyProfileBody = ({ name, use2fa, image }: myProfilePageProps) => {
 				<UserId userName={name} />
 				<Box display="flex" flexDirection="column" alignItems="center">
 					<TwoFACheck twoFA={use2fa} />
-					<div className={styles['my-profile-body__div']}>
-						<Odds gameRecords={gameRecords} message={gameRecordsErrorMessage} />
-					</div>
+					{gameRecords === undefined ? (
+						<></>
+					) : (
+						<div className={styles['my-profile-body__div']}>
+							<Odds gameRecords={gameRecords} message={gameRecordsErrorMessage} />
+						</div>
+					)}
 				</Box>
-				<FightRecords fightRecords={gameRecords.slice(0, 5)} message={gameRecordsErrorMessage} />
+				{gameRecords === undefined ? (
+					<></>
+				) : (
+					<FightRecords fightRecords={gameRecords.slice(0, 5)} message={gameRecordsErrorMessage} />
+				)}
 			</Container>
 		</Box>
 	);

@@ -1,23 +1,29 @@
 .my-profile-index__body {
-  height: 100vh;
-  display: flex;
-  justify-content: space-between;
-  flex-direction: column;
+  height: 100%;
 }
 
 .my-profile-index__relative {
-  position: relative;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: 10%;
 }
 
 .my-profile-index__absolute {
-  position: absolute;
-  top: 60px;
+  position: fixed;
+  top: 10%;
+  height: 84%;
   width: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: center;
 }
 
 .my-profile-body__div {
   margin-top: -30px;
+}
+
+.my-profile-bottombutton {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
 }
