@@ -154,10 +154,16 @@ class ChannelGateway {
 				data.userId,
 				data.message,
 			);
+
+			if (await this.muteService.isMuted(data.channelId, data.userId)) {
+				throw new Error('User is muted');
+			}
+
 			this.server.to(data.channelId).emit('message', {
 				userId: data.userId,
 				message: filteredMessage,
 			});
+
 			return { res: true };
 		} catch (error) {
 			console.error("An error occurred in channel.gateway 'message':", error);
@@ -306,7 +312,7 @@ class ChannelGateway {
 				throw new Error('Permission denied');
 			}
 			if ((await this.participantService.isOwner(data.toUserId)) === true) {
-				throw new Error('Owner cannot perform this action');
+				throw new Error('Cannot mute owner');
 			}
 			await this.muteService.muteUser(data.channelId, data.toUserId);
 
@@ -315,6 +321,7 @@ class ChannelGateway {
 				userId: data.toUserId,
 				nickname: data.nickname,
 			});
+
 			return { res: true };
 		} catch (error) {
 			console.error("An error occurred in channel.gateway 'mute':", error);
@@ -359,15 +366,18 @@ class ChannelGateway {
 			if ((await this.participantService.isOwner(data.toUserId)) === true) {
 				throw new Error('Owner cannot perform this action');
 			}
-			await this.participantService.kickByUserId(socket.user.id);
-			await this.banService.create(data.channelId, socket.user.id);
+
+			this.participantService.kickByUserId(data.toUserId);
+			this.banService.create(data.channelId, data.toUserId);
 
 			socket.leave(data.channelId);
+
 			this.server.to(data.channelId).emit('ban', {
 				channelId: data.channelId,
 				userId: data.toUserId,
 				nickname: data.nickname,
 			});
+
 			return { res: true };
 		} catch (error) {
 			console.error('An error occurred in handleBan:', error);
