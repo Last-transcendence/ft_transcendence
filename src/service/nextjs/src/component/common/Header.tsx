@@ -60,7 +60,7 @@ export const MenuHeader = ({ type, title, children }: MenuHeaderProps) => {
 				alignItems={'center'}
 			>
 				{type === 'chat' ? (
-					<IconButton onClick={() => router.back()}>
+					<IconButton onClick={() => router.push('/')}>
 						<ArrowBackIosNew fontSize={'large'} />
 					</IconButton>
 				) : (

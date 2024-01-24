@@ -1,6 +1,6 @@
 import { useParams } from 'next/navigation';
 import useFetchData from '@/hook/useFetchData';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import ChatRoomLayout from '@/component/chat/ChatRoomLayout';
 import { MenuHeader } from '@/component/common/Header';
 import PrivateParticipantList from '@/component/chat/PrivateParticipantList';

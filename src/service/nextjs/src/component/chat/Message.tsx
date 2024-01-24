@@ -48,10 +48,6 @@ export const HelpMsg = () => {
 				도움말
 			</Typography>
 			<Typography fontSize={'small'}>
-				<span style={helpTextStyle}>/w &lt;닉네임&gt; &lt;메세지&gt;: </span>
-				&lt;닉네임&gt;에게 &lt;메세지&gt;를 보냅니다
-			</Typography>
-			<Typography fontSize={'small'}>
 				<span style={helpTextStyle}>/g &lt;닉네임&gt;:</span> &lt;닉네임&gt;에게 1:1 게임 매칭을
 				요청합니다
 			</Typography>

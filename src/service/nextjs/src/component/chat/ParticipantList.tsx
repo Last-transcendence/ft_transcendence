@@ -100,7 +100,7 @@ const ParticipantList = ({ myRole, ownerId, channelData, channelId }: Participan
 								className={style['user-brief-information']}
 								userId={data?.userId}
 								isMute={isMute(data?.userId)}
-								imgUrl={data?.user.profileImageURI}
+								imgUrl={data?.user?.profileImageURI}
 							/>
 						))}
 					</div>
