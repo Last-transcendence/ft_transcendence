@@ -323,7 +323,7 @@ class ChannelGateway {
 			if ((await this.participantService.isOwner(data.toUserId)) === true) {
 				throw new Error('Permission denied');
 			}
-			await this.participantService.kick(data.toUserId);
+			await this.participantService.kickByUserId(data.toUserId);
 
 			socket.leave(data.channelId);
 			this.server.to(data.channelId).emit('kick', {
