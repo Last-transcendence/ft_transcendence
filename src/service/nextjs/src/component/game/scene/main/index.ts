@@ -38,6 +38,8 @@ class Main extends Phaser.Scene {
 		this.socket = socket;
 		this.room = room;
 
+		console.log(this.socket);
+
 		if (this.socket) {
 			this.initSocket();
 		}
@@ -90,6 +92,12 @@ class Main extends Phaser.Scene {
 			this.socket.off('move');
 			this.socket.off('score');
 			this.socket.off('end');
+
+			if (response.state === 'DISCONNECTED') {
+				// this.scene.start('Disconnected', {});
+				this.navigate.push('/');
+				return;
+			}
 
 			this.scene.start('Result', {
 				navigate: this.navigate,

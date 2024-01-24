@@ -217,6 +217,15 @@ class ChannelGateway {
 				throw new BadRequestException('Opponent not found');
 			}
 
+			const opponentParticipant = await this.participantService.get(opponent.id);
+
+			this.server.to(opponentParticipant.socketId).emit('invite', {
+				channelId: inviteRequestDto.channelId,
+				userId: socket['user']['id'],
+				nickname: socket['user']['nickname'],
+				mode: inviteRequestDto.mode,
+			});
+
 			return { status: 'SUCCESS' };
 		} catch (error) {
 			return {
@@ -267,8 +276,8 @@ class ChannelGateway {
 			socket2.join(gameRoomId);
 
 			// event 명 무엇으로 할지 고민
-			this.server.to(participant.socketId).emit('matched', { room: gameRoomId });
-			this.server.to(opponentParticipant.socketId).emit('matched', { room: gameRoomId });
+			this.server.to(participant.socketId).emit('invite/matched', { room: gameRoomId });
+			this.server.to(opponentParticipant.socketId).emit('invite/matched', { room: gameRoomId });
 
 			return { status: 'SUCCESS' };
 		} catch (error) {

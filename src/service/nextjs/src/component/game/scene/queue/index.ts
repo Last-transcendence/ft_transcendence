@@ -5,15 +5,17 @@ import { Socket } from 'socket.io-client';
 class Queue extends Phaser.Scene {
 	private navigate!: AppRouterInstance;
 	private socket!: Socket;
+	private gameRoomId!: string | null;
 
 	private loadingText!: Phaser.GameObjects.Text[];
 	private loadingTextIdx: number = 0;
 
-	constructor(navigate: AppRouterInstance, socket: Socket) {
+	constructor(navigate: AppRouterInstance, socket: Socket, gameRoomId: string | null) {
 		super({ key: 'Queue', active: true });
 		this.events = new Phaser.Events.EventEmitter();
 		this.navigate = navigate;
 		this.socket = socket;
+		this.gameRoomId = gameRoomId;
 	}
 
 	preload() {}
@@ -56,6 +58,14 @@ class Queue extends Phaser.Scene {
 	}
 
 	create() {
+		if (this.gameRoomId) {
+			this.scene.start('Main', {
+				navigate: this.navigate,
+				socket: this.socket,
+				room: this.gameRoomId,
+			});
+		}
+
 		this.initLoadingText();
 		this.initSocket();
 	}

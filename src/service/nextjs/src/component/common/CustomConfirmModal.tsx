@@ -23,8 +23,22 @@ export const CustomConfirmModal = ({
 				<div>{title}</div>
 				<div>{content}</div>
 				<Stack flexDirection={'row'} gap={2}>
-					<button onClick={onConfirm}>예</button>
-					<button onClick={onCancel}>아니오</button>
+					<button
+						onClick={() => {
+							onConfirm();
+							setIsOpened(false);
+						}}
+					>
+						예
+					</button>
+					<button
+						onClick={() => {
+							onCancel();
+							setIsOpened(false);
+						}}
+					>
+						아니오
+					</button>
 				</Stack>
 			</Stack>
 		</CustomModal>

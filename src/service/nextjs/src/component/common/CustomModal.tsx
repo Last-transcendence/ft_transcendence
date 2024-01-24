@@ -3,7 +3,6 @@
 import { Dispatch, ReactNode, SetStateAction, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import style from '../../style/common/custom-modal/index.module.css';
-import { Stack } from '@mui/material';
 
 interface CustomModalProps {
 	setIsOpened: Dispatch<SetStateAction<boolean>>;

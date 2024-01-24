@@ -176,6 +176,8 @@ class GameGateway {
 				const opponentSocketId = this.getOpponentSocketId(socket, moveRequestDto.room);
 				const opponentGame = await this.gameService.getBySocketId(opponentSocketId);
 
+				await this.gameService.update(game.id, { updatedAt: new Date() });
+
 				if (1000 < Date.now() - opponentGame.updatedAt.getTime()) {
 					this.server.to(socket.id).emit('end', {
 						state: 'DISCONNECTED',
