@@ -12,6 +12,7 @@ import { GameInstance, IonPhaser } from '@ion-phaser/react';
 import Config from '@/component/game/config';
 import style from '@/style/game/index.module.css';
 import SocketContext from '@/context/socket.context';
+import IsWithAuth from '@/component/common/accessControl/IsWithAuth';
 
 const destroy = (props: {
 	gameRef: RefObject<HTMLIonPhaserElement>;
@@ -69,4 +70,4 @@ const GameQueuePage = () => {
 	);
 };
 
-export default GameQueuePage;
+export default IsWithAuth(GameQueuePage);

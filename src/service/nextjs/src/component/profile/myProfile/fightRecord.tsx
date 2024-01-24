@@ -2,7 +2,7 @@ import { Grid, Box } from '@mui/material';
 import Mydate from './fightDate';
 import MatchPoint, { matchPointProps } from './matchPoint';
 import User from '@/type/user.type';
-import Game, { Result } from '@/type/game.type';
+import Game from '@/type/game.type';
 import { useEffect, useState } from 'react';
 import { getFetcher } from '@/service/api';
 import OpenProfileAvatar from '@/component/common/detailProfile/openProfileAvatar';
@@ -41,17 +41,19 @@ const FightRecord = ({
 					createdAt: createdAt,
 					mode: mode,
 				});
-			} catch (error : any) {
+			} catch (error: any) {
 				setErrorMessage(error.message);
 			}
 		};
 
 		loadRecordData();
-	}, [mode, result]);
+	}, [mode, result, player1Id, player2Id, player1Score, player2Score, createdAt]);
 
 	console.log(result);
-	return recordData !== undefined && recordData.player1 !== undefined && recordData.player2 && errorMessage === '' ?
-	 (
+	return recordData !== undefined &&
+		recordData.player1 !== undefined &&
+		recordData.player2 &&
+		errorMessage === '' ? (
 		<Box marginBottom={2}>
 			<Mydate date={createdAt} />
 			<Box
@@ -70,8 +72,11 @@ const FightRecord = ({
 						<p>{recordData.player1.nickname}</p>
 					</Grid>
 					<Grid item xs={4}>
-						<p>{result === 'LOSE' ? '패배' :  '승리'}</p>
-						<MatchPoint player1Score={recordData.player1Score} player2Score={recordData.player2Score} />
+						<p>{result === 'LOSE' ? '패배' : '승리'}</p>
+						<MatchPoint
+							player1Score={recordData.player1Score}
+							player2Score={recordData.player2Score}
+						/>
 					</Grid>
 					<Grid item xs={4} display={'flex'} flexDirection={'column'} alignItems={'center'}>
 						<OpenProfileAvatar
@@ -89,7 +94,7 @@ const FightRecord = ({
 				{errorMessage}
 			</Box>
 		</Box>
-	)
+	);
 };
 
 export default FightRecord;
