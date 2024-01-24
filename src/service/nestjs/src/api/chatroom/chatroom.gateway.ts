@@ -8,9 +8,9 @@ import {
 } from '@nestjs/websockets';
 import { Namespace } from 'socket.io';
 import { ConfigService } from '@nestjs/config';
-import ChatRoomService from './chatroom.service';
 import * as Auth from '../../common/auth';
 import * as ChatRoomDto from './dto';
+import ChatRoomService from './chatroom.service';
 import ChatService from 'api/chat/chat.service';
 import BlockService from 'api/block/block.service';
 
