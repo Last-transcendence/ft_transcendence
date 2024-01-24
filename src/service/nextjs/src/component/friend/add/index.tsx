@@ -9,6 +9,7 @@ import { useCallback, useState, useContext } from 'react';
 import PositionableSnackbar from '@/component/common/PositionableSnackbar';
 import { deleteFetcher, postFetcher } from '@/service/api';
 import Friend from '@/type/friend.type';
+import Block from '@/type/block.type';
 import AuthContext from '@/context/auth.context';
 
 const Title = () => {
@@ -19,13 +20,14 @@ const Title = () => {
 	);
 };
 
-const AddFriend = ({
-	friendList,
-	refetch,
-}: {
+interface AddFriendProps {
 	friendList: Friend[] | undefined;
 	refetch: () => void;
-}) => {
+	blockList: Block[] | undefined;
+	blockRefetch: () => void;
+}
+
+const AddFriend = ({ friendList, refetch, blockList, blockRefetch }: AddFriendProps) => {
 	const [searchData, setSearchData] = useState<User[]>([]);
 	const [showSuccessSnackbar, setShowSuccessSnackbar] = useState(false);
 	const [message, setMessage] = useState({
@@ -105,9 +107,12 @@ const AddFriend = ({
 								userId={user?.id}
 								imgUrl={user?.profileImageURI}
 								refetch={refetch}
+								blockRefetch={blockRefetch}
 							/>
 							{me?.id !== user.id &&
-								(isFriend(user.id) ? (
+								(blockList?.find(item => item.blockedId === user.id) ? (
+									<div>차단된 유저</div>
+								) : isFriend(user.id) ? (
 									<button onClick={() => setFriend(user.id, 'delete')}>삭제</button>
 								) : (
 									<button onClick={() => setFriend(user.id, 'add')}>추가</button>

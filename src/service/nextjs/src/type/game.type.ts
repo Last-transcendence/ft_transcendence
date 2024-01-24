@@ -1,23 +1,13 @@
-enum Mode {
-	NORMAL,
-	HARD,
-	RANK,
-}
 
-enum Result {
-	LOSE,
-	WIN,
-	DRAW,
-}
 
 type Game = {
 	id: string;
-	userId1: string;
-	userId2: string;
-	userScore1: number;
-	userScore2: number;
+	player1Id: string;
+	player2Id: string;
+	player1Score: number;
+	player2Score: number;
 	mode: Mode;
-	result: Result;
+	result: string;
 	createdAt: string;
 	updatedAt: string;
 };

@@ -12,6 +12,7 @@ interface UserBriefInformationProps {
 	isMute?: boolean;
 	imgUrl: string | undefined | null;
 	refetch?: () => void;
+	blockRefetch?: () => void;
 }
 
 const UserBriefInformation = ({
@@ -22,10 +23,11 @@ const UserBriefInformation = ({
 	isMute,
 	imgUrl,
 	refetch,
+	blockRefetch,
 }: UserBriefInformationProps) => {
 	return (
 		<div className={className}>
-			<OpenProfileAvatar otherUserId={userId} imgUrl={imgUrl} refetch={refetch} />
+			<OpenProfileAvatar otherUserId={userId} imgUrl={imgUrl} refetch={refetch} blockRefetch={blockRefetch} />
 			<div>{nickname}</div>
 			{condition && <div>{condition}</div>}
 			{isMute && <VolumeOffIcon />}

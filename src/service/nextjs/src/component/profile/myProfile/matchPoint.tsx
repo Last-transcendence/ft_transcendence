@@ -1,15 +1,15 @@
 import { Typography } from '@mui/material';
 
 export interface matchPointProps {
-	score1: number;
-	score2: number;
+	player1Score: number,
+	player2Score: number,
 }
 
-const MatchPoint = ({ score1, score2 }: matchPointProps) => {
+const MatchPoint = ({ player1Score, player2Score }: matchPointProps) => {
 	return (
 		<div>
 			<Typography variant="h5">
-				{score1} vs {score2}
+				{player1Score} vs {player2Score}
 			</Typography>
 		</div>
 	);

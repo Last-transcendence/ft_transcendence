@@ -25,7 +25,9 @@ const MyProfilePage = () => {
 			<div className={styles['my-profile-index__absolute']}>
 				<MyProfileBody image={me?.profileImageURI} name={me.nickname} use2fa={me?.use2fa} />
 			</div>
-			<BottomButton title="프로필 수정하기" onClick={onClick} />
+			<div className={styles['my-profile-bottombutton']}>
+				<BottomButton title="프로필 수정하기" onClick={onClick} />
+			</div>
 		</div>
 	);
 };
