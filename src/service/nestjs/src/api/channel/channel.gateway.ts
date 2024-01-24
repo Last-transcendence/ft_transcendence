@@ -203,7 +203,7 @@ class ChannelGateway {
 			if (error.length > 0) {
 				throw new Error('Failed validation: ' + JSON.stringify(error));
 			}
-			this.participantService.updateRole(data.toUserId, newRole);
+			await this.participantService.update(data.toUserId, newRole);
 
 			return { res: true };
 		} catch (error) {
