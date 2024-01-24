@@ -1,8 +1,8 @@
+import styles from '@/style/auth/2fa/sign/index.module.css';
 import { TextField, Button, Container, Box, Typography } from '@mui/material';
 import Message from './Message';
 import LockAvater from '@/component/auth/2fa/lcokAvater';
 import { useState } from 'react';
-import styles from '@/style/auth/2fa/sign/index.module.css';
 import { getFetcher, postFetcher } from '@/service/api';
 import CustomSnackbar from '@/component/common/customSnackbar';
 import { useRouter } from 'next/navigation';
@@ -24,7 +24,7 @@ const TwoFactorBody = () => {
 				clearInterval(intervalId);
 			}
 			const response = await getFetcher('/auth/2fa');
-			setTime(5000);
+			setTime(300);
 			setIntervalId(
 				setInterval(() => {
 					setTime(prevTime => {
@@ -58,10 +58,15 @@ const TwoFactorBody = () => {
 
 	const dataSendToServer = async () => {
 		try {
-			await postFetcher('/auth/2fa', { inputData: password });
-			router.push('/');
-		} catch (error) {
-			setSnackErrorMessage('*인증코드가 잘못되었습니다.');
+			if (time === undefined) {
+				throw new Error('이메일 인증을 요청해주세요.');
+			} else if (time <= 0) {
+				throw new Error('인증 응답 시간이 초과되었습니다');
+			}
+			await postFetcher('/auth/2fa', { twoFaCode: password });
+			router.push('/auth/login/callback');
+		} catch (error: any) {
+			setSnackErrorMessage(error.message);
 		} finally {
 			setLoading(false);
 		}

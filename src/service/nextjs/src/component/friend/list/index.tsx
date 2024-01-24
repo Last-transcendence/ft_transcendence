@@ -9,14 +9,14 @@ const Title = () => {
 	return <Typography>친구 목록</Typography>;
 };
 
-const FriendList = ({ data }: { data: Friend[] | undefined }) => {
+const FriendList = ({ data, refetch }: { data: Friend[] | undefined; refetch: () => void }) => {
 	return (
 		<div className={style.container}>
 			<Title />
 			{data && data?.length ? (
 				data.map(user => {
 					return (
-						<div key={user?.userId}>
+						<div key={user?.id}>
 							{/*@todo 문자제거.*/}
 							<UserBriefInformation
 								nickname={user?.nickname}
@@ -24,6 +24,7 @@ const FriendList = ({ data }: { data: Friend[] | undefined }) => {
 								className={style['user-brief-information']}
 								userId={user?.id}
 								imgUrl={user?.profileImageURI}
+								refetch={refetch}
 							/>
 						</div>
 					);

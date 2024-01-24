@@ -7,17 +7,18 @@ import {
 	WebSocketGateway,
 	WebSocketServer,
 } from '@nestjs/websockets';
-import BanService from 'api/ban/ban.service';
-import ParticipantService from 'api/participant/participant.service';
-import { plainToClass } from 'class-transformer';
 import { validate } from 'class-validator';
+import { plainToClass } from 'class-transformer';
 import { Namespace, Socket } from 'socket.io';
-import * as Dto from './dto';
-import * as Auth from '../../common/auth';
-import * as ParticipantDto from '../participant/dto';
+import BanService from 'api/ban/ban.service';
+import MuteService from 'api/mute/mute.service';
+import ParticipantService from 'api/participant/participant.service';
 import ChannelService from './channel.service';
 import UserService from 'api/user/user.service';
 import GameService from 'api/game/game.service';
+import * as Dto from './dto';
+import * as Auth from '../../common/auth';
+import * as ParticipantDto from '../participant/dto';
 
 const getCorsOrigin = () => {
 	const configService = new ConfigService();
@@ -37,6 +38,7 @@ class ChannelGateway {
 		private readonly participantService: ParticipantService,
 		@Inject(forwardRef(() => BanService)) private readonly banService: BanService,
 		private readonly userService: UserService,
+		private readonly muteService: MuteService,
 		private readonly gameService: GameService,
 	) {}
 
@@ -50,9 +52,7 @@ class ChannelGateway {
 	@SubscribeMessage('create')
 	async handleCreate(@ConnectedSocket() socket, @MessageBody() data) {
 		try {
-			if (await this.participantService.isParticipated(socket.user.id)) {
-				await this.channelService.leaveChannel(socket.user.id);
-			}
+			await this.channelService.leaveChannel(socket, socket.user.id);
 
 			const newChannel = await this.channelService.createChannel(data);
 			await this.participantService.create({
@@ -75,15 +75,15 @@ class ChannelGateway {
 	@SubscribeMessage('join')
 	async handleJoin(@MessageBody() joinData, @ConnectedSocket() socket) {
 		try {
-			if (await this.participantService.isParticipated(socket.user.id)) {
-				await this.channelService.leaveChannel(socket.user.id);
-			}
+			const userId = socket.user.id;
+
+			await this.channelService.leaveChannel(socket, userId);
 
 			const channel = await this.channelService.getChannel(joinData.channelId);
 			if (!channel) {
 				throw new BadRequestException('Channel not found');
 			}
-			if (await this.banService.isBanned(socket.user.id, joinData.channelId)) {
+			if (await this.banService.isBanned(userId, joinData.channelId)) {
 				throw new BadRequestException('User is banned');
 			}
 			if (
@@ -95,14 +95,13 @@ class ChannelGateway {
 
 			await this.participantService.create({
 				channelId: joinData.channelId,
-				userId: socket.user.id,
+				userId,
 				socketId: socket.id,
 			});
 
 			socket.join(joinData.channelId);
-
-			this.server.to(joinData.channelId).emit('message', {
-				userId: socket.user.id,
+			this.server.to(joinData.channelId).emit('join', {
+				userId,
 				nickname: socket.user.nickname,
 				profileImageURI: socket.user.profileImageURI,
 			});
@@ -120,6 +119,7 @@ class ChannelGateway {
 	async handleEdit(@MessageBody() data, @ConnectedSocket() socket: Socket) {
 		try {
 			this.channelService.editChannel(data);
+
 			return { res: true };
 		} catch (error) {
 			console.error("An error occurred in channel.gateway 'edit':", error);
@@ -138,14 +138,13 @@ class ChannelGateway {
 	@UseGuards(Auth.Guard.UserWsJwt)
 	async handleMessage(@MessageBody() data, @ConnectedSocket() socket) {
 		try {
-			const filteredMessage = this.channelService.messageFilter(
+			const filteredMessage = await this.channelService.messageFilter(
 				data.channelId,
 				data.userId,
 				data.message,
 			);
 			this.server.to(data.channelId).emit('message', {
-				channelId: data.channelId,
-				userId: socket.user.id,
+				userId: data.userId,
 				message: filteredMessage,
 			});
 			return { res: true };
@@ -171,7 +170,7 @@ class ChannelGateway {
 				profileImageURI: participant.userProfileImageURI,
 			});
 			socket.leave(participant.channelId);
-			this.channelService.leaveChannel(socket.user.id);
+			this.channelService.leaveChannel(socket, socket.user.id);
 
 			return { res: true };
 		} catch (error) {
@@ -277,6 +276,69 @@ class ChannelGateway {
 				message: error.message,
 				status: error.status,
 			};
+		}
+	}
+
+	@SubscribeMessage('mute')
+	@UseGuards(Auth.Guard.UserWsJwt)
+	async handleMute(@ConnectedSocket() socket, @MessageBody() data) {
+		try {
+			if ((await this.participantService.isAdmin(socket.user.id)) === false) {
+				throw new Error('Permission denied');
+			}
+			await this.muteService.muteUser(data.channelId, data.toUserId);
+
+			this.server.to(data.channelId).emit('mute', {
+				channelId: data.channelId,
+				userId: data.toUserId,
+				nickname: data.nickname,
+			});
+			return { res: true };
+		} catch (error) {
+			return { res: false, message: error };
+		}
+	}
+
+	@SubscribeMessage('kick')
+	@UseGuards(Auth.Guard.UserWsJwt)
+	async handleKick(@ConnectedSocket() socket, @MessageBody() data) {
+		try {
+			if ((await this.participantService.isAdmin(socket.user.id)) === false) {
+				throw new Error('Permission denied');
+			}
+			await this.participantService.kick(socket.user.id);
+
+			socket.leave(data.channelId);
+			this.server.to(data.channelId).emit('kick', {
+				channelId: data.channelId,
+				userId: data.toUserId,
+				nickname: data.nickname,
+			});
+			return { res: true };
+		} catch (error) {
+			return { res: false, message: error };
+		}
+	}
+
+	@SubscribeMessage('ban')
+	@UseGuards(Auth.Guard.UserWsJwt)
+	async handleBan(@ConnectedSocket() socket, @MessageBody() data) {
+		try {
+			if ((await this.participantService.isAdmin(socket.user.id)) === false) {
+				throw new Error('Permission denied');
+			}
+			await this.participantService.kick(socket.user.id);
+			await this.banService.create(data.channelId, socket.user.id);
+
+			socket.leave(data.channelId);
+			this.server.to(data.channelId).emit('ban', {
+				channelId: data.channelId,
+				userId: data.toUserId,
+				nickname: data.nickname,
+			});
+			return { res: true };
+		} catch (error) {
+			return { res: false, message: error };
 		}
 	}
 }

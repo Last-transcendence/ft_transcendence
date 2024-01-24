@@ -47,6 +47,7 @@ const SendChat = ({ sendAction, commandAction }: SendChatProps) => {
 		}
 	};
 	const onChangeInput = (e: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+		if (e.target.value.length > 20) return;
 		setChat(e.target.value);
 	};
 

@@ -3,12 +3,13 @@ import SearchFriend from './search';
 import UserBriefInformation from '@/component/common/user/bried-information';
 import { Skeleton, Typography } from '@mui/material';
 import User, { UserStatus } from '@/type/user.type';
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useContext } from 'react';
 // import { getFetcher } from '@/component/api/getFetcher';
 // import Friend from '@/type/friend.type';
 import PositionableSnackbar from '@/component/common/PositionableSnackbar';
 import { deleteFetcher, postFetcher } from '@/service/api';
 import Friend from '@/type/friend.type';
+import AuthContext from '@/context/auth.context';
 
 const Title = () => {
 	return (
@@ -32,6 +33,7 @@ const AddFriend = ({
 		success: true,
 	});
 	const [isSearching, setIsSearching] = useState(false);
+	const { me } = useContext(AuthContext);
 
 	const onSearch = async (name: string) => {
 		if (name.length === 0) setSearchData([]);
@@ -102,12 +104,14 @@ const AddFriend = ({
 								className={style['user-brief-information']}
 								userId={user.id}
 								imgUrl={user?.profileImageURI}
+								refetch={refetch}
 							/>
-							{isFriend(user.id) ? (
-								<button onClick={() => setFriend(user.id, 'delete')}>삭제</button>
-							) : (
-								<button onClick={() => setFriend(user.id, 'add')}>추가</button>
-							)}
+							{me?.id !== user.id &&
+								(isFriend(user.id) ? (
+									<button onClick={() => setFriend(user.id, 'delete')}>삭제</button>
+								) : (
+									<button onClick={() => setFriend(user.id, 'add')}>추가</button>
+								))}
 						</div>
 					))}
 				</div>

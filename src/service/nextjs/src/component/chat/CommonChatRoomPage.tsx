@@ -25,7 +25,8 @@ const CommonChatRoomPage = () => {
 	const { channelSocket } = sockets;
 	const [channelData, setChannelData] = useState<ChannelInfo | undefined>(undefined);
 	const [chatLiveData, setChatLiveData] = useState<ChatLiveDataType[]>([]);
-
+	//채널 입장 메세지 두 번 찍혀서 방지
+	const [channelLoading, setChannelLoading] = useState<boolean>(false);
 	//채널 정보 받아오기
 	useEffect(() => {
 		if (!params?.id) return;
@@ -37,7 +38,7 @@ const CommonChatRoomPage = () => {
 
 	// @todo participant 처리되면 주석 해제
 	useEffect(() => {
-		if (!channelData || !me) return;
+		if (!channelData) return;
 		// if (channelData.participant?.some((data: Participant) => data.userId === me?.id)) {
 		// 	setChatLiveData(prev => [
 		// 		...prev,
@@ -46,11 +47,12 @@ const CommonChatRoomPage = () => {
 		// } else {
 		// 	router.push('/');
 		// }
-
+		if (channelLoading) return;
 		setChatLiveData(prev => [
 			...prev,
 			{ type: 'action', message: `${channelData?.title} 채널에 입장하셨습니다.` },
 		]);
+		setChannelLoading(true);
 	}, [channelData, me]);
 
 	const setActionMessage = useCallback((message: string) => {

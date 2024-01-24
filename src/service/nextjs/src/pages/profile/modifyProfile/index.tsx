@@ -1,4 +1,5 @@
 import ModifyMyProfile from '@/component/profile/modifyProfile';
+import IsWithAuth from '@/component/common/accessControl/IsWithAuth';
 
 const modifyProfile = () => {
 	return (
@@ -8,4 +9,4 @@ const modifyProfile = () => {
 	);
 };
 
-export default modifyProfile;
+export default IsWithAuth(modifyProfile);
