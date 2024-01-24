@@ -34,9 +34,9 @@ const ProfilePageBody = ({
 		<div>
 			<Container maxWidth="xs">
 				<NewIcon {...ar} image={userData.profileImageURI} name={userData.nickname} />
-				<Box marginTop="10%" display="flex" flexDirection="column" alignItems="center">
-					<Typography variant="h5">{userData.nickname}</Typography>
-					<Typography style={{ opacity: 0.5 }} variant="h6">
+				<Box marginTop="4%" display="flex" flexDirection="column" alignItems="center">
+					<p style={{ fontSize: 28 }}>{userData.nickname}</p>
+					<Typography style={{ opacity: 0.5, marginTop: -10 }} variant="body1">
 						{userData.status}
 					</Typography>
 				</Box>

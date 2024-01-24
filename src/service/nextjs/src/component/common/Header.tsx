@@ -14,7 +14,7 @@ export const Header = ({ title }: { title: string }) => {
 	const router = useRouter();
 	return (
 		<Stack
-			bgcolor={'skyblue'}
+			bgcolor={'#D9BDE4'}
 			width={'100%'}
 			height={'70px'}
 			flexDirection={'row'}
@@ -52,7 +52,7 @@ export const MenuHeader = ({ type, title, children }: MenuHeaderProps) => {
 				</HambergurMenu>
 			)}
 			<Stack
-				bgcolor={'skyblue'}
+				bgcolor={'#D9BDE4'}
 				width={'100%'}
 				height={'70px'}
 				flexDirection={type === 'chat' ? 'row' : 'row-reverse'}

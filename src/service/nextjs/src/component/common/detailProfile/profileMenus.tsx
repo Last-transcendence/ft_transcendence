@@ -6,10 +6,19 @@ import Paper from '@mui/material/Paper';
 import Popper from '@mui/material/Popper';
 import MenuItem from '@mui/material/MenuItem';
 import MenuList from '@mui/material/MenuList';
-import { postFetcher } from '@/service/api';
+import { deleteFetcher, postFetcher } from '@/service/api';
 import CustomSnackbar from '../customSnackbar';
+import { Dispatch, SetStateAction } from 'react';
 
-const ProfileMenus = ({ otherUserId, isblock }: { otherUserId: string; isblock: boolean }) => {
+interface profileMenusProps {
+	otherUserId: string; 
+	isblock: boolean;
+	setIsBlockUser: Dispatch<SetStateAction<boolean | undefined>>;
+	blockRefetch?: () => void;
+	isFriend: boolean | undefined;
+}
+
+const ProfileMenus = ({ otherUserId, isblock, setIsBlockUser, blockRefetch, isFriend }: profileMenusProps) => {
 	const [open, setOpen] = useState(false);
 	const [errorMessage, setErrorMessage] = useState<string>('');
 	const anchorRef = useRef<HTMLButtonElement>(null);
@@ -29,6 +38,11 @@ const ProfileMenus = ({ otherUserId, isblock }: { otherUserId: string; isblock: 
 	const blockFetch = async () => {
 		try {
 			const responce = await postFetcher('/block', { blockedId: otherUserId });
+			if (isFriend === true) {
+				await deleteFetcher(`/friend/${otherUserId}`);
+			}
+			setIsBlockUser(true);
+			if (blockRefetch !== undefined) blockRefetch();
 		} catch (error: any) {
 			setErrorMessage(error.message);
 		} finally {

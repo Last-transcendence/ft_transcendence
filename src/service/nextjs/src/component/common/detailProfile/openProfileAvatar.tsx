@@ -18,9 +18,10 @@ interface OpenProfileAvatarProps {
 	otherUserId: string;
 	imgUrl: string | undefined | null;
 	refetch?: () => void;
+	blockRefetch?: () => void;
 }
 
-const OpenProfileAvatar = ({ otherUserId, imgUrl, refetch }: OpenProfileAvatarProps) => {
+const OpenProfileAvatar = ({ otherUserId, imgUrl, refetch, blockRefetch }: OpenProfileAvatarProps) => {
 	const router = useRouter();
 	const { me } = useContext(AuthContext);
 	const isMe = me?.id ? me.id === otherUserId : false;
@@ -88,7 +89,7 @@ const OpenProfileAvatar = ({ otherUserId, imgUrl, refetch }: OpenProfileAvatarPr
 			{click && isBlockUser !== undefined && isFriend !== undefined && (
 				<ProfileModar
 					setClick={setClick}
-					childMenu={<ProfileMenus isblock={isBlockUser} otherUserId={otherUserId} />}
+					childMenu={<ProfileMenus isblock={isBlockUser} otherUserId={otherUserId} setIsBlockUser={setIsBlockUser} blockRefetch={blockRefetch} isFriend={isFriend} />}
 				>
 					<ProfilePageBody
 						userData={otherUserData}

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, forwardRef, Inject } from '@nestjs/common';
 import { MessageBody } from '@nestjs/websockets';
 import { $Enums } from '@prisma/client';
 import MuteService from 'api/mute/mute.service';
@@ -12,6 +12,7 @@ import * as Dto from './dto';
 class ChannelService {
 	constructor(
 		private readonly prismaService: PrismaService,
+		@Inject(forwardRef(() => MuteService))
 		private readonly muteService: MuteService,
 	) {}
 
@@ -94,17 +95,11 @@ class ChannelService {
 
 	async editChannel(@MessageBody() data) {
 		try {
-			const updateChannelDto = plainToClass(Dto.Request.Create, data);
-			const error = await validate(updateChannelDto);
+			const { channelId, ...updateData } = data;
 
-			if (error.length > 0) {
-				throw new Error('Failed validation: ' + JSON.stringify(error));
-			}
-
-			const id = data.channelId;
 			await this.prismaService.channel.update({
-				where: { id },
-				data: updateChannelDto,
+				where: { id: channelId },
+				data: updateData,
 				select: {
 					id: true,
 					updatedAt: true,

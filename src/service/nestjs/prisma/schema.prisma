@@ -116,6 +116,7 @@ model Game {
 model GameHistory {
     // Attributes
     id           String     @id @default(uuid()) @db.Uuid
+    gameId       String     @db.Uuid
     player1Id    String     @db.Uuid
     player2Id    String     @db.Uuid
     mode         GameMode   @default(NORMAL)

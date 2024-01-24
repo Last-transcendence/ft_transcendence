@@ -1,4 +1,4 @@
-import { Stack } from '@mui/material';
+import { Button, Stack, TextField, Typography } from '@mui/material';
 import CustomModal from '@/component/common/CustomModal';
 import { Dispatch, SetStateAction } from 'react';
 
@@ -18,27 +18,35 @@ export const CustomConfirmModal = ({
 	onCancel,
 }: CustomConfirmModalProps) => {
 	return (
-		<CustomModal setIsOpened={setIsOpened}>
-			<Stack alignItems={'center'} justifyContent={'center'} padding={20} gap={2}>
+		<CustomModal setIsOpened={setIsOpened} halfHeight>
+			<Stack
+				spacing={2}
+				width={'100cqh'}
+				height={'100cqh'}
+				alignItems={'center'}
+				justifyContent={'center'}
+			>
 				<div>{title}</div>
 				<div>{content}</div>
 				<Stack flexDirection={'row'} gap={2}>
-					<button
+					<Button
+						variant={'contained'}
 						onClick={() => {
 							onConfirm();
 							setIsOpened(false);
 						}}
 					>
 						예
-					</button>
-					<button
+					</Button>
+					<Button
+						variant={'contained'}
 						onClick={() => {
 							onCancel();
 							setIsOpened(false);
 						}}
 					>
 						아니오
-					</button>
+					</Button>
 				</Stack>
 			</Stack>
 		</CustomModal>

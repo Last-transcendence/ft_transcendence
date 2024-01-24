@@ -93,11 +93,22 @@ class ChannelGateway {
 				throw new BadRequestException('Wrong password');
 			}
 
-			await this.participantService.create({
-				channelId: joinData.channelId,
-				userId,
-				socketId: socket.id,
-			});
+			const participant = await this.participantService.get(userId);
+			if (participant) {
+				const newSocketId = plainToClass(ParticipantDto.Request.Update, { socketId: socket.id });
+				const error = await validate(newSocketId);
+
+				if (error.length > 0) {
+					throw new Error('Failed validation: ' + JSON.stringify(error));
+				}
+				await this.participantService.update(participant.id, newSocketId);
+			} else {
+				await this.participantService.create({
+					channelId: joinData.channelId,
+					userId: userId,
+					socketId: socket.id,
+				});
+			}
 
 			socket.join(joinData.channelId);
 			this.server.to(joinData.channelId).emit('join', {
@@ -118,6 +129,19 @@ class ChannelGateway {
 	@UseGuards(Auth.Guard.UserWsJwt)
 	async handleEdit(@MessageBody() data, @ConnectedSocket() socket: Socket) {
 		try {
+			const channel = await this.channelService.getChannel(data.channelId);
+			if (!channel) {
+				throw new BadRequestException('Channel not found');
+			}
+			if (data.visibility === "PROTECTED" && (!data.password || data.password.length !== 6 || !/^\d+$/.test(data.password))) {
+				throw new BadRequestException('Password error');
+			}
+			if (data.title.length > 30) {
+				throw new BadRequestException('Title must be less than 30 characters');
+			}
+			if (!data.title) {
+				data.title = channel.title;
+			}
 			this.channelService.editChannel(data);
 
 			return { res: true };
@@ -143,10 +167,16 @@ class ChannelGateway {
 				data.userId,
 				data.message,
 			);
+
+			if (await this.muteService.isMuted(data.channelId, data.userId)) {
+				throw new Error('User is muted');
+			}
+
 			this.server.to(data.channelId).emit('message', {
 				userId: data.userId,
 				message: filteredMessage,
 			});
+
 			return { res: true };
 		} catch (error) {
 			console.error("An error occurred in channel.gateway 'message':", error);
@@ -169,7 +199,6 @@ class ChannelGateway {
 				message: `${socket.user.id} has left the channel`,
 				profileImageURI: participant.userProfileImageURI,
 			});
-			socket.leave(participant.channelId);
 			await this.channelService.leaveChannel(socket, socket.user.id);
 
 			return { res: true };
@@ -193,7 +222,7 @@ class ChannelGateway {
 			if (error.length > 0) {
 				throw new Error('Failed validation: ' + JSON.stringify(error));
 			}
-			this.participantService.update(data.toUserId, newRole);
+			await this.participantService.update(data.toUserId, newRole);
 
 			return { res: true };
 		} catch (error) {
@@ -296,7 +325,7 @@ class ChannelGateway {
 				throw new Error('Permission denied');
 			}
 			if ((await this.participantService.isOwner(data.toUserId)) === true) {
-				throw new Error('Permission denied');
+				throw new Error('Cannot mute owner');
 			}
 			await this.muteService.muteUser(data.channelId, data.toUserId);
 
@@ -305,8 +334,11 @@ class ChannelGateway {
 				userId: data.toUserId,
 				nickname: data.nickname,
 			});
+
 			return { res: true };
 		} catch (error) {
+			console.error("An error occurred in channel.gateway 'mute':", error);
+			socket.emit('error', { message: "An error occurred in channel.gateway 'mute'" });
 			return { res: false, message: error };
 		}
 	}
@@ -319,9 +351,9 @@ class ChannelGateway {
 				throw new Error('Permission denied');
 			}
 			if ((await this.participantService.isOwner(data.toUserId)) === true) {
-				throw new Error('Permission denied');
+				throw new Error('Owner cannot perform this action');
 			}
-			await this.participantService.kick(socket.user.id);
+			await this.participantService.kickByUserId(data.toUserId);
 
 			socket.leave(data.channelId);
 			this.server.to(data.channelId).emit('kick', {
@@ -331,6 +363,8 @@ class ChannelGateway {
 			});
 			return { res: true };
 		} catch (error) {
+			console.error('An error occurred in channel.gateway:', error);
+			socket.emit('error', { message: 'An error occurred in channel.gateway' });
 			return { res: false, message: error };
 		}
 	}
@@ -343,19 +377,24 @@ class ChannelGateway {
 				throw new Error('Permission denied');
 			}
 			if ((await this.participantService.isOwner(data.toUserId)) === true) {
-				throw new Error('Permission denied');
+				throw new Error('Owner cannot perform this action');
 			}
-			await this.participantService.kick(socket.user.id);
-			await this.banService.create(data.channelId, socket.user.id);
+
+			this.participantService.kickByUserId(data.toUserId);
+			this.banService.create(data.channelId, data.toUserId);
 
 			socket.leave(data.channelId);
+
 			this.server.to(data.channelId).emit('ban', {
 				channelId: data.channelId,
 				userId: data.toUserId,
 				nickname: data.nickname,
 			});
+
 			return { res: true };
 		} catch (error) {
+			console.error('An error occurred in handleBan:', error);
+			socket.emit('error', { message: 'An error occurred in handleBan' });
 			return { res: false, message: error };
 		}
 	}

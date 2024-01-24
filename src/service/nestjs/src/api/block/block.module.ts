@@ -6,6 +6,7 @@ import ChatRoomService from 'api/chatroom/chatroom.service';
 @Module({
 	controllers: [BlockController],
 	providers: [BlockService, ChatRoomService],
+	exports: [BlockService],
 })
 class BlockModule {}
 
