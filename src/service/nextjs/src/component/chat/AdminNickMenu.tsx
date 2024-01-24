@@ -33,6 +33,7 @@ const AdminNickMenu = ({ nickname, userId, channelId, ownerId, isMute }: NickMen
 			toUserId: userId,
 			nickname,
 		};
+		console.log('req', req);
 		switch (targetId) {
 			case 'kickBtn':
 				channelSocket?.emit('kick', req, (res: any) => {
@@ -64,7 +65,7 @@ const AdminNickMenu = ({ nickname, userId, channelId, ownerId, isMute }: NickMen
 			<Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
 				<MenuItem>{nickname}</MenuItem>
 				{userId !== me?.id && userId !== ownerId && (
-					<>
+					<div>
 						<MenuItem id={'kickBtn'} onClick={handleMenuClick}>
 							추방하기
 						</MenuItem>
@@ -74,7 +75,7 @@ const AdminNickMenu = ({ nickname, userId, channelId, ownerId, isMute }: NickMen
 						<MenuItem id={'muteBtn'} onClick={handleMenuClick} disabled={isMute}>
 							뮤트하기
 						</MenuItem>
-					</>
+					</div>
 				)}
 				{ownerId === me?.id && (
 					<MenuItem id={'adminBtn'} onClick={handleMenuClick}>
@@ -83,7 +84,7 @@ const AdminNickMenu = ({ nickname, userId, channelId, ownerId, isMute }: NickMen
 				)}
 			</Menu>
 			<Typography fontWeight={'bold'} sx={{ cursor: 'pointer' }} onClick={handleClick}>
-				{nickname}
+				{nickname + '임시 닉네임'}
 			</Typography>
 		</>
 	);
