@@ -93,9 +93,15 @@ class ChannelGateway {
 				throw new BadRequestException('Wrong password');
 			}
 
-			const existingParticipant = await this.participantService.get(userId);
-			if (existingParticipant) {
-				await this.participantService.updateParticipant(existingParticipant.id, socket.id);
+			const participant = await this.participantService.get(userId);
+			if (participant) {
+				const newSocketId = plainToClass(ParticipantDto.Request.Update, { socketId: socket.id });
+				const error = await validate(newSocketId);
+
+				if (error.length > 0) {
+					throw new Error('Failed validation: ' + JSON.stringify(error));
+				}
+				await this.participantService.update(participant.id, newSocketId);
 			} else {
 				await this.participantService.create({
 					channelId: joinData.channelId,

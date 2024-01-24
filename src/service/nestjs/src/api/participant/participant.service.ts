@@ -107,7 +107,7 @@ class ParticipantService {
 		}
 	}
 
-	async updateRole(
+	async update(
 		id: string,
 		updateParticipantDto: Dto.Request.Update,
 	): Promise<Dto.Response.Participant> {
@@ -122,26 +122,6 @@ class ParticipantService {
 			return await this.prismaService.participant.update({
 				where: { id },
 				data: updateParticipantDto,
-			});
-		} catch (error) {
-			throw new Error(error.message);
-		}
-	}
-
-	async updateParticipant(id: string, socketId: string): Promise<Dto.Response.Participant> {
-		try {
-			const participant = await this.prismaService.participant.findUnique({
-				where: { id },
-			});
-			if (!participant) {
-				throw new BadRequestException('Participant not found');
-			}
-
-			return await this.prismaService.participant.update({
-				where: { id },
-				data: {
-					socketId: socketId,
-				},
 			});
 		} catch (error) {
 			throw new Error(error.message);

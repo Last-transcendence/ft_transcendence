@@ -8,7 +8,13 @@ class Update {
 	@IsNotEmpty()
 	@Trim()
 	@ApiProperty({ description: 'Participant role' })
-	role: $Enums.ParticipantRole;
+	role?: $Enums.ParticipantRole;
+
+	@IsString()
+	@IsNotEmpty()
+	@Trim()
+	@ApiProperty({ description: 'Participant socket id' })
+	socketId?: string;
 }
 
 export default Update;
