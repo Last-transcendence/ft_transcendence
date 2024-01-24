@@ -77,7 +77,7 @@ class ChannelGateway {
 		try {
 			const userId = socket.user.id;
 
-			await this.channelService.leaveChannel(socket, joinData.channelId, userId);
+			await this.channelService.joinCheck(socket, joinData.channelId, userId);
 
 			const channel = await this.channelService.getChannel(joinData.channelId);
 			if (!channel) {
@@ -170,7 +170,7 @@ class ChannelGateway {
 				profileImageURI: participant.userProfileImageURI,
 			});
 			socket.leave(participant.channelId);
-			this.channelService.leaveChannel(socket, socket.user.id);
+			await this.channelService.leaveChannel(socket, data.channelId, socket.user.id);
 
 			return { res: true };
 		} catch (error) {
