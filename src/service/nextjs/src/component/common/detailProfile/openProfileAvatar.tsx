@@ -18,9 +18,10 @@ interface OpenProfileAvatarProps {
 	otherUserId: string;
 	imgUrl: string | undefined | null;
 	refetch?: () => void;
+	blockRefetch?: () => void;
 }
 
-const OpenProfileAvatar = ({ otherUserId, imgUrl, refetch }: OpenProfileAvatarProps) => {
+const OpenProfileAvatar = ({ otherUserId, imgUrl, refetch, blockRefetch }: OpenProfileAvatarProps) => {
 	const router = useRouter();
 	const { me } = useContext(AuthContext);
 	const isMe = me?.id ? me.id === otherUserId : false;
@@ -69,9 +70,7 @@ const OpenProfileAvatar = ({ otherUserId, imgUrl, refetch }: OpenProfileAvatarPr
 		setErrorMessage('');
 	};
 
-	return imgUrl === null ? (
-		<Loading />
-	) : (
+	return (
 		<>
 			<CustomSnackbar
 				open={errorMessage !== '' ? true : false}
@@ -81,7 +80,7 @@ const OpenProfileAvatar = ({ otherUserId, imgUrl, refetch }: OpenProfileAvatarPr
 				{errorMessage}
 			</CustomSnackbar>
 			<Avatar onClick={handleAvatarOpen} sx={{ cursor: 'pointer' }}>
-				{imgUrl === '' ? (
+				{imgUrl === null ? (
 					<CustomImage img={UNKNOWN_PROFILE_IMAGE_URI} alt={'user img'} />
 				) : (
 					<CustomImage useLoader img={imgUrl as string} alt="user img" />
@@ -90,7 +89,7 @@ const OpenProfileAvatar = ({ otherUserId, imgUrl, refetch }: OpenProfileAvatarPr
 			{click && isBlockUser !== undefined && isFriend !== undefined && (
 				<ProfileModar
 					setClick={setClick}
-					childMenu={<ProfileMenus isblock={isBlockUser} otherUserId={otherUserId} />}
+					childMenu={<ProfileMenus isblock={isBlockUser} otherUserId={otherUserId} setIsBlockUser={setIsBlockUser} blockRefetch={blockRefetch} isFriend={isFriend} />}
 				>
 					<ProfilePageBody
 						userData={otherUserData}
