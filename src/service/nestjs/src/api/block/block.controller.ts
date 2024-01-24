@@ -33,7 +33,9 @@ class BlockController {
 	async blockUser(@Body() blockRequestDto: Dto.Request.Create, @Req() req): Promise<BlockModel> {
 		try {
 			const findChatRoom = await this.chatRoomService.find(req.user.id, blockRequestDto.blockedId)
-			await this.chatRoomService.delete(findChatRoom.id);
+			if (findChatRoom) {
+				await this.chatRoomService.delete(findChatRoom.id);
+			}
 			return await this.blockService.create(req.user.id, blockRequestDto.blockedId);
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
