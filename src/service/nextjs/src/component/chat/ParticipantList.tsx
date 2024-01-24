@@ -1,9 +1,9 @@
-import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import style from '@/style/friend/list/index.module.css';
-import { Button, Stack, Typography } from '@mui/material';
+import { Button, Stack } from '@mui/material';
 import UserBriefInformation from '@/component/common/user/bried-information';
 import CustomModal from '@/component/common/CustomModal';
-import { Mute, ParticipantRole } from '@/type/channel.type';
+import { AdminActionType, Mute, ParticipantRole } from '@/type/channel.type';
 import NickMenu from '@/component/chat/NickMenu';
 import AdminNickMenu from '@/component/chat/AdminNickMenu';
 import Chatroom from '@/type/chatroom.type';
@@ -18,9 +18,16 @@ interface ParticipantListProps {
 	ownerId: string | undefined;
 	channelData: ChannelInfo | undefined;
 	channelId: string;
+	adminAction?: (action: AdminActionType, nickname: string, id: string) => void;
 }
 
-const ParticipantList = ({ myRole, ownerId, channelData, channelId }: ParticipantListProps) => {
+const ParticipantList = ({
+	myRole,
+	ownerId,
+	channelData,
+	channelId,
+	adminAction,
+}: ParticipantListProps) => {
 	const router = useRouter();
 	const [open, setOpen] = useState(false);
 	const { sockets } = useContext(SocketContext);
@@ -59,11 +66,9 @@ const ParticipantList = ({ myRole, ownerId, channelData, channelId }: Participan
 			if (res) {
 				router.push('/');
 			}
-			console.log(res);
 		});
 	}, [channelId, channelSocket, me?.id, router]);
 
-	console.log('myRole', myRole, 'ownerId', ownerId);
 	return (
 		<div>
 			{/*채널이 protected일때만 비밀번호 변경 보임*/}
@@ -87,6 +92,7 @@ const ParticipantList = ({ myRole, ownerId, channelData, channelId }: Participan
 								nickname={
 									myRole !== 'USER' ? (
 										<AdminNickMenu
+											adminAction={adminAction}
 											nickname={data?.user?.nickname}
 											userId={data?.userId}
 											channelId={channelId}

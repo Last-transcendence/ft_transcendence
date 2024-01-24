@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useContext, useMemo, useState } from 'react';
+import { useCallback, useContext, useState } from 'react';
 import style from '../../../style/main/body/index.module.css';
 import ChattingRoom from './chatting-room';
 import ChattingModeToggle from './chatting-mode';
@@ -10,10 +10,9 @@ import PositionableSnackbar from '@/component/common/PositionableSnackbar';
 import Chatroom from '@/type/chatroom.type';
 import { Channel } from '@/type/channel.type';
 import useFetchData from '@/hook/useFetchData';
-import axios, { AxiosError } from 'axios';
+import { AxiosError } from 'axios';
 import SocketContext from '@/context/socket.context';
 import CustomModal from '@/component/common/CustomModal';
-import FriendType from '@/type/friend.type';
 
 export type ChattingMode = 'normal' | 'private';
 
@@ -44,9 +43,7 @@ const MainPageBody = () => {
 	const navigateChannel = useCallback(
 		(channelId: string | undefined, password?: string) => {
 			if (!channelSocket) return;
-			console.log('channelId, password', channelId, password);
 			channelSocket?.emit('join', { channelId, password }, (res: any) => {
-				console.log(res);
 				if (res?.res) router.push(`/chat/${channelId}/common`);
 				else {
 					setMessage('채널 입장에 실패했습니다.');
@@ -60,14 +57,8 @@ const MainPageBody = () => {
 	const navigateChatroom = useCallback(
 		(destId: string) => {
 			if (!chatSocket) return;
-			chatSocket.emit('join', { destId }, (res: any) => {
-				console.log(res);
+			chatSocket.emit('join', { destId }, () => {
 				router.push(`/chat/${destId}/private`);
-				// if (res.enter) router.push(`/chat/${toUserId}/private`);
-				// else {
-				// 	setMessage('DM 입장에 실패했습니다.');
-				// 	setShowSnackbar(true);
-				// }
 			});
 		},
 		[chatSocket, router],
@@ -126,32 +117,35 @@ const MainPageBody = () => {
 						</Stack>
 					</CustomModal>
 				)}
-				{datas?.map(data => (
-					<Box
-						key={data.id}
-						onClick={() =>
-							mode === 'normal'
-								? (data as Channel)?.visibility === 'PROTECTED'
-									? openPasswordModal(data?.id)
-									: navigateChannel(data?.id)
-								: navigateChatroom((data as Chatroom)?.destId)
-						}
-						style={{ textDecoration: 'none' }}
-					>
-						<ChattingRoom
-							title={
-								mode === 'normal'
-									? (data as Channel)?.title
-									: `${(data as Chatroom)?.destNickname}님과의 대화`
-							}
-							visibility={
-								mode === 'normal'
-									? ((data as Channel)?.visibility as 'PUBLIC' | 'PROTECTED')
-									: 'PRIVATE'
-							}
-						/>
-					</Box>
-				))}
+				{datas?.map(
+					data =>
+						(data as Channel)?.visibility !== 'PRIVATE' && (
+							<Box
+								key={data.id}
+								onClick={() =>
+									mode === 'normal'
+										? (data as Channel)?.visibility === 'PROTECTED'
+											? openPasswordModal(data?.id)
+											: navigateChannel(data?.id)
+										: navigateChatroom((data as Chatroom)?.destId)
+								}
+								style={{ textDecoration: 'none' }}
+							>
+								<ChattingRoom
+									title={
+										mode === 'normal'
+											? (data as Channel)?.title
+											: `${(data as Chatroom)?.destNickname}님과의 대화`
+									}
+									visibility={
+										mode === 'normal'
+											? ((data as Channel)?.visibility as 'PUBLIC' | 'PROTECTED')
+											: 'PRIVATE'
+									}
+								/>
+							</Box>
+						),
+				)}
 			</>
 		);
 	};

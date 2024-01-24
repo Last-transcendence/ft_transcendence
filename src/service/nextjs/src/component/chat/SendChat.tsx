@@ -24,17 +24,16 @@ const SendChat = ({ sendAction, commandAction }: SendChatProps) => {
 			const chatSplit = chat.split(' ');
 			const command = chatSplit?.[0];
 			const nickname = chatSplit?.[1];
-			const message = chatSplit?.[2];
 
 			switch (command) {
 				case '/help':
 					commandAction('HELP');
 					break;
-				case '/w':
-					commandAction('DM', nickname, message, params?.id);
+				case '/i':
+					commandAction('INVITE', nickname, params?.id);
 					break;
 				case '/g':
-					commandAction('GAME', nickname, undefined, params?.id);
+					commandAction('GAME', nickname, params?.id);
 					break;
 				default:
 					sendAction(chat ?? '');
