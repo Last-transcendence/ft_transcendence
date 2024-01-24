@@ -296,7 +296,7 @@ class ChannelGateway {
 				throw new Error('Permission denied');
 			}
 			if ((await this.participantService.isOwner(data.toUserId)) === true) {
-				throw new Error('Permission denied');
+				throw new Error('Owner cannot perform this action');
 			}
 			await this.muteService.muteUser(data.channelId, data.toUserId);
 
@@ -307,6 +307,8 @@ class ChannelGateway {
 			});
 			return { res: true };
 		} catch (error) {
+			console.error("An error occurred in channel.gateway 'mute':", error);
+			socket.emit('error', { message: "An error occurred in channel.gateway 'mute'" });
 			return { res: false, message: error };
 		}
 	}
@@ -321,7 +323,7 @@ class ChannelGateway {
 			if ((await this.participantService.isOwner(data.toUserId)) === true) {
 				throw new Error('Permission denied');
 			}
-			await this.participantService.kick(socket.user.id);
+			await this.participantService.kick(data.toUserId);
 
 			socket.leave(data.channelId);
 			this.server.to(data.channelId).emit('kick', {
@@ -331,6 +333,8 @@ class ChannelGateway {
 			});
 			return { res: true };
 		} catch (error) {
+			console.error('An error occurred in channel.gateway:', error); // 에러 메시지 출력
+			socket.emit('error', { message: 'An error occurred in channel.gateway' }); // 에러 메시지 전달
 			return { res: false, message: error };
 		}
 	}
@@ -356,6 +360,8 @@ class ChannelGateway {
 			});
 			return { res: true };
 		} catch (error) {
+			console.error('An error occurred in handleBan:', error); // 에러 메시지 출력
+			socket.emit('error', { message: 'An error occurred in handleBan' }); // 에러 메시지 전달
 			return { res: false, message: error };
 		}
 	}

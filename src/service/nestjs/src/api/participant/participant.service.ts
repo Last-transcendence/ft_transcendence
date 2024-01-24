@@ -45,7 +45,7 @@ class ParticipantService {
 			if (!participant) {
 				throw new Error('User is not participant');
 			} else if (participant.role !== 'OWNER') {
-				throw new Error('User is not the owner');
+				return false;
 			}
 			return true;
 		} catch (error) {
