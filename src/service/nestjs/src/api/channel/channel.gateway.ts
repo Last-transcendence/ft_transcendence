@@ -49,6 +49,15 @@ class ChannelGateway {
 		console.log('Client connected to channel namespace');
 	}
 
+	async handleDisconnect(@ConnectedSocket() socket) {
+		try {
+			await this.channelService.deleteEmptyChannel();
+		} catch (error) {
+			console.error("An error occurred in channel.gateway 'handleDisconnect':", error);
+			socket.emit('error', { message: "An error occurred in channel.gateway 'handleDisconnect'" });
+		}
+	}
+
 	@SubscribeMessage('create')
 	async handleCreate(@ConnectedSocket() socket, @MessageBody() data) {
 		try {
@@ -223,7 +232,7 @@ class ChannelGateway {
 			if ((await this.participantService.isOwner(socket.user.id)) === false) {
 				throw new Error('Permission denied');
 			}
-			const newRole: ParticipantDto.Request.Update =  { role: data.role, socketId: socket.id };
+			const newRole: ParticipantDto.Request.Update = { role: data.role, socketId: socket.id };
 
 			await this.participantService.update(data.toUserId, newRole);
 
