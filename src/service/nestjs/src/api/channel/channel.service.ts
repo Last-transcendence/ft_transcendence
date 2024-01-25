@@ -1,6 +1,7 @@
 import { Injectable, forwardRef, Inject } from '@nestjs/common';
 import { MessageBody } from '@nestjs/websockets';
 import { $Enums } from '@prisma/client';
+import * as bcrypt from 'bcrypt';
 import MuteService from 'api/mute/mute.service';
 import { plainToClass } from 'class-transformer';
 import { validate } from 'class-validator';
@@ -80,7 +81,10 @@ class ChannelService {
 		try {
 			const createRequestDto = plainToClass(Dto.Request.Create, data);
 			const error = await validate(createRequestDto);
+			console.log("create", createRequestDto);
 
+			createRequestDto.password = await bcrypt.hash(createRequestDto.password, 10);
+			
 			if (error.length > 0) {
 				throw new Error('Failed validation: ' + JSON.stringify(error));
 			}
@@ -96,6 +100,9 @@ class ChannelService {
 	async editChannel(@MessageBody() data) {
 		try {
 			const { channelId, ...updateData } = data;
+			console.log("edit", updateData.password);
+			updateData.password = await bcrypt.hash(updateData.password, 10);
+			console.log("edit", updateData.password);
 
 			await this.prismaService.channel.update({
 				where: { id: channelId },
@@ -156,7 +163,8 @@ class ChannelService {
 				where: { id },
 			});
 
-			return channel.password === password;
+			return await bcrypt.compare(password, channel.password);
+
 		} catch (error) {
 			throw new Error(error.message);
 		}
