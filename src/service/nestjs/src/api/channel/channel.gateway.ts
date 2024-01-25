@@ -199,8 +199,9 @@ class ChannelGateway {
 			const participant = await this.participantService.get(socket.user.id);
 
 			socket.to(participant.channelId).emit('leave', {
-				message: `${socket.user.id} has left the channel`,
-				profileImageURI: participant.userProfileImageURI,
+				channelId: participant.channelId,
+				userId: socket.user.id,
+				nickname: socket.user.nickname,
 			});
 			await this.channelService.leaveChannel(socket, socket.user.id);
 
