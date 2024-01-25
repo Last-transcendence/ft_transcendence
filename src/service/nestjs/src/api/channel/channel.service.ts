@@ -101,9 +101,7 @@ class ChannelService {
 	async editChannel(@MessageBody() data) {
 		try {
 			const { channelId, ...updateData } = data;
-			console.log("edit", updateData.password);
 			updateData.password = await bcrypt.hash(updateData.password, 10);
-			console.log("edit", updateData.password);
 
 			await this.prismaService.channel.update({
 				where: { id: channelId },
