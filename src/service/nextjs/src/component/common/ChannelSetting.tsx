@@ -16,9 +16,16 @@ interface ChannelSettingProps {
 	setOpen?: Dispatch<SetStateAction<boolean>>;
 	channelData?: ChannelInfo;
 	channelId?: string;
+	refetch?: (() => void) | void;
 }
 
-const ChannelSetting = ({ isCreate, setOpen, channelData, channelId }: ChannelSettingProps) => {
+const ChannelSetting = ({
+	isCreate,
+	setOpen,
+	channelData,
+	channelId,
+	refetch,
+}: ChannelSettingProps) => {
 	const router = useRouter();
 	const { sockets } = useContext(SocketContext);
 	const { channelSocket } = sockets;
@@ -90,6 +97,7 @@ const ChannelSetting = ({ isCreate, setOpen, channelData, channelId }: ChannelSe
 						title: label + ' 성공',
 						success: true,
 					});
+					refetch && refetch();
 				} else {
 					setMessage({
 						title: `${label} 실패 ${res?.message ? ': ' + res?.message : ''}`,
