@@ -1,8 +1,8 @@
 import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { MessageBody } from '@nestjs/websockets';
 import { $Enums } from '@prisma/client';
-import * as bcrypt from 'bcrypt';
 import MuteService from 'api/mute/mute.service';
+import * as bcrypt from 'bcrypt';
 import { plainToClass } from 'class-transformer';
 import { validate } from 'class-validator';
 import PrismaService from 'common/prisma/prisma.service';
@@ -82,10 +82,9 @@ class ChannelService {
 		try {
 			const createRequestDto = plainToClass(Dto.Request.Create, data);
 			const error = await validate(createRequestDto);
-			console.log("create", createRequestDto);
 
 			createRequestDto.password = await bcrypt.hash(createRequestDto.password, 10);
-			
+
 			if (error.length > 0) {
 				throw new Error('Failed validation: ' + JSON.stringify(error));
 			}
@@ -163,7 +162,6 @@ class ChannelService {
 			});
 
 			return await bcrypt.compare(password, channel.password);
-
 		} catch (error) {
 			throw new Error(error.message);
 		}
@@ -176,6 +174,26 @@ class ChannelService {
 			return 'This message is from a muted user';
 		} else {
 			return message;
+		}
+	}
+
+	async deleteEmptyChannel(): Promise<void> {
+		try {
+			const emptyChannelList = await this.prismaService.channel.findMany({
+				where: { participant: { none: {} } },
+			});
+
+			for (const channel of emptyChannelList) {
+				await this.prismaService.ban.deleteMany({
+					where: { channelId: channel.id },
+				});
+
+				await this.prismaService.channel.delete({
+					where: { id: channel.id },
+				});
+			}
+		} catch (error) {
+			throw new Error(error.message);
 		}
 	}
 }
