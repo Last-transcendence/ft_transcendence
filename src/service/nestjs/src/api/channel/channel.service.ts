@@ -82,7 +82,6 @@ class ChannelService {
 		try {
 			const createRequestDto = plainToClass(Dto.Request.Create, data);
 			const error = await validate(createRequestDto);
-			console.log('create', createRequestDto);
 
 			createRequestDto.password = await bcrypt.hash(createRequestDto.password, 10);
 
@@ -101,9 +100,7 @@ class ChannelService {
 	async editChannel(@MessageBody() data) {
 		try {
 			const { channelId, ...updateData } = data;
-			console.log('edit', updateData.password);
 			updateData.password = await bcrypt.hash(updateData.password, 10);
-			console.log('edit', updateData.password);
 
 			await this.prismaService.channel.update({
 				where: { id: channelId },
