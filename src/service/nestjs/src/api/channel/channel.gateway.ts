@@ -83,7 +83,7 @@ class ChannelGateway {
 			if (!channel) {
 				throw new BadRequestException('Channel not found');
 			}
-			if (await this.banService.isBanned(userId, joinData.channelId)) {
+			if (await this.banService.isBanned(joinData.channelId, userId)) {
 				throw new BadRequestException('User is banned');
 			}
 			if (
@@ -133,7 +133,10 @@ class ChannelGateway {
 			if (!channel) {
 				throw new BadRequestException('Channel not found');
 			}
-			if (data.visibility === "PROTECTED" && (!data.password || data.password.length !== 6 || !/^\d+$/.test(data.password))) {
+			if (
+				data.visibility === 'PROTECTED' &&
+				(!data.password || data.password.length !== 6 || !/^\d+$/.test(data.password))
+			) {
 				throw new BadRequestException('Password error');
 			}
 			if (data.title.length > 30) {
@@ -381,7 +384,9 @@ class ChannelGateway {
 			}
 
 			this.participantService.kickByUserId(data.toUserId);
-			this.banService.create(data.channelId, data.toUserId);
+			if ((await this.banService.isBanned(data.channelId, data.toUserId)) === false) {
+				this.banService.create(data.channelId, data.toUserId);
+			}
 
 			socket.leave(data.channelId);
 

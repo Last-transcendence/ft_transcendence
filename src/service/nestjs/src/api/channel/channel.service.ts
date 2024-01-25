@@ -1,4 +1,4 @@
-import { Injectable, forwardRef, Inject } from '@nestjs/common';
+import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { MessageBody } from '@nestjs/websockets';
 import { $Enums } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
@@ -59,6 +59,7 @@ class ChannelService {
 							user: {
 								select: {
 									nickname: true,
+									profileImageURI: true,
 								},
 							},
 						},
