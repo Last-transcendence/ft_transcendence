@@ -28,6 +28,7 @@ type Sockets = {
 	chatSocket: Socket | null;
 	channelSocket: Socket | null;
 	gameSocket: Socket | null;
+	inviteSocket: Socket | null;
 };
 
 const SocketContext = createContext<{
@@ -38,6 +39,7 @@ const SocketContext = createContext<{
 		chatSocket: null,
 		channelSocket: null,
 		gameSocket: null,
+		inviteSocket: null,
 	},
 	setSocket: () => {},
 });
@@ -48,6 +50,7 @@ export const SocketProvider = (props: { children: ReactNode }) => {
 		chatSocket: null,
 		channelSocket: null,
 		gameSocket: null,
+		inviteSocket: null,
 	});
 	const [socketLoading, setSocketLoading] = useState<boolean>(false);
 
@@ -70,7 +73,13 @@ export const SocketProvider = (props: { children: ReactNode }) => {
 				gameSocket: initSocket('game'),
 			});
 		}
-		if (sockets.chatSocket && sockets.channelSocket && sockets.gameSocket) {
+		if (!sockets.inviteSocket) {
+			setSocket({
+				...sockets,
+				inviteSocket: initSocket('invite'),
+			});
+		}
+		if (sockets.chatSocket && sockets.channelSocket && sockets.gameSocket && sockets.inviteSocket) {
 			setSocketLoading(true);
 		}
 	}, [sockets]);

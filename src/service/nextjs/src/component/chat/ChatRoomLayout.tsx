@@ -18,7 +18,7 @@ import { ChatLiveDataType } from '@/component/chat/CommonChatRoomPage';
 import ListenContext from '@/context/listen.context';
 import User from '@/type/user.type';
 
-export type CommandType = 'DM' | 'GAME' | 'HELP';
+export type CommandType = 'INVITE' | 'GAME' | 'HELP';
 
 interface ChatRoomLayoutProps {
 	type: 'channel' | 'chatroom';
@@ -44,7 +44,7 @@ const ChatRoomLayout = ({
 	adminAction,
 }: ChatRoomLayoutProps) => {
 	const params = useParams<{ id: string }>();
-	const { channelSocket, chatSocket } = useContext(SocketContext).sockets;
+	const { channelSocket, chatSocket, inviteSocket } = useContext(SocketContext).sockets;
 	const { me } = useContext(AuthContext);
 	const { currentDm } = useContext(ListenContext);
 	const scrollRef = useRef<HTMLDivElement>(null);
@@ -54,11 +54,10 @@ const ChatRoomLayout = ({
 		if (type === 'chatroom') return;
 		if (!channelSocket) return;
 		channelSocket.on('message', res => {
-			if (params?.id === res.channelId)
-				setChatLiveData((prev: ChatLiveDataType[]) => [
-					...prev,
-					{ type: 'chat', id: res?.userId, message: res?.message },
-				]);
+			setChatLiveData((prev: ChatLiveDataType[]) => [
+				...prev,
+				{ type: 'chat', id: res?.userId, message: res?.message },
+			]);
 		});
 		return () => {
 			channelSocket?.off('message');
@@ -103,7 +102,6 @@ const ChatRoomLayout = ({
 	const commandAction = (
 		type: CommandType,
 		nickname?: string,
-		message?: string,
 		channelId?: string,
 		mode?: string,
 	) => {
@@ -111,13 +109,20 @@ const ChatRoomLayout = ({
 			case 'HELP':
 				setChatLiveData((prev: ChatLiveDataType[]) => [...prev, { type: 'help' }]);
 				break;
-			case 'DM':
+			case 'INVITE':
 				if (!nickname) return;
-
-				// send DM invite (nickname, message)
+				inviteSocket?.emit(
+					'invite',
+					{
+						channelId,
+						destNickname: nickname,
+					},
+					(res: any) => {
+						console.log('invite res', res);
+					},
+				);
 				break;
 			case 'GAME':
-				// @todo 게임 시작
 				channelSocket?.emit('invite', {
 					channelId,
 					userId: me?.id,
@@ -168,7 +173,6 @@ const ChatRoomLayout = ({
 					else if (chat.type === 'action') return <StatusMsg message={chat?.message} key={index} />;
 				})}
 			</Stack>
-			{/*@todo 연결이 완료되어야 채팅을 보낼 수 있도록 설정 */}
 			<SendChat sendAction={sendAction} commandAction={commandAction} />
 		</Stack>
 	);
