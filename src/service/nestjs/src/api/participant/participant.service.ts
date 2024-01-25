@@ -41,7 +41,6 @@ class ParticipantService {
 			const participant = await this.prismaService.participant.findFirst({
 				where: { userId },
 			});
-
 			if (!participant) {
 				throw new Error('User is not participant');
 			} else if (participant.role !== 'OWNER') {
@@ -110,18 +109,19 @@ class ParticipantService {
 	async update(
 		id: string,
 		updateParticipantDto: Dto.Request.Update,
-	): Promise<Dto.Response.Participant> {
+	) {
 		try {
-			const participant = await this.prismaService.participant.findUnique({
-				where: { id },
+			const participant = await this.prismaService.participant.findFirst({
+				where: { userId: id },
 			});
+
 			if (!participant) {
 				throw new BadRequestException('Participant not found');
 			}
 
-			return await this.prismaService.participant.update({
-				where: { id },
-				data: updateParticipantDto,
+			await this.prismaService.participant.update({
+				where: { userId: id },
+				data: { role: updateParticipantDto.role },
 			});
 		} catch (error) {
 			throw new Error(error.message);
