@@ -79,7 +79,7 @@ class InviteGateway {
 			socket.to('invite').emit('invite', {
 				srcId: userId,
 				destId: destUser.id,
-				destNickname: destUser.nickname,
+				srcNickname: socket.user.nickname,
                 channelId: messageDto.channelId,
                 channelTitle: channelInfo.title,
             });
