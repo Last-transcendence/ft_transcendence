@@ -6,7 +6,6 @@ import CustomModal from '@/component/common/CustomModal';
 import { AdminActionType, Mute, ParticipantRole } from '@/type/channel.type';
 import NickMenu from '@/component/chat/NickMenu';
 import AdminNickMenu from '@/component/chat/AdminNickMenu';
-import Chatroom from '@/type/chatroom.type';
 import ChannelSetting from '@/component/common/ChannelSetting';
 import SocketContext from '@/context/socket.context';
 import AuthContext from '@/context/auth.context';
@@ -63,7 +62,8 @@ const ParticipantList = ({
 
 	const handleLeave = useCallback(() => {
 		channelSocket!.emit('leave', { channelId, userId: me?.id }, (res: any) => {
-			if (res) {
+			console.log('leave emit', res);
+			if (res?.res) {
 				router.push('/');
 			}
 		});
@@ -103,7 +103,7 @@ const ParticipantList = ({
 										<NickMenu nickname={data?.user?.nickname} />
 									)
 								}
-								condition={<ChatStatus status={data?.role} />}
+								condition={<ChatStatus status={data?.role as ParticipantRole} />}
 								className={style['user-brief-information']}
 								userId={data?.userId}
 								isMute={isMute(data?.userId)}

@@ -44,11 +44,9 @@ const MainPageBody = () => {
 		(channelId: string | undefined, password?: string) => {
 			if (!channelSocket) return;
 			channelSocket?.emit('join', { channelId, password }, (res: any) => {
+				console.log('channel join res', res);
 				if (res?.res) router.push(`/chat/${channelId}/common`);
-				else {
-					setMessage('채널 입장에 실패했습니다.');
-					setShowSnackbar(true);
-				}
+				else alert('채널 입장에 실패했습니다.');
 			});
 		},
 		[channelSocket, router],

@@ -41,6 +41,7 @@ const CommonChatRoomPage = () => {
 	useEffect(() => {
 		if (!params?.id) return;
 		channelSocket?.emit('info', { channelId: params?.id }, (res: any) => {
+			console.log('info res', res);
 			setChannelData(res);
 		});
 	}, [channelSocket, params?.id]);
@@ -76,6 +77,7 @@ const CommonChatRoomPage = () => {
 	}, []);
 
 	const removeParticipant = useCallback((userId: string) => {
+		console.log('userId');
 		setChannelData(prev => {
 			if (!prev) return prev;
 			return { ...prev, participant: prev?.participant?.filter(data => data.id !== userId) };
@@ -84,22 +86,24 @@ const CommonChatRoomPage = () => {
 
 	//이용자 참여
 	useListeningChannelEvent('join', (res: any) => {
+		console.log('join listen res', res);
+		setActionMessage(`${res?.nickname}님이 들어오셨습니다.`);
 		setChannelData(prev => {
 			if (!prev) return prev;
-			if (prev?.participant?.some(data => data.id === res?.id)) return prev;
+			if (prev?.participant?.some(data => data.id === res?.userId)) return prev;
 			return {
 				...prev,
 				participant: [
 					...prev?.participant,
-					{ ...res, role: 'USER', user: { nickname: res?.nickname } },
+					{ ...res, userId: res?.userId, role: ParticipantRole.USER, user: res },
 				],
 			};
 		});
-		setActionMessage(`${res?.nickname}님이 들어오셨습니다.`);
 	});
 
 	//이용자 퇴장
 	useListeningChannelEvent('leave', (res: any) => {
+		console.log('listen leave', res);
 		setActionMessage(`${getNickname(res.id)}님이 나가셨습니다.`);
 		removeParticipant(res?.id);
 	});
@@ -181,12 +185,23 @@ const CommonChatRoomPage = () => {
 		adminAction('ban', res?.nickname, res?.id);
 	});
 
+	//이용자 킥
 	useListeningChannelEvent('kick', (res: any) => {
+		console.log('kick', res);
 		if (res?.userId === me?.id) {
 			alert('채널에서 킥되었습니다.');
 			router.push('/');
 		}
 		adminAction('kick', res?.nickname, res?.id);
+	});
+
+	//이용자 어드민 임명
+	useListeningChannelEvent('role', (res: { userId: string; nickname: string }) => {
+		console.log('res', res);
+		if (res?.userId === me?.id) {
+			alert('채널 어드민으로 임명되었습니다.');
+		}
+		adminAction('admin', res?.nickname, res?.userId);
 	});
 
 	const myRole = useMemo(() => {
@@ -214,7 +229,7 @@ const CommonChatRoomPage = () => {
 				<MenuHeader title={channelData?.title ?? ''} type={'chat'}>
 					<ParticipantList
 						channelId={params?.id}
-						myRole={myRole}
+						myRole={myRole as ParticipantRole}
 						ownerId={ownerId}
 						channelData={channelData}
 						adminAction={adminAction}

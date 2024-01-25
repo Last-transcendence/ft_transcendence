@@ -2,12 +2,11 @@ import { Box, Stack, Typography } from '@mui/material';
 import React from 'react';
 import NickMenu from '@/component/chat/NickMenu';
 import AdminNickMenu from '@/component/chat/AdminNickMenu';
-import { AdminActionType, ParticipantRole } from '@/type/channel.type';
+import { AdminActionType, Participant, ParticipantRole } from '@/type/channel.type';
 import OpenProfileAvatar from '@/component/common/detailProfile/openProfileAvatar';
-import User from '@/type/user.type';
 
 interface ChatMsgProps {
-	userData: User;
+	userData: Participant;
 	channelId: string;
 	myRole?: ParticipantRole;
 	ownerId: string | undefined;
@@ -30,7 +29,7 @@ export const ChatMsg = ({
 				{myRole && myRole !== ParticipantRole.USER ? (
 					<AdminNickMenu
 						adminAction={adminAction}
-						nickname={userData?.nickname}
+						nickname={userData?.user?.nickname || userData?.nickname || '알수없음'}
 						userId={userData.id}
 						channelId={channelId}
 						ownerId={ownerId}
@@ -59,6 +58,10 @@ export const HelpMsg = () => {
 			<Typography fontSize={'small'}>
 				<span style={helpTextStyle}>/g &lt;닉네임&gt;:</span> &lt;닉네임&gt;에게 1:1 게임 매칭을
 				요청합니다
+			</Typography>
+			<Typography fontSize={'small'}>
+				<span style={helpTextStyle}>/i &lt;닉네임&gt;:</span> &lt;닉네임&gt;에게 현재방 초대 요청을
+				보냅니다.
 			</Typography>
 		</Box>
 	);
