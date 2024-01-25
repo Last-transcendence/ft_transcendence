@@ -212,18 +212,18 @@ class ChannelGateway {
 	@UseGuards(Auth.Guard.UserWsJwt)
 	async handleRole(@MessageBody() data, @ConnectedSocket() socket) {
 		try {
+			const toUser = await this.userService.get(data.toUserId);
+			if (toUser) {
+				throw new Error('User not found');
+			}
 			if ((await this.participantService.isOwner(socket.user.id)) === false) {
 				throw new Error('Permission denied');
 			}
+			const newRole: ParticipantDto.Request.Update =  { role: data.role, socketId: socket.id };
 
-			const newRole = plainToClass(ParticipantDto.Request.Update, data.role);
-			const error = await validate(newRole);
-
-			if (error.length > 0) {
-				throw new Error('Failed validation: ' + JSON.stringify(error));
-			}
 			await this.participantService.update(data.toUserId, newRole);
 
+			socket.emit('role', { userId: data.toUserId, nickname: toUser.nickname });
 			return { res: true };
 		} catch (error) {
 			return { res: false, message: error };
