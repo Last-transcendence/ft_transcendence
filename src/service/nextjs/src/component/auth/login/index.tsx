@@ -1,5 +1,5 @@
 import { Box, Container, Typography } from '@mui/material';
-import CustomButton from './customButton';
+import CustomButton from './CustomButton';
 import styles from '@/style/auth/login/index.module.css';
 import Link from 'next/link';
 

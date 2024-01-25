@@ -9,18 +9,28 @@ import MenuList from '@mui/material/MenuList';
 import { deleteFetcher, postFetcher } from '@/service/api';
 import CustomSnackbar from '../customSnackbar';
 import { Dispatch, SetStateAction } from 'react';
+import CustomConfirmModal from '../CustomConfirmModal';
 
 interface profileMenusProps {
-	otherUserId: string; 
+	otherUserId: string;
 	isblock: boolean;
 	setIsBlockUser: Dispatch<SetStateAction<boolean | undefined>>;
 	blockRefetch?: () => void;
 	isFriend: boolean | undefined;
+	refetch?: () => void;
 }
 
-const ProfileMenus = ({ otherUserId, isblock, setIsBlockUser, blockRefetch, isFriend }: profileMenusProps) => {
+const ProfileMenus = ({
+	otherUserId,
+	isblock,
+	setIsBlockUser,
+	blockRefetch,
+	isFriend,
+	refetch,
+}: profileMenusProps) => {
 	const [open, setOpen] = useState(false);
 	const [errorMessage, setErrorMessage] = useState<string>('');
+	const [blockOpen, setBlockOpen] = useState<boolean>(false);
 	const anchorRef = useRef<HTMLButtonElement>(null);
 
 	const handleToggle = () => {
@@ -40,6 +50,7 @@ const ProfileMenus = ({ otherUserId, isblock, setIsBlockUser, blockRefetch, isFr
 			const responce = await postFetcher('/block', { blockedId: otherUserId });
 			if (isFriend === true) {
 				await deleteFetcher(`/friend/${otherUserId}`);
+				if (refetch !== undefined) refetch();
 			}
 			setIsBlockUser(true);
 			if (blockRefetch !== undefined) blockRefetch();
@@ -63,6 +74,17 @@ const ProfileMenus = ({ otherUserId, isblock, setIsBlockUser, blockRefetch, isFr
 
 	return (
 		<div>
+			{blockOpen && (
+				<CustomConfirmModal
+					setIsOpened={setBlockOpen}
+					title={`해당 유저의 모든 것을 영구히 차단하게 됩니다. (복원 불가)`}
+					content="수락하시겠습니까?"
+					onConfirm={() => {
+						blockFetch();
+					}}
+					onCancel={() => {}}
+				/>
+			)}
 			<CustomSnackbar
 				open={errorMessage === '' ? false : true}
 				onClose={handleSnackbarClose}
@@ -90,7 +112,7 @@ const ProfileMenus = ({ otherUserId, isblock, setIsBlockUser, blockRefetch, isFr
 						<Paper>
 							<ClickAwayListener onClickAway={handleClose}>
 								<MenuList autoFocusItem={open} onKeyDown={handleListKeyDown}>
-									<MenuItem onClick={blockFetch} disabled={isblock}>
+									<MenuItem onClick={() => setBlockOpen(true)} disabled={isblock}>
 										{isblock ? '차단된 유저' : '유저 차단'}
 									</MenuItem>
 								</MenuList>
