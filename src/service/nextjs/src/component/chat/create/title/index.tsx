@@ -1,6 +1,6 @@
 'use client';
 
-import { Dispatch, SetStateAction, useState } from 'react';
+import { Dispatch, SetStateAction } from 'react';
 import style from '../../../../style/chat/create/title/index.module.css';
 
 interface CreateChatTitleProps {
@@ -15,9 +15,9 @@ const CreateChatTitle = ({ title, setTitle }: CreateChatTitleProps) => {
 			<input
 				type="text"
 				value={title}
-				placeholder="채널명을 입력하세요."
+				placeholder="채널명을 입력하세요. (최대 20자)"
 				onChange={event => {
-					if (event.target.value.length === 10) return;
+					if (event.target.value.length > 20) return;
 					setTitle(event.target.value);
 				}}
 			/>

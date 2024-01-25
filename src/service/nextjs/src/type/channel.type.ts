@@ -29,8 +29,10 @@ interface CommonInterface {
 }
 
 export interface Participant extends CommonInterface {
-	role: ParticipantRole;
-	user: any;
+	id: string;
+	userId: string;
+	role: string;
+	user: User;
 }
 
 export interface Ban extends CommonInterface {}

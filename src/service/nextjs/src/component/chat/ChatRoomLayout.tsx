@@ -54,6 +54,7 @@ const ChatRoomLayout = ({
 		if (type === 'chatroom') return;
 		if (!channelSocket) return;
 		channelSocket.on('message', res => {
+			console.log('listen message', res);
 			setChatLiveData((prev: ChatLiveDataType[]) => [
 				...prev,
 				{ type: 'chat', id: res?.userId, message: res?.message },
@@ -88,12 +89,14 @@ const ChatRoomLayout = ({
 
 			// send message
 			(type === 'channel' ? channelSocket : chatSocket)?.emit('message', req, (res: any) => {
-				if (res?.res) {
-					setChatLiveData((prev: ChatLiveDataType[]) => [
-						...prev,
-						{ type: 'chat', id: me?.id, message: message, me: true },
-					]);
-				}
+				console.log('channelSocket', channelSocket);
+				console.log('message emit res', res);
+				// if (res?.res) {
+				// 	setChatLiveData((prev: ChatLiveDataType[]) => [
+				// 		...prev,
+				// 		{ type: 'chat', id: me?.id, message: message, me: true },
+				// 	]);
+				// }
 			});
 		},
 		[me?.id, params?.id, setChatLiveData, type],
