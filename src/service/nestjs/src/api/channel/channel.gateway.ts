@@ -129,6 +129,19 @@ class ChannelGateway {
 	@UseGuards(Auth.Guard.UserWsJwt)
 	async handleEdit(@MessageBody() data, @ConnectedSocket() socket: Socket) {
 		try {
+			const channel = await this.channelService.getChannel(data.channelId);
+			if (!channel) {
+				throw new BadRequestException('Channel not found');
+			}
+			if (data.visibility === "PROTECTED" && (!data.password || data.password.length !== 6 || !/^\d+$/.test(data.password))) {
+				throw new BadRequestException('Password error');
+			}
+			if (data.title.length > 30) {
+				throw new BadRequestException('Title must be less than 30 characters');
+			}
+			if (!data.title) {
+				data.title = channel.title;
+			}
 			this.channelService.editChannel(data);
 
 			return { res: true };
