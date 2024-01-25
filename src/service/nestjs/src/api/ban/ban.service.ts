@@ -20,6 +20,11 @@ class BanService {
 
 	async create(channelId: string, userId: string): Promise<BanModel> {
 		try {
+			const isBanned = await this.isBanned(channelId, userId);
+			if (isBanned) {
+				throw new Error('User is already banned');
+			}
+
 			return await this.prismaService.ban.create({
 				data: {
 					channelId,
