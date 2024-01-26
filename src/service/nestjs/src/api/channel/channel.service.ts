@@ -8,6 +8,7 @@ import { validate } from 'class-validator';
 import PrismaService from 'common/prisma/prisma.service';
 import { Socket } from 'socket.io';
 import * as Dto from './dto';
+import ParticipantModel from 'common/model/participant.model';
 
 @Injectable()
 class ChannelService {
@@ -34,6 +35,7 @@ class ChannelService {
 	}
 
 	async getChannel(id: string): Promise<{
+		id;
 		title: string;
 		visibility: $Enums.ChannelVisibility;
 		participant: Array<{
@@ -49,6 +51,7 @@ class ChannelService {
 			const channelDetail = await this.prismaService.channel.findUnique({
 				where: { id },
 				select: {
+					id: true,
 					title: true,
 					visibility: true,
 					participant: {
@@ -135,14 +138,13 @@ class ChannelService {
 		}
 	}
 
-	async leaveChannel(socket: Socket, userId: string) {
+	async leaveChannel(socket: Socket, userId: string): Promise<ParticipantModel> {
 		try {
 			const participant = await this.prismaService.participant.findFirst({
-				where: { userId: userId },
+				where: { userId },
 			});
-
 			if (!participant) {
-				return;
+				return null;
 			}
 
 			socket.leave(participant.channelId);
@@ -186,7 +188,6 @@ class ChannelService {
 			for (const channel of emptyChannelList) {
 				await this.prismaService.channel.delete({
 					where: { id: channel.id },
-					include: { participant: true, mute: true, ban: true },
 				});
 			}
 		} catch (error) {

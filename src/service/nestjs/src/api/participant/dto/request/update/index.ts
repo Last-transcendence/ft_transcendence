@@ -1,17 +1,6 @@
-import { Trim } from '@miaooo/class-transformer-trim';
-import { ApiProperty } from '@nestjs/swagger';
-import { $Enums } from '@prisma/client';
-import { IsString } from 'class-validator';
+import { PartialType } from '@nestjs/swagger';
+import Create from '../create';
 
-class Update {
-	@Trim()
-	@ApiProperty({ description: 'Participant role' })
-	role?: $Enums.ParticipantRole;
-
-	@IsString()
-	@Trim()
-	@ApiProperty({ description: 'Participant socket id' })
-	socketId?: string;
-}
+class Update extends PartialType(Create) {}
 
 export default Update;

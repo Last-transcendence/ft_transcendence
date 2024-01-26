@@ -12,11 +12,8 @@ import GameService from 'api/game/game.service';
 import MuteService from 'api/mute/mute.service';
 import ParticipantService from 'api/participant/participant.service';
 import UserService from 'api/user/user.service';
-import { plainToClass } from 'class-transformer';
-import { validate } from 'class-validator';
 import { Namespace, Socket } from 'socket.io';
 import * as Auth from '../../common/auth';
-import * as ParticipantDto from '../participant/dto';
 import ChannelService from './channel.service';
 import * as Dto from './dto';
 
@@ -49,9 +46,9 @@ class ChannelGateway {
 		console.log('Client connected to channel namespace');
 	}
 
-	async handleDisconnect(@ConnectedSocket() socket) {
+	handleDisconnect(@ConnectedSocket() socket) {
 		try {
-			await this.channelService.deleteEmptyChannel();
+			this.channelService.deleteEmptyChannel();
 		} catch (error) {
 			console.error("An error occurred in channel.gateway 'handleDisconnect':", error);
 			socket.emit('error', { message: "An error occurred in channel.gateway 'handleDisconnect'" });
@@ -86,45 +83,44 @@ class ChannelGateway {
 		try {
 			const userId = socket.user.id;
 
-			await this.channelService.joinCheck(socket, joinData.channelId, userId);
-
 			const channel = await this.channelService.getChannel(joinData.channelId);
 			if (!channel) {
 				throw new BadRequestException('Channel not found');
 			}
-			if (await this.banService.isBanned(joinData.channelId, userId)) {
+			if (await this.banService.isBanned(channel.id, userId)) {
 				throw new BadRequestException('User is banned');
 			}
 			if (
 				channel.visibility === 'PROTECTED' &&
-				!(await this.channelService.validatePassword(joinData.channelId, joinData.password))
+				!(await this.channelService.validatePassword(channel.id, joinData.password))
 			) {
 				throw new BadRequestException('Wrong password');
 			}
 
-			const participant = await this.participantService.get(userId);
+			let participant = await this.participantService.getByUserId(userId);
 			if (participant) {
-				const newSocketId = plainToClass(ParticipantDto.Request.Update, { socketId: socket.id });
-				const error = await validate(newSocketId);
-
-				if (error.length > 0) {
-					throw new Error('Failed validation: ' + JSON.stringify(error));
+				if (participant.channelId !== channel.id) {
+					socket.leave(participant.channelId);
+					participant = await this.participantService.update(participant.id, {
+						channelId: channel.id,
+						socketId: socket.id,
+					});
 				}
-				await this.participantService.update(participant.userId, newSocketId);
 			} else {
-				await this.participantService.create({
-					channelId: joinData.channelId,
-					userId: userId,
+				participant = await this.participantService.create({
+					channelId: channel.id,
+					userId,
 					socketId: socket.id,
 				});
 			}
 
-			socket.join(joinData.channelId);
-			this.server.to(joinData.channelId).emit('join', {
+			this.server.to(participant.channelId).emit('join', {
 				userId,
 				nickname: socket.user.nickname,
 				profileImageURI: socket.user.profileImageURI,
 			});
+
+			socket.join(participant.channelId);
 
 			return { res: true };
 		} catch (error) {
@@ -205,14 +201,23 @@ class ChannelGateway {
 				throw new Error('User is not a participant');
 			}
 
-			const participant = await this.participantService.get(socket.user.id);
+			const channel = await this.channelService.getChannel(data.channelId);
+			if (!channel) {
+				throw new Error('Channel not found');
+			}
+
+			let participant = await this.participantService.getByUserId(socket.user.id);
+			if (!participant) {
+				throw new Error('Participant not found');
+			}
 
 			socket.to(participant.channelId).emit('leave', {
 				channelId: participant.channelId,
 				userId: socket.user.id,
 				nickname: socket.user.nickname,
 			});
-			await this.channelService.leaveChannel(socket, socket.user.id);
+
+			participant = await this.channelService.leaveChannel(socket, socket.user.id);
 
 			return { res: true };
 		} catch (error) {
@@ -225,19 +230,29 @@ class ChannelGateway {
 	@UseGuards(Auth.Guard.UserWsJwt)
 	async handleRole(@MessageBody() data, @ConnectedSocket() socket) {
 		try {
-			const toUser = await this.userService.get(data.toUserId);
-			if (!toUser) {
-				throw new Error('User not found');
-			}
 			if ((await this.participantService.isOwner(socket.user.id)) === false) {
 				throw new Error('Permission denied');
 			}
 
-			const newRole: ParticipantDto.Request.Update = { role: data.role, socketId: socket.id };
+			const channel = await this.channelService.getChannel(data.channelId);
+			if (!channel) {
+				throw new Error('Channel not found');
+			}
 
-			await this.participantService.update(data.toUserId, newRole);
+			let participant = await this.participantService.getByUserId(data.toUserId);
+			if (!participant) {
+				throw new Error('Participant not found');
+			}
 
-			socket.emit('role', { userId: data.toUserId, nickname: toUser.nickname });
+			participant = await this.participantService.update(participant.id, {
+				socketId: socket.id,
+				role: data.role,
+			});
+			if (!participant) {
+				throw new Error('Fail to update role');
+			}
+
+			socket.emit('role', { userId: participant.userId, nickname: participant.nickname });
 
 			return { res: true };
 		} catch (error) {
@@ -261,7 +276,7 @@ class ChannelGateway {
 				throw new BadRequestException('Opponent not found');
 			}
 
-			const opponentParticipant = await this.participantService.get(opponent.id);
+			const opponentParticipant = await this.participantService.getByUserId(opponent.id);
 
 			this.server.to(opponentParticipant.socketId).emit('invite', {
 				channelId: inviteRequestDto.channelId,
@@ -299,8 +314,8 @@ class ChannelGateway {
 				throw new BadRequestException('Opponent not found');
 			}
 
-			const participant = await this.participantService.get(socket['user']['id']);
-			const opponentParticipant = await this.participantService.get(opponent.id);
+			const participant = await this.participantService.getByUserId(socket['user']['id']);
+			const opponentParticipant = await this.participantService.getByUserId(opponent.id);
 
 			await this.gameService.create({
 				socketId: participant.socketId,
@@ -342,7 +357,21 @@ class ChannelGateway {
 			if ((await this.participantService.isOwner(data.toUserId)) === true) {
 				throw new Error('Cannot mute owner');
 			}
-			await this.muteService.muteUser(data.channelId, data.toUserId);
+
+			const channel = await this.channelService.getChannel(data.channelId);
+			if (!channel) {
+				throw new Error('Channel not found');
+			}
+
+			const participant = await this.participantService.getByUserId(data.toUserId);
+			if (!participant) {
+				throw new Error('Participant not found');
+			}
+
+			const mute = await this.muteService.muteUser(channel.id, participant.userId);
+			if (!mute) {
+				throw new Error('Fail to mute');
+			}
 
 			this.server.to(data.channelId).emit('mute', {
 				channelId: data.channelId,
@@ -368,14 +397,28 @@ class ChannelGateway {
 			if ((await this.participantService.isOwner(data.toUserId)) === true) {
 				throw new Error('Owner cannot perform this action');
 			}
-			await this.participantService.kickByUserId(data.toUserId);
 
-			socket.leave(data.channelId);
-			this.server.to(data.channelId).emit('kick', {
-				channelId: data.channelId,
-				userId: data.toUserId,
-				nickname: data.nickname,
+			const channel = await this.channelService.getChannel(data.channelId);
+			if (!channel) {
+				throw new Error('Channel not found');
+			}
+
+			let participant = await this.participantService.getByUserId(data.toUserId);
+			if (!participant) {
+				throw new Error('Participant not found');
+			}
+
+			this.server.to(channel.id).emit('kick', {
+				channelId: channel.id,
+				userId: participant.userId,
+				nickname: participant.nickname,
 			});
+
+			participant = await this.participantService.kick(participant.id);
+			if (participant && participant?.socketId) {
+				this.server.sockets.get(participant.socketId).leave(channel.id);
+			}
+
 			return { res: true };
 		} catch (error) {
 			console.error('An error occurred in channel.gateway:', error);
@@ -395,18 +438,31 @@ class ChannelGateway {
 				throw new Error('Owner cannot perform this action');
 			}
 
-			this.participantService.kickByUserId(data.toUserId);
-			if ((await this.banService.isBanned(data.channelId, data.toUserId)) === false) {
-				this.banService.create(data.channelId, data.toUserId);
+			const channel = await this.channelService.getChannel(data.channelId);
+			if (!channel) {
+				throw new Error('Channel not found');
 			}
 
-			socket.leave(data.channelId);
+			let participant = await this.participantService.getByUserId(data.toUserId);
+			if (!participant) {
+				throw new Error('Participant not found');
+			}
 
-			this.server.to(data.channelId).emit('ban', {
-				channelId: data.channelId,
-				userId: data.toUserId,
-				nickname: data.nickname,
+			this.server.to(channel.id).emit('ban', {
+				channelId: channel.id,
+				userId: participant.userId,
+				nickname: participant.nickname,
 			});
+
+			participant = await this.participantService.kick(participant.id);
+
+			if ((await this.banService.isBanned(channel.id, participant.userId)) === false) {
+				this.banService.create(channel.id, participant.userId);
+			}
+
+			if (participant && participant?.socketId) {
+				this.server.sockets.get(participant.socketId).leave(channel.id);
+			}
 
 			return { res: true };
 		} catch (error) {
