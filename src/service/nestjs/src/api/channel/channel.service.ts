@@ -186,7 +186,7 @@ class ChannelService {
 			});
 
 			for (const channel of emptyChannelList) {
-				const existingChannel = await this.prismaService.channel.findUnique({
+				const existingChannel = await this.prismaService.channel.findFirst({
 					where: { id: channel.id },
 				});
 
@@ -196,6 +196,27 @@ class ChannelService {
 					});
 				}
 			}
+		} catch (error) {
+			throw new Error(error.message);
+		}
+	}
+
+	async getParticipants(channelId: string): Promise<Dto.Response.Participant[]> {
+		try {
+			return await this.prismaService.participant.findMany({
+				where: { channelId },
+				select: {
+					id: true,
+					userId: true,
+					role: true,
+					user: {
+						select: {
+							nickname: true,
+							profileImageURI: true,
+						},
+					},
+				},
+			});
 		} catch (error) {
 			throw new Error(error.message);
 		}
