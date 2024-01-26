@@ -46,15 +46,6 @@ class ChannelGateway {
 		console.log('Client connected to channel namespace');
 	}
 
-	handleDisconnect(@ConnectedSocket() socket) {
-		try {
-			this.channelService.deleteEmptyChannel();
-		} catch (error) {
-			console.error("An error occurred in channel.gateway 'handleDisconnect':", error);
-			socket.emit('error', { message: "An error occurred in channel.gateway 'handleDisconnect'" });
-		}
-	}
-
 	@SubscribeMessage('create')
 	async handleCreate(@ConnectedSocket() socket, @MessageBody() data) {
 		try {
