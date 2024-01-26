@@ -1,16 +1,15 @@
 import Avatar from '@mui/material/Avatar';
 import { useState, useContext, useEffect } from 'react';
-import ProfileModar from '@/component/common/detailProfile/profileModar';
-import ProfileMenus from '@/component/common/detailProfile/profileMenus';
-import ProfilePageBody from '@/component/common/detailProfile/profilePageBody';
+import ProfileModar from '@/component/common/detailProfile/ProfileModar';
+import ProfileMenus from '@/component/common/detailProfile/ProfileMenus';
+import ProfilePageBody from '@/component/common/detailProfile/ProfilePageBody';
 import Block from '@/type/block.type';
 import User, { UserStatus } from '@/type/user.type';
 import { useRouter } from 'next/navigation';
 import { getFetcher } from '@/service/api';
 import AuthContext from '@/context/auth.context';
 import { UNKNOWN_PROFILE_IMAGE_URI } from '@/common/constant';
-import Loading from '../Loading';
-import CustomSnackbar from '../customSnackbar';
+import CustomSnackbar from '../CustomSnackbar';
 import Friend from '@/type/friend.type';
 import CustomImage from '@/component/common/CustomImage';
 
@@ -21,7 +20,12 @@ interface OpenProfileAvatarProps {
 	blockRefetch?: () => void;
 }
 
-const OpenProfileAvatar = ({ otherUserId, imgUrl, refetch, blockRefetch }: OpenProfileAvatarProps) => {
+const OpenProfileAvatar = ({
+	otherUserId,
+	imgUrl,
+	refetch,
+	blockRefetch,
+}: OpenProfileAvatarProps) => {
 	const router = useRouter();
 	const { me } = useContext(AuthContext);
 	const isMe = me?.id ? me.id === otherUserId : false;
@@ -89,7 +93,16 @@ const OpenProfileAvatar = ({ otherUserId, imgUrl, refetch, blockRefetch }: OpenP
 			{click && isBlockUser !== undefined && isFriend !== undefined && (
 				<ProfileModar
 					setClick={setClick}
-					childMenu={<ProfileMenus isblock={isBlockUser} otherUserId={otherUserId} setIsBlockUser={setIsBlockUser} blockRefetch={blockRefetch} isFriend={isFriend} />}
+					childMenu={
+						<ProfileMenus
+							isblock={isBlockUser}
+							otherUserId={otherUserId}
+							setIsBlockUser={setIsBlockUser}
+							blockRefetch={blockRefetch}
+							refetch={refetch}
+							isFriend={isFriend}
+						/>
+					}
 				>
 					<ProfilePageBody
 						userData={otherUserData}

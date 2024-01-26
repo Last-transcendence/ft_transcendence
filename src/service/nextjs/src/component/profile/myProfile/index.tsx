@@ -1,5 +1,5 @@
 import styles from '@/style/profile/myProfile/index.module.css';
-import MyProfileBody from './myProfileBodys';
+import MyProfileBody from './MyProfileBody';
 import { BottomButton } from '@/component/common/ButtomButton';
 import { Header } from '@/component/common/Header';
 import { useContext } from 'react';

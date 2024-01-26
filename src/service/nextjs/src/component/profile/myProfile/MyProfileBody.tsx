@@ -1,14 +1,14 @@
 import styles from '@/style/profile/myProfile/index.module.css';
 import { Container, Box } from '@mui/material';
-import FightRecords from './fightRecords';
-import MyProfileMenu from './myProfileMenu';
-import ProfileAvartar from './profileAvatar';
-import TwoFACheck from './2faCheck';
-import { myImageProps } from '../common/myImage';
-import UserId from '@/component/profile/myProfile/userId';
+import FightRecords from './FightRecords';
+import MyProfileMenu from './MyProfileMenu';
+import ProfileAvatar from './ProfileAvatar';
+import TwoFACheck from './TwoFACheck';
+import { myImageProps } from '../common/MyImage';
+import UserId from '@/component/profile/myProfile/UserId';
 import Game from '@/type/game.type';
+import Odds from './Odds';
 import { useState, useEffect, useContext } from 'react';
-import Odds from './odds';
 import GameContext from '@/context/game.context';
 
 export interface myProfilePageProps extends myImageProps {
@@ -34,7 +34,7 @@ const MyProfileBody = ({ name, use2fa, image }: myProfilePageProps) => {
 		<Box overflow="auto">
 			<Container maxWidth="xs" sx={{ paddingBottom: 15 }}>
 				<MyProfileMenu />
-				<ProfileAvartar name={name} image={image} />
+				<ProfileAvatar name={name} image={image} />
 				<UserId userName={name} />
 				<Box display="flex" flexDirection="column" alignItems="center">
 					<TwoFACheck twoFA={use2fa} />

@@ -1,12 +1,12 @@
 import styles from '@/style/profile/myProfile/index.module.css'
 import { Grid, Box } from '@mui/material';
-import Mydate from './fightDate';
-import MatchPoint, { matchPointProps } from './matchPoint';
+import Mydate from './FightDate';
+import MatchPoint, { matchPointProps } from './MatchPoint';
 import User from '@/type/user.type';
 import Game from '@/type/game.type';
 import { useEffect, useState } from 'react';
 import { getFetcher } from '@/service/api';
-import OpenProfileAvatar from '@/component/common/detailProfile/openProfileAvatar';
+import OpenProfileAvatar from '@/component/common/detailProfile/OpenProfileAvatar';
 
 export interface fightRecordProps extends matchPointProps {
 	player1: User;

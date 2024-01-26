@@ -3,7 +3,7 @@ import React from 'react';
 import NickMenu from '@/component/chat/NickMenu';
 import AdminNickMenu from '@/component/chat/AdminNickMenu';
 import { AdminActionType, Participant, ParticipantRole } from '@/type/channel.type';
-import OpenProfileAvatar from '@/component/common/detailProfile/openProfileAvatar';
+import OpenProfileAvatar from '@/component/common/detailProfile/OpenProfileAvatar';
 
 interface ChatMsgProps {
 	userData: Participant;

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Avatar } from '@mui/material';
-import MyImage, { myImageProps } from './myImage';
+import MyImage, { myImageProps } from './MyImage';
 import CustomImage from '@/component/common/CustomImage';
 
 export interface avatarStyle {

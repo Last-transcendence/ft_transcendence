@@ -1,4 +1,4 @@
-import FightRecord, { fightRecordProps } from './fightRecord';
+import FightRecord from './FightRecord';
 import { Box, Typography } from '@mui/material';
 import Game from '@/type/game.type';
 

@@ -1,11 +1,11 @@
 import { Box } from '@mui/material';
-import BottomAvatarsGrid from '@/component/common/detailProfile/bottomAvatars';
-import { avatarStyle } from '../../profile/common/newAvatar';
+import BottomAvatarsGrid from '@/component/common/detailProfile/BottomAvatars';
+import { avatarStyle } from '../../profile/common/NewAvatar';
 import { useState, Dispatch, SetStateAction, useContext } from 'react';
 import { postFetcher, getFetcher, deleteFetcher } from '@/service/api';
 import Chatroom from '@/type/chatroom.type';
 import { useRouter } from 'next/navigation';
-import CustomSnackbar from '../customSnackbar';
+import CustomSnackbar from '../CustomSnackbar';
 import SocketContext from '@/context/socket.context';
 
 const sxStyle: avatarStyle = {
