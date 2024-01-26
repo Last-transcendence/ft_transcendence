@@ -1,6 +1,6 @@
 import { useParams } from 'next/navigation';
 import useFetchData from '@/hook/useFetchData';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import ChatRoomLayout from '@/component/chat/ChatRoomLayout';
 import { MenuHeader } from '@/component/common/Header';
 import PrivateParticipantList from '@/component/chat/PrivateParticipantList';
@@ -22,11 +22,16 @@ const PrivateChatRoomPage = () => {
 	const { data: chatData } = useFetchData<IChat[]>(params?.id ? `/chat?destId=${params.id}` : null);
 	const [chatLiveData, setChatLiveData] = useState<ChatLiveDataType[]>([]);
 	const { data: chatRoomList } = useFetchData<Chatroom[]>('/chatroom');
-	const chatRoomData = chatRoomList?.find((data: any) => data?.destId === params?.id);
+
+	const chatRoomData = useMemo(() => {
+		if (!chatRoomList) return;
+		return chatRoomList?.find(data => data?.destId === params?.id || data?.srcId === params?.id);
+	}, [chatRoomList, params?.id]);
 
 	//@todo chatData를 기본데이터로 세팅
 	useEffect(() => {
 		if (!chatData) return;
+		if (!chatRoomData) return;
 		setChatLiveData(
 			chatData?.map(data => ({
 				type: 'chat',
@@ -34,7 +39,7 @@ const PrivateChatRoomPage = () => {
 				message: data?.content,
 			})),
 		);
-	}, [chatData]);
+	}, [chatData, chatRoomData, chatRoomData?.destId, chatRoomData?.id, chatRoomData?.srcId]);
 
 	return (
 		<ChatRoomLayout
