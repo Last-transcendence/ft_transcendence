@@ -54,7 +54,6 @@ const ChatRoomLayout = ({
 		if (type === 'chatroom') return;
 		if (!channelSocket) return;
 		channelSocket.on('message', res => {
-			console.log('listen message', res);
 			if (res.userId === me?.id) return;
 			setChatLiveData((prev: ChatLiveDataType[]) => [
 				...prev,
@@ -77,10 +76,11 @@ const ChatRoomLayout = ({
 	}, [currentDm]);
 
 	const isMute = useCallback(
-		(userId: string) => {
-			if (!userId) return false;
+		(myId: string) => {
+			if (!myId) return false;
 			if (!data || !data?.mute || data?.mute.length == 0) return false;
-			return data.mute.some((data: Mute) => data?.userId === userId);
+			// console.log('isMute', data?.mute);
+			return data.mute.some((data: Mute) => data?.userId === myId);
 		},
 		[data],
 	);
@@ -99,7 +99,7 @@ const ChatRoomLayout = ({
 
 			// send message
 			(type === 'channel' ? channelSocket : chatSocket)?.emit('message', req, (res: any) => {
-				console.log('message emit', message, res);
+				// console.log('message emit', message, res);
 				if (res?.res) {
 					setChatLiveData((prev: ChatLiveDataType[]) => [
 						...prev,
@@ -131,9 +131,7 @@ const ChatRoomLayout = ({
 						channelId,
 						destNickname: nickname,
 					},
-					(res: any) => {
-						console.log('invite res', res);
-					},
+					(res: any) => {},
 				);
 				break;
 			case 'GAME':

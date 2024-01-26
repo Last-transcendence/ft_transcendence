@@ -64,13 +64,13 @@ export const ListenProvider = (props: { children: ReactNode }) => {
 			if (friendDatas) {
 				friendDatas?.forEach(data => {
 					(sockets.chatSocket as any).emit('join', { destId: data?.id }, (res: any) => {
-						console.log('join', res);
+						// console.log('join', res);
 					});
 				});
 			}
 
 			(sockets.chatSocket as any).on('message', (res: any) => {
-				console.log('listen chat msg', res);
+				// console.log('listen chat msg', res);
 				if (router.pathname.includes('game')) return;
 				if (!res?.message || res.message === '') return;
 				if (router.pathname.includes('private')) {
@@ -88,7 +88,7 @@ export const ListenProvider = (props: { children: ReactNode }) => {
 		if (sockets?.inviteSocket) {
 			//invite 참여
 			(sockets.inviteSocket as any).emit('join', (res: any) => {
-				console.log('invite join res', res);
+				// console.log('invite join res', res);
 			});
 			//invite 구독
 			(sockets.inviteSocket as any).on(

@@ -2,7 +2,7 @@ import { Box } from '@mui/material';
 import BottomAvatarsGrid from '@/component/common/detailProfile/BottomAvatars';
 import { avatarStyle } from '../../profile/common/NewAvatar';
 import { useState, Dispatch, SetStateAction, useContext } from 'react';
-import { postFetcher, getFetcher, deleteFetcher } from '@/service/api';
+import { postFetcher, deleteFetcher } from '@/service/api';
 import Chatroom from '@/type/chatroom.type';
 import { useRouter } from 'next/navigation';
 import CustomSnackbar from '../CustomSnackbar';
@@ -79,9 +79,8 @@ const BottomProfile = ({ otherUserId, isFriend, setIsFriend, refetch }: BottomPr
 			// if (chatroom === undefined) {
 			//	const id = await makeNewChatroom(otherUserId);
 			// }
-			//@todo dm 접속에 실패할 경우 처리 필요
 			chatSocket?.emit('join', { destId: otherUserId }, (res: any) => {
-				console.log('res', res);
+				// console.log('res', res);
 			});
 			router.push(`/chat/${otherUserId}/private`);
 		} catch (error: any) {
