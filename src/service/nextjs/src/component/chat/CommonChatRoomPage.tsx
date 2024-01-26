@@ -123,7 +123,7 @@ const CommonChatRoomPage = () => {
 	const responseInvite = useCallback(
 		(inviteResponse: any, response: 'ACCEPT' | 'REJECT') => {
 			channelSocket?.emit('invite/response', { ...inviteResponse, response }, (res: any) => {
-				// console.log(res);
+				//console.log('invite/response', res);
 			});
 		},
 		[channelSocket],

@@ -333,24 +333,17 @@ class ChannelGateway {
 			const participant = await this.participantService.getByUserId(socket['user']['id']);
 			const opponentParticipant = await this.participantService.getByUserId(opponent.id);
 
-			await this.gameService.create({
-				socketId: participant.socketId,
+			this.gameService.create({
+				userId: participant.userId,
 				mode: inviteResponseRequestDto.mode,
 			});
-			await this.gameService.create({
-				socketId: opponentParticipant.socketId,
+			this.gameService.create({
+				userId: opponentParticipant.userId,
 				mode: inviteResponseRequestDto.mode,
 			});
 
-			// game play 중이면 channel에서 leave?
-			const socket1 = this.server.sockets.get(participant.socketId);
-			const socket2 = this.server.sockets.get(opponentParticipant.socketId);
 			const gameRoomId = await this.gameService.createRoom();
 
-			socket1.join(gameRoomId);
-			socket2.join(gameRoomId);
-
-			// event 명 무엇으로 할지 고민
 			this.server.to(participant.socketId).emit('invite/matched', { room: gameRoomId });
 			this.server.to(opponentParticipant.socketId).emit('invite/matched', { room: gameRoomId });
 

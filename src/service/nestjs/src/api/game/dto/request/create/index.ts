@@ -14,7 +14,7 @@ class Create {
 	@IsNotEmpty()
 	@Trim()
 	@ApiProperty({ description: 'Socket id' })
-	socketId: string;
+	socketId?: string;
 
 	@IsString()
 	@IsNotEmpty()
