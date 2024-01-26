@@ -96,7 +96,12 @@ const CreatOrModifyBody = ({
 		} catch (error: any) {
 			setErrorMessageNickName('');
 			setErrorMessageEmail('');
-			setModarErrorMessage(error.message);
+			if (error.response.status === 401) {
+				router.push('auth/login');
+				// window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/ft`;
+			} else {
+				setModarErrorMessage(error.message);
+			}
 		} finally {
 			setLoading(false);
 		}
