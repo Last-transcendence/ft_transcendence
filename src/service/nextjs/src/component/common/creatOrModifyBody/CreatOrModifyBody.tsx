@@ -99,10 +99,9 @@ const CreatOrModifyBody = ({
 		} catch (error: any) {
 			setErrorMessageNickName('');
 			setErrorMessageEmail('');
-			// 값 확인
-			console.log(error);
 			if (!error?.response?.status) {
 				setModarErrorMessage('서버에러입니다');
+				return ;
 			}
 			if (error.response.status === 401) {
 				try {
