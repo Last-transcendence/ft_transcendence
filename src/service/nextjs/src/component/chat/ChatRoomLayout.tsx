@@ -160,6 +160,7 @@ const ChatRoomLayout = ({
 			<Stack ref={scrollRef} padding={2} spacing={1} sx={{ overflowY: 'scroll' }} height={'100%'}>
 				{chatLiveData?.map((chat: any, index: number) => {
 					if (chat.type === 'chat') {
+						console.log('chatId', chat?.id);
 						const userData = getUser(chat?.id);
 						return (
 							<ChatMsg

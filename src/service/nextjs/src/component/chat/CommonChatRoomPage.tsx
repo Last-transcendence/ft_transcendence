@@ -38,12 +38,17 @@ const CommonChatRoomPage = () => {
 	} | null>(null);
 	const [isOpened, setIsOpened] = useState<boolean>(false);
 
-	useEffect(() => {
+	const getChannelInfo = useCallback(() => {
 		if (!params?.id) return;
 		channelSocket?.emit('info', { channelId: params?.id }, (res: any) => {
 			console.log('info res', res);
 			setChannelData(res);
 		});
+	}, []);
+
+	useEffect(() => {
+		if (!params?.id) return;
+		getChannelInfo();
 	}, [channelSocket, params?.id]);
 
 	useEffect(() => {
@@ -76,36 +81,38 @@ const CommonChatRoomPage = () => {
 		setChatLiveData(prev => [...prev, { type: 'action', message }]);
 	}, []);
 
-	const removeParticipant = useCallback((userId: string) => {
-		console.log('userId');
-		setChannelData(prev => {
-			if (!prev) return prev;
-			return { ...prev, participant: prev?.participant?.filter(data => data.id !== userId) };
-		});
-	}, []);
+	// const removeParticipant = useCallback((userId: string) => {
+	// 	console.log('userId');
+	// 	getChannelInfo();
+	// 	// setChannelData(prev => {
+	// 	// 	if (!prev) return prev;
+	// 	// 	return { ...prev, participant: prev?.participant?.filter(data => data.id !== userId) };
+	// 	// });
+	// }, []);
 
 	//이용자 참여
 	useListeningChannelEvent('join', (res: any) => {
 		console.log('join listen res', res);
 		setActionMessage(`${res?.nickname}님이 들어오셨습니다.`);
-		setChannelData(prev => {
-			if (!prev) return prev;
-			if (prev?.participant?.some(data => data.id === res?.userId)) return prev;
-			return {
-				...prev,
-				participant: [
-					...prev?.participant,
-					{ ...res, userId: res?.userId, role: ParticipantRole.USER, user: res },
-				],
-			};
-		});
+		getChannelInfo();
+		// setChannelData(prev => {
+		// 	if (!prev) return prev;
+		// 	if (prev?.participant?.some(data => data.id === res?.userId)) return prev;
+		// 	return {
+		// 		...prev,
+		// 		participant: [
+		// 			...prev?.participant,
+		// 			{ ...res, userId: res?.userId, role: ParticipantRole.USER, user: res },
+		// 		],
+		// 	};
+		// });
 	});
 
 	//이용자 퇴장
 	useListeningChannelEvent('leave', (res: any) => {
 		console.log('listen leave', res);
 		setActionMessage(`${getNickname(res.id)}님이 나가셨습니다.`);
-		removeParticipant(res?.id);
+		getChannelInfo();
 	});
 
 	const responseInvite = useCallback(
@@ -119,42 +126,47 @@ const CommonChatRoomPage = () => {
 
 	const adminAction = useCallback(
 		(action: AdminActionType, nickname: string, id: string) => {
+			if (action === 'setting') return getChannelInfo();
 			if (!id) return;
 			if (!nickname) return;
 			switch (action) {
 				case 'kick':
 					setActionMessage(`${nickname}님이 킥되었습니다.`);
-					removeParticipant(id);
+					// removeParticipant(id);
+					getChannelInfo();
 					break;
 				case 'ban':
 					setActionMessage(`${nickname}님이 밴되었습니다.`);
-					removeParticipant(id);
+					getChannelInfo();
+					// removeParticipant(id);
 					break;
 				case 'mute':
 					setActionMessage(`${nickname}님이 뮤트되었습니다.`);
-					setChannelData((prev: ChannelInfo | undefined): ChannelInfo | undefined => {
-						if (!prev || !prev?.mute) return prev;
-						return { ...prev, mute: [...prev?.mute, { userId: id }] };
-					});
+					getChannelInfo();
+					// setChannelData((prev: ChannelInfo | undefined): ChannelInfo | undefined => {
+					// 	if (!prev || !prev?.mute) return prev;
+					// 	return { ...prev, mute: [...prev?.mute, { userId: id }] };
+					// });
 					break;
 				case 'admin':
 					setActionMessage(`${nickname}님이 어드민으로 임명되었습니다.`);
-					setChannelData((prev: ChannelInfo | undefined) => {
-						if (!prev) return prev;
-						return {
-							...prev,
-							participant: prev?.participant?.map((data: Participant) => {
-								if (data.userId === id) return { ...data, role: ParticipantRole.ADMIN };
-								return data;
-							}),
-						};
-					});
+					getChannelInfo();
+					// setChannelData((prev: ChannelInfo | undefined) => {
+					// 	if (!prev) return prev;
+					// 	return {
+					// 		...prev,
+					// 		participant: prev?.participant?.map((data: Participant) => {
+					// 			if (data.userId === id) return { ...data, role: ParticipantRole.ADMIN };
+					// 			return data;
+					// 		}),
+					// 	};
+					// });
 					break;
 				default:
 					break;
 			}
 		},
-		[removeParticipant, setActionMessage],
+		[setActionMessage],
 	);
 
 	// 이용자 게임 초대

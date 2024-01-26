@@ -1,4 +1,4 @@
-import { Controller, Delete } from '@nestjs/common';
+import { Controller, Delete, Get } from '@nestjs/common';
 import { ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import TestService from './test.service';
 

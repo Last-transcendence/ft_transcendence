@@ -79,6 +79,7 @@ const ParticipantList = ({
 						setOpen={setOpen}
 						channelData={channelData}
 						channelId={channelId}
+						refetch={adminAction ? adminAction('setting', '', '') : undefined}
 					/>
 				</CustomModal>
 			)}

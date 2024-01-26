@@ -32,7 +32,9 @@ class Main extends Phaser.Scene {
 	init(data: { navigate: AppRouterInstance; socket: Socket; room: string }) {
 		const { navigate, socket, room } = data;
 
-		this.scene.setVisible(false);
+		if (this.scene) {
+			this.scene.setVisible(false);
+		}
 
 		this.navigate = navigate;
 		this.socket = socket;
@@ -95,27 +97,29 @@ class Main extends Phaser.Scene {
 
 			console.log('end', response);
 
-			if (response.state === 'DISCONNECTED') {
+			if (response.state === 'DISCONNECTED' && this.scene) {
 				this.scene.start('Disconnected', {
 					navigate: this.navigate,
 				});
 				return;
 			}
 
-			this.scene.start('Result', {
-				navigate: this.navigate,
-				socket: this.socket,
-				me: {
-					nickname: response.me.nickname,
-					profileImageURI: response.me.profileImageURI,
-					score: this.myScore.text,
-				},
-				opponent: {
-					nickname: response.opponent.nickname,
-					profileImageURI: response.opponent.profileImageURI,
-					score: this.enemyScore.text,
-				},
-			});
+			if (this.scene) {
+				this.scene.start('Result', {
+					navigate: this.navigate,
+					socket: this.socket,
+					me: {
+						nickname: response.me.nickname,
+						profileImageURI: response.me.profileImageURI,
+						score: this.myScore.text,
+					},
+					opponent: {
+						nickname: response.opponent.nickname,
+						profileImageURI: response.opponent.profileImageURI,
+						score: this.enemyScore.text,
+					},
+				});
+			}
 		});
 	}
 
@@ -228,7 +232,7 @@ class Main extends Phaser.Scene {
 	}
 
 	create() {
-		if (this.socket) {
+		if (this.socket && this.scene) {
 			this.scene.setVisible(true);
 		}
 		this.initBall();
@@ -263,9 +267,11 @@ class Main extends Phaser.Scene {
 			}
 			this.readyText.setVisible(false);
 			setTimeout(() => {
-				this.socket.emit('ready', {
-					room: this.room,
-				});
+				if (this.socket) {
+					this.socket.emit('ready', {
+						room: this.room,
+					});
+				}
 			}, 1000);
 			return;
 		}

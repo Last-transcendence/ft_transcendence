@@ -7,29 +7,28 @@ import TwoFACheck from './TwoFACheck';
 import { myImageProps } from '../common/MyImage';
 import UserId from '@/component/profile/myProfile/UserId';
 import Game from '@/type/game.type';
-import { useState, useEffect } from 'react';
-import { getFetcher } from '@/service/api';
 import Odds from './Odds';
+import { useState, useEffect, useContext } from 'react';
+import GameContext from '@/context/game.context';
 
 export interface myProfilePageProps extends myImageProps {
 	use2fa?: boolean;
 }
 
 const MyProfileBody = ({ name, use2fa, image }: myProfilePageProps) => {
-	const [gameRecords, setGameRecords] = useState<Game[] | undefined>(undefined);
 	const [gameRecordsErrorMessage, setGameRecordsErrorMessage] = useState<string>('');
+	const { game } = useContext(GameContext);
 
 	useEffect(() => {
-		const roadGameRecord = async () => {
-			try {
-				const gameData = await getFetcher<Game[]>('/game/history');
-				setGameRecords(gameData);
-			} catch (error) {
-				setGameRecordsErrorMessage('데이터를 로드할 수 없습니다.');
+		const update = (game: Game[]) => {
+			if (game.length === 0) {
+				setGameRecordsErrorMessage('데이터 없음');
 			}
 		};
-		roadGameRecord();
-	}, []);
+		if (game !== null) {
+			update(game);
+		}
+	}, [game]);
 
 	return (
 		<Box overflow="auto">
@@ -39,18 +38,18 @@ const MyProfileBody = ({ name, use2fa, image }: myProfilePageProps) => {
 				<UserId userName={name} />
 				<Box display="flex" flexDirection="column" alignItems="center">
 					<TwoFACheck twoFA={use2fa} />
-					{gameRecords === undefined ? (
+					{game === null ? (
 						<></>
 					) : (
 						<div className={styles['my-profile-body__div']}>
-							<Odds gameRecords={gameRecords} message={gameRecordsErrorMessage} />
+							<Odds gameRecords={game} message={gameRecordsErrorMessage} />
 						</div>
 					)}
 				</Box>
-				{gameRecords === undefined ? (
+				{game === null ? (
 					<></>
 				) : (
-					<FightRecords fightRecords={gameRecords.slice(0, 5)} message={gameRecordsErrorMessage} />
+					<FightRecords fightRecords={game.slice(0, 5)} message={gameRecordsErrorMessage} />
 				)}
 			</Container>
 		</Box>
