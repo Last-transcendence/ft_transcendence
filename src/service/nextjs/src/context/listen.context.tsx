@@ -70,6 +70,7 @@ export const ListenProvider = (props: { children: ReactNode }) => {
 			}
 
 			(sockets.chatSocket as any).on('message', (res: any) => {
+				console.log('listen chat msg', res);
 				if (router.pathname.includes('game')) return;
 				if (!res?.message || res.message === '') return;
 				if (router.pathname.includes('private')) {
