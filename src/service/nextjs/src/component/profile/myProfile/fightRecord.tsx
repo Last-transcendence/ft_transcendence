@@ -1,3 +1,4 @@
+import styles from '@/style/profile/myProfile/index.module.css'
 import { Grid, Box } from '@mui/material';
 import Mydate from './fightDate';
 import MatchPoint, { matchPointProps } from './matchPoint';
@@ -60,9 +61,9 @@ const FightRecord = ({
 				borderRadius={3}
 				boxShadow={1}
 				padding={2}
-				color={mode === 'NORMAL' ? 'black' : mode === 'HARD' ? 'tomato' : 'blue'}
+				color={result === 'WIN' ? 'blue' : 'red'}
 			>
-				<Grid container display="flex" flexDirection="row" alignItems="center">
+				<Grid container display="flex" flexDirection="row" alignItems="center" color={'black'}>
 					<Grid item xs={4} display={'flex'} flexDirection={'column'} alignItems={'center'}>
 						<OpenProfileAvatar
 							imgUrl={recordData.player1.profileImageURI || ''}
@@ -70,8 +71,9 @@ const FightRecord = ({
 						/>
 						<p>{recordData.player1.nickname}</p>
 					</Grid>
-					<Grid item xs={4}>
-						<p>{result === 'LOSE' ? '패배' : '승리'}</p>
+					<Grid item xs={4} >
+						<p>{mode === 'NORMAL' ? 'NORMAL' : mode === 'HARD' ? 'HARD' : 'RANK'}</p>
+						<p style={{ color: result === 'LOSE' ? 'red' : 'blue'}}>{result === 'LOSE' ? '패배' : '승리'}</p>
 						<MatchPoint
 							player1Score={recordData.player1Score}
 							player2Score={recordData.player2Score}
