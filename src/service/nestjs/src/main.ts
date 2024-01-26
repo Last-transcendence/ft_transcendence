@@ -32,6 +32,7 @@ async function bootstrap() {
 		credentials: true,
 	});
 	app.use('/upload', express.static(join(__dirname, '../../upload')));
+	app.use('/public', express.static(join(__dirname, '../../public')));
 	app.use(cookieParser());
 	app.use(passport.initialize());
 	app.useWebSocketAdapter(new IoAdapter(app));
