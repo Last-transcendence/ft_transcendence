@@ -1,6 +1,6 @@
 import { Container, Typography, Box } from '@mui/material';
-import NewIcon from '../../profile/common/newIcon';
-import BottomProfile from './bottomProfile';
+import NewIcon from '../../profile/common/NewIcon';
+import BottomProfile from './BottomProfile';
 import { Dispatch, SetStateAction } from 'react';
 import Loading from '../Loading';
 import User from '@/type/user.type';

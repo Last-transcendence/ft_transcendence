@@ -1,7 +1,7 @@
 import React, { ReactNode } from 'react';
 import { DefaultProfileImageIcon } from './icon';
 import Avatar from '@mui/material/Avatar';
-import OpenProfileAvatar from '@/component/common/detailProfile/openProfileAvatar';
+import OpenProfileAvatar from '@/component/common/detailProfile/OpenProfileAvatar';
 import VolumeOffIcon from '@mui/icons-material/VolumeOff';
 
 interface UserBriefInformationProps {

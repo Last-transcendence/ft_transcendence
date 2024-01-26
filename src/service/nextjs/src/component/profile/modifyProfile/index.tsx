@@ -1,4 +1,4 @@
-import CreatOrModifyBody from '@/component/common/creatOrModifyBody/creatOrModifyBody';
+import CreatOrModifyBody from '@/component/common/creatOrModifyBody/CreatOrModifyBody';
 import { BottomButton } from '@/component/common/ButtomButton';
 import { Header } from '@/component/common/Header';
 import { Stack } from '@mui/material';

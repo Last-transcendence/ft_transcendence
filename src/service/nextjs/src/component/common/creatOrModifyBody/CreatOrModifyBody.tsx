@@ -1,12 +1,12 @@
 import styles from '@/style/auth/creatUser/index.module.css';
 import { Container, Box, Stack } from '@mui/material';
-import UserPhoto from './userPhoto';
+import UserPhoto from './UserPhoto';
 import { ChangeEvent, useState, useEffect, useContext } from 'react';
-import Modify2FA, { ModifyTwoFactorProps } from '@/component/common/modify2FA';
+import Modify2FA, { ModifyTwoFactorProps } from '@/component/common/Modify2FA';
 import { useRouter } from 'next/navigation';
 import { Dispatch, SetStateAction } from 'react';
-import CustomSnackbar from '@/component/common/customSnackbar';
-import CustomTextField, { customTextFieldProps } from '@/component/common/customInputField';
+import CustomSnackbar from '@/component/common/CustomSnackbar';
+import CustomTextField, { customTextFieldProps } from '@/component/common/CustomInputField';
 import { useCallback } from 'react';
 import { postFetcher, patchFetcher } from '@/service/api';
 import AuthContext from '@/context/auth.context';

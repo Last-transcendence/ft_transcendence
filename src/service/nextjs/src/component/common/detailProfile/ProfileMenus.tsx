@@ -7,7 +7,7 @@ import Popper from '@mui/material/Popper';
 import MenuItem from '@mui/material/MenuItem';
 import MenuList from '@mui/material/MenuList';
 import { deleteFetcher, postFetcher } from '@/service/api';
-import CustomSnackbar from '../customSnackbar';
+import CustomSnackbar from '../CustomSnackbar';
 import { Dispatch, SetStateAction } from 'react';
 import CustomConfirmModal from '../CustomConfirmModal';
 

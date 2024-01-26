@@ -4,7 +4,7 @@ import Message from './Message';
 import LockAvater from '@/component/auth/2fa/lcokAvater';
 import { useState } from 'react';
 import { getFetcher, postFetcher } from '@/service/api';
-import CustomSnackbar from '@/component/common/customSnackbar';
+import CustomSnackbar from '@/component/common/CustomSnackbar';
 import { useRouter } from 'next/navigation';
 
 const TwoFactorBody = () => {

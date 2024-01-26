@@ -1,6 +1,6 @@
 import { Typography, Box } from '@mui/material';
 import { deleteFetcher } from '@/service/api';
-import CustomSnackbar from '@/component/common/customSnackbar';
+import CustomSnackbar from '@/component/common/CustomSnackbar';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 

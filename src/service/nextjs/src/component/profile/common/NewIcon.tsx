@@ -1,4 +1,4 @@
-import NewAvatar, { newAvatarProps } from './newAvatar';
+import NewAvatar, { newAvatarProps } from './NewAvatar';
 import { Box, Typography } from '@mui/material';
 
 export interface NewIconProps extends newAvatarProps {

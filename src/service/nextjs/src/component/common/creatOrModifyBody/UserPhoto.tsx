@@ -1,6 +1,6 @@
 import { Badge } from '@mui/material';
-import SmallAvatar from './smallAvatar';
-import BigAvatar from './bigAvatar';
+import SmallAvatar from './SmallAvatar';
+import BigAvatar from './BigAvatar';
 import AddAPhotoIcon from '@mui/icons-material/AddAPhoto';
 import CustomImage from '@/component/common/CustomImage';
 import { UNKNOWN_PROFILE_IMAGE_URI } from '@/common/constant';
