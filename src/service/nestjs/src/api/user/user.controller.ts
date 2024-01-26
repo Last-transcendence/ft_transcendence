@@ -27,13 +27,14 @@ import * as Auth from '../../common/auth';
 import { FileInterceptor } from '@nestjs/platform-express';
 import * as fs from 'fs';
 import { join } from 'path';
+
 @Controller('user')
 @ApiTags('user')
+@UseGuards(Auth.Guard.UserJwt)
 class UserController {
 	constructor(private readonly userService: UserService) {}
 
 	@Get('me')
-	@UseGuards(Auth.Guard.UserJwt)
 	@ApiOperation({ summary: 'Get my information' })
 	@ApiOkResponse({ description: 'Get my info successfully', type: Dto.Response.User })
 	@ApiNotFoundResponse({ description: 'User not found' })
@@ -42,7 +43,6 @@ class UserController {
 	}
 
 	@Patch('me')
-	@UseGuards(Auth.Guard.UserJwt)
 	@ApiOperation({ summary: 'Update my information' })
 	@ApiOkResponse({ description: 'Get my info successfully', type: UserModel })
 	@ApiNotFoundResponse({ description: 'User not found' })
@@ -87,6 +87,30 @@ class UserController {
 	async searchUserByNickname(@Query('queryString') nickname: string): Promise<Dto.Response.User[]> {
 		try {
 			return await this.userService.searchUserByNickname(nickname);
+		} catch (error) {
+			throw new HttpException(error.message, error.status);
+		}
+	}
+
+	@Post('online')
+	@ApiOperation({ summary: 'Change status to online' })
+	@ApiOkResponse({ description: 'Change status to online successfully', type: Dto.Response.User })
+	@ApiNotFoundResponse({ description: 'User not found' })
+	async online(@Req() req): Promise<UserModel> {
+		try {
+			return await this.userService.online(req.user.id);
+		} catch (error) {
+			throw new HttpException(error.message, error.status);
+		}
+	}
+
+	@Post('offline')
+	@ApiOperation({ summary: 'Change status to offline' })
+	@ApiOkResponse({ description: 'Change status to offline successfully', type: Dto.Response.User })
+	@ApiNotFoundResponse({ description: 'User not found' })
+	async offline(@Req() req): Promise<UserModel> {
+		try {
+			return await this.userService.offline(req.user.id);
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
 		}
