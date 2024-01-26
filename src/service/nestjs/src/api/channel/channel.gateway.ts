@@ -257,10 +257,9 @@ class ChannelGateway {
 			if (!participant) {
 				throw new Error('Fail to update role');
 			}
-
-			this.server
+			socket
 				.to(participant.channelId)
-				.emit('role', { userId: participant.userId, nickname: participant.nickname });
+				.emit('role', { userId: participant.userId, nickname: data.nickname });
 			return { res: true };
 		} catch (error) {
 			return { res: false, message: error };
