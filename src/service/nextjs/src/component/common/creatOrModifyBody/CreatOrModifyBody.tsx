@@ -50,7 +50,7 @@ const CreatOrModifyBody = ({
 			if (me !== null) {
 				setUserName(me.nickname);
 				setTwoFATrueFalse(me.use2fa);
-				if (me.email2fa !== undefined) setTwoFactorEmail(me.email2fa);
+				if (me.email2fa !== undefined && me.email2fa !== null) setTwoFactorEmail(me.email2fa);
 				if (me.profileImageURI !== undefined) setImg(me.profileImageURI);
 			}
 		};
@@ -99,6 +99,11 @@ const CreatOrModifyBody = ({
 		} catch (error: any) {
 			setErrorMessageNickName('');
 			setErrorMessageEmail('');
+			// 값 확인
+			console.log(error);
+			if (!error?.response?.status) {
+				setModarErrorMessage('서버에러입니다');
+			}
 			if (error.response.status === 401) {
 				router.push('/auth/login');
 				// window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/ft`;

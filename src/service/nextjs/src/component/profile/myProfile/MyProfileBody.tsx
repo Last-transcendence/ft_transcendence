@@ -39,9 +39,9 @@ const MyProfileBody = ({ name, use2fa, image }: myProfilePageProps) => {
 				<Box display="flex" flexDirection="column" alignItems="center">
 					<TwoFACheck twoFA={use2fa} />
 					{game === null ? (
-						<div className={styles['my-profile-body__div']}>로딩 실패</div>
+						<div>로딩 실패</div>
 					) : (
-						<div className={styles['my-profile-body__div']}>
+						<div>
 							<Odds gameRecords={game} message={gameRecordsErrorMessage} />
 						</div>
 					)}

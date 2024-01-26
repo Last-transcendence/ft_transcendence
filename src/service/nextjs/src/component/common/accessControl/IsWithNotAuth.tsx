@@ -11,7 +11,7 @@ const IsWithNotAuth = <P extends object>(Destination: ComponentType<P>) => {
 		useEffect(() => {
 			setTimeout(() => {
 				setIsLoaded(true);
-			}, 100);
+			}, 150);
 			if (isLoaded) {
 				if (me) {
 					alert('잘못된 접근입니다.');

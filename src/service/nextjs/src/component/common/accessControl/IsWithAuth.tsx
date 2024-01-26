@@ -12,7 +12,7 @@ const IsWithAuth = <P extends object>(Destination: ComponentType<P>) => {
 		useEffect(() => {
 			setTimeout(() => {
 				setIsLoaded(true);
-			}, 100);
+			}, 150);
 			if (isLoaded) {
 				if (!me) {
 					alert('로그인이 필요합니다.');
