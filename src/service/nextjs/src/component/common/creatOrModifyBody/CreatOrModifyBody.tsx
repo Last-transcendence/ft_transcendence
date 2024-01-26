@@ -87,22 +87,24 @@ const CreatOrModifyBody = ({
 				: await postFetcher<Me>(path, formData, { headers });
 			if (isModify === true) {
 				setMe(response);
-			}
-			if (twoFATrueFalse == true) {
-				window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/login`;
+				router.push('/');
 			} else {
-				router.push('/auth/login/callback');
+				window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/login`;
 			}
+			// if (twoFATrueFalse == true) {
+			// 	window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/login`;
+			// } else {
+			// 	router.push('/auth/login/callback');
+			// }
 		} catch (error: any) {
 			setErrorMessageNickName('');
 			setErrorMessageEmail('');
 			if (error.response.status === 401) {
-				router.push('auth/login');
+				router.push('/auth/login');
 				// window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/ft`;
-			} else if(error.response.status === 400) {
+			} else if (error.response.status === 400) {
 				setModarErrorMessage('이미 쓰고있는 닉네임입니다.');
-			}
-			 else {
+			} else {
 				setModarErrorMessage(error.message);
 			}
 		} finally {

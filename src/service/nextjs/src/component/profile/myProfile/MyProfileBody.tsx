@@ -22,7 +22,7 @@ const MyProfileBody = ({ name, use2fa, image }: myProfilePageProps) => {
 	useEffect(() => {
 		const update = (game: Game[]) => {
 			if (game.length === 0) {
-				setGameRecordsErrorMessage('데이터 없음');
+				setGameRecordsErrorMessage('게임 이력이 없습니다.');
 			}
 		};
 		if (game !== null) {
@@ -39,7 +39,7 @@ const MyProfileBody = ({ name, use2fa, image }: myProfilePageProps) => {
 				<Box display="flex" flexDirection="column" alignItems="center">
 					<TwoFACheck twoFA={use2fa} />
 					{game === null ? (
-						<></>
+						<div className={styles['my-profile-body__div']}>로딩 실패</div>
 					) : (
 						<div className={styles['my-profile-body__div']}>
 							<Odds gameRecords={game} message={gameRecordsErrorMessage} />
@@ -47,7 +47,7 @@ const MyProfileBody = ({ name, use2fa, image }: myProfilePageProps) => {
 					)}
 				</Box>
 				{game === null ? (
-					<></>
+					<p>데이터를 로드할 수 없습니다.</p>
 				) : (
 					<FightRecords fightRecords={game.slice(0, 5)} message={gameRecordsErrorMessage} />
 				)}

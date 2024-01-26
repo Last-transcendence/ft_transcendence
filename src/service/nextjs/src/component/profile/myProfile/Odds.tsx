@@ -11,7 +11,7 @@ const Odds = ({ gameRecords, message }: { gameRecords: Game[]; message: string }
 			});
 			return `${gameRecords.length === 0 ? 0 : ((count / gameRecords.length) * 100).toFixed(0)}%`;
 		} else {
-			return '로딩 실패';
+			return '전적 없음';
 		}
 	};
 	return <p>전적 : {calcOdd()}</p>;
