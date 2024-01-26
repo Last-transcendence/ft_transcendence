@@ -1,6 +1,7 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import PrismaService from 'common/prisma/prisma.service';
 import * as Dto from './dto';
+import ParticipantModel from 'common/model/participant.model';
 
 @Injectable()
 class ParticipantService {
@@ -23,14 +24,7 @@ class ParticipantService {
 
 	async isAuthorized(userId: string): Promise<boolean> {
 		try {
-			const participant = await this.prismaService.participant.findFirst({
-				where: { userId },
-			});
-
-			if (!participant || (participant.role !== 'OWNER' && participant.role !== 'ADMIN')) {
-				return false;
-			}
-			return true;
+			return (await this.isOwner(userId)) || (await this.isAdmin(userId));
 		} catch (error) {
 			throw new Error(error.message);
 		}
@@ -69,11 +63,16 @@ class ParticipantService {
 		}
 	}
 
-	async get(userId: string): Promise<Dto.Response.Participant> {
+	async getByUserId(userId: string): Promise<Dto.Response.Participant> {
 		try {
-			return await this.prismaService.participant.findUnique({
+			const participant = await this.prismaService.participant.findFirst({
 				where: { userId },
 			});
+			if (!participant) {
+				return null;
+			}
+
+			return participant;
 		} catch (error) {
 			throw new Error(error.message);
 		}
@@ -106,18 +105,18 @@ class ParticipantService {
 		}
 	}
 
-	async update(userId: string, updateParticipantDto: Dto.Request.Update) {
+	async update(id: string, updateParticipantDto: Dto.Request.Update): Promise<ParticipantModel> {
 		try {
 			const participant = await this.prismaService.participant.findFirst({
-				where: { userId: userId },
+				where: { id },
 			});
 
 			if (!participant) {
-				throw new BadRequestException('Participant not found');
+				return null;
 			}
 
-			await this.prismaService.participant.update({
-				where: { userId: userId },
+			return await this.prismaService.participant.update({
+				where: { id },
 				data: { ...updateParticipantDto },
 			});
 		} catch (error) {
@@ -131,7 +130,7 @@ class ParticipantService {
 				where: { id },
 			});
 			if (!participant) {
-				throw new BadRequestException('Participant not found');
+				return null;
 			}
 
 			return await this.prismaService.participant.delete({
@@ -148,7 +147,7 @@ class ParticipantService {
 				where: { userId },
 			});
 			if (!participant) {
-				throw new BadRequestException('Participant not found');
+				return null;
 			}
 
 			return await this.prismaService.participant.delete({

@@ -41,3 +41,10 @@
 .user-brief-information > :nth-child(2) {
 	font-size: 5.5cqw;
 }
+
+.user-block {
+	display: flex;
+	align-items: center;
+	color: green;
+	font-weight: 500;
+}

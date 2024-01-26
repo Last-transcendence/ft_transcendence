@@ -1,3 +1,4 @@
+import { axiosInstance } from '@/service/api';
 import Game from '@/type/game.type';
 import axios from 'axios';
 import { Dispatch, ReactNode, SetStateAction, createContext, useEffect, useState } from 'react';
@@ -16,8 +17,8 @@ export const GameProvider = (props: { children: ReactNode }) => {
 
 	useEffect(() => {
 		if (!game) {
-			axios
-				.get(`${process.env.NEXT_PUBLIC_API_URL}/game/history`, { withCredentials: true })
+			axiosInstance
+				.get('/game/history')
 				.then(response => {
 					setGame(response.data);
 				})

@@ -61,7 +61,7 @@ model Friend {
     updatedAt DateTime @updatedAt
 
     // Refer to
-    user     User @relation("user", fields: [userId], references: [id])
+    user     User @relation("user", fields: [userId], references: [id], onDelete: Cascade)
     friended User @relation("friended", fields: [friendId], references: [id])
 
     @@unique([userId, friendId], name: "userId_friendId")
@@ -79,7 +79,7 @@ model Block {
     updatedAt DateTime @updatedAt
 
     // Refer to
-    user    User @relation("user", fields: [userId], references: [id])
+    user    User @relation("user", fields: [userId], references: [id], onDelete: Cascade)
     blocked User @relation("blocked", fields: [blockedId], references: [id])
 
     @@unique([userId, blockedId], name: "userId_blockedId")
@@ -177,7 +177,7 @@ model Participant {
     updatedAt DateTime @updatedAt
 
     // Refer to
-    channel Channel @relation("channel", fields: [channelId], references: [id])
+    channel Channel @relation("channel", fields: [channelId], references: [id], onDelete: Cascade)
     user    User    @relation("user", fields: [userId], references: [id])
 }
 
@@ -192,7 +192,7 @@ model Ban {
     updatedAt DateTime @updatedAt
 
     // Refer to
-    channel Channel @relation("channel", fields: [channelId], references: [id])
+    channel Channel @relation("channel", fields: [channelId], references: [id], onDelete: Cascade)
     user    User    @relation("user", fields: [userId], references: [id])
 
     @@unique([channelId, userId], name: "channelId_userId")
@@ -209,7 +209,7 @@ model Mute {
     updatedAt DateTime @updatedAt
 
     // Refer to
-    channel Channel @relation("channel", fields: [channelId], references: [id])
+    channel Channel @relation("channel", fields: [channelId], references: [id], onDelete: Cascade)
     user    User    @relation("user", fields: [userId], references: [id])
 }
 
@@ -245,7 +245,7 @@ model Chat {
     updatedAt DateTime @updatedAt
 
     // Refer to
-    chatRoom ChatRoom @relation("chatRoom", fields: [chatRoomId], references: [id])
+    chatRoom ChatRoom @relation("chatRoom", fields: [chatRoomId], references: [id], onDelete: Cascade)
 
     @@index([chatRoomId], name: "chatRoomId")
 }

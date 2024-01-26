@@ -95,7 +95,6 @@ class GameService {
 
 	async getHistory(userId: string): Promise<GameHistoryModel[]> {
 		try {
-			console.log(userId);
 			const histories = await this.prismaService.gameHistory.findMany({
 				where: {
 					player1Id: userId,
@@ -104,7 +103,6 @@ class GameService {
 					createdAt: 'desc',
 				},
 			});
-			console.log(histories);
 
 			return histories.filter(history => history.result !== 'PENDING');
 		} catch (error) {
