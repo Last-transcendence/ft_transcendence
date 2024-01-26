@@ -104,7 +104,7 @@ class ChannelGateway {
 				});
 			}
 
-			this.server.to(participant.channelId).emit('join', {
+			socket.broadcast.to(participant.channelId).emit('join', {
 				userId,
 				nickname: socket.user.nickname,
 				profileImageURI: socket.user.profileImageURI,
@@ -122,7 +122,7 @@ class ChannelGateway {
 
 	@SubscribeMessage('edit')
 	@UseGuards(Auth.Guard.UserWsJwt)
-	async handleEdit(@MessageBody() data, @ConnectedSocket() socket: Socket) {
+	async handleEdit(@MessageBody() data, @ConnectedSocket() socket) {
 		try {
 			const channel = await this.channelService.getChannel(data.channelId);
 			if (!channel) {
@@ -141,6 +141,10 @@ class ChannelGateway {
 				data.title = channel.title;
 			}
 			this.channelService.editChannel(data);
+			socket.broadcast.to(socket.user.channelId).emit('edit', {
+				title: data.title,
+				visibility: data.visibility,
+			});
 
 			return { res: true };
 		} catch (error) {
@@ -257,7 +261,8 @@ class ChannelGateway {
 			if (!participant) {
 				throw new Error('Fail to update role');
 			}
-			socket
+
+			socket.broadcast
 				.to(participant.channelId)
 				.emit('role', { userId: participant.userId, nickname: data.nickname });
 			return { res: true };
@@ -273,7 +278,6 @@ class ChannelGateway {
 		@MessageBody() inviteRequestDto: Dto.Request.Invite,
 	) {
 		try {
-			console.log(inviteRequestDto);
 			if (!(await this.participantService.isParticipated(socket['user']['id']))) {
 				throw new BadRequestException('User is not participated');
 			}
@@ -384,10 +388,10 @@ class ChannelGateway {
 			if (!mute) {
 				throw new Error('Fail to mute');
 			}
-			this.server.to(channel.id).emit('mute', {
+			socket.broadcast.to(channel.id).emit('mute', {
 				channelId: channel.id,
 				userId: participant.id,
-				nickname: participant.nickname,
+				nickname: data.nickname,
 			});
 
 			return { res: true };
@@ -419,10 +423,10 @@ class ChannelGateway {
 				throw new Error('Participant not found');
 			}
 
-			this.server.to(channel.id).emit('kick', {
+			socket.broadcast.to(channel.id).emit('kick', {
 				channelId: channel.id,
 				userId: participant.userId,
-				nickname: participant.nickname,
+				nickname: data.nickname,
 			});
 
 			participant = await this.participantService.kick(participant.id);
@@ -459,10 +463,10 @@ class ChannelGateway {
 				throw new Error('Participant not found');
 			}
 
-			this.server.to(channel.id).emit('ban', {
+			socket.broadcast.to(channel.id).emit('ban', {
 				channelId: channel.id,
 				userId: participant.userId,
-				nickname: participant.nickname,
+				nickname: data.nickname,
 			});
 
 			participant = await this.participantService.kick(participant.id);
