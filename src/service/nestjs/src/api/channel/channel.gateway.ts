@@ -368,14 +368,16 @@ class ChannelGateway {
 			if ((await this.participantService.isOwner(data.toUserId)) === true) {
 				throw new Error('Owner cannot perform this action');
 			}
-			await this.participantService.kickByUserId(data.toUserId);
 
-			socket.leave(data.channelId);
 			this.server.to(data.channelId).emit('kick', {
 				channelId: data.channelId,
 				userId: data.toUserId,
 				nickname: data.nickname,
 			});
+
+			const kickedUser = await this.participantService.get(data.toUserId);
+			const kickedUserSocket = this.server.sockets.get(kickedUser.socketId);
+			this.channelService.leaveChannel(kickedUserSocket, kickedUser.userId);
 			return { res: true };
 		} catch (error) {
 			console.error('An error occurred in channel.gateway:', error);
@@ -395,19 +397,18 @@ class ChannelGateway {
 				throw new Error('Owner cannot perform this action');
 			}
 
-			this.participantService.kickByUserId(data.toUserId);
-			if ((await this.banService.isBanned(data.channelId, data.toUserId)) === false) {
-				this.banService.create(data.channelId, data.toUserId);
-			}
-
-			socket.leave(data.channelId);
-
 			this.server.to(data.channelId).emit('ban', {
 				channelId: data.channelId,
 				userId: data.toUserId,
 				nickname: data.nickname,
 			});
 
+			const bannedUser = await this.participantService.get(data.toUserId);
+			const bannedUserSocket = this.server.sockets.get(bannedUser.socketId);
+			this.channelService.leaveChannel(bannedUserSocket, bannedUser.userId);
+			if ((await this.banService.isBanned(data.channelId, data.toUserId)) === false) {
+				this.banService.create(data.channelId, data.toUserId);
+			}
 			return { res: true };
 		} catch (error) {
 			console.error('An error occurred in handleBan:', error);
