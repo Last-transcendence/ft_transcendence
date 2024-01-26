@@ -188,7 +188,6 @@ class ChannelService {
 					where: { id: channel.id },
 					include: { participant: true, mute: true, ban: true },
 				});
-				console.log('==========delete', channel.id);
 			}
 		} catch (error) {
 			throw new Error(error.message);
