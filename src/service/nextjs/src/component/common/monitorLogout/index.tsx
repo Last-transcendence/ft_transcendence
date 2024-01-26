@@ -8,7 +8,7 @@ const LogoutOnUnload = () => {
 
 	useEffect(() => {
 		window.onbeforeunload = () => {
-			postFetcher('/user/offline');
+			postFetcher('/user/offline').catch(async (error: any) => {});
 		};
 		return () => {
 			window.onbeforeunload = () => {};

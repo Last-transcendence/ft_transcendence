@@ -12,7 +12,7 @@ const FightRecords = ({ fightRecords, message }: { fightRecords: Game[]; message
 						<FightRecord {...data} />
 					</Box>
 				))}
-			{message.length !== 0 ? <p>데이터를 불러올수 없습니다.</p> : <></>}
+			{message.length !== 0 ? <p>{message}</p> : <></>}
 		</Box>
 	);
 };
