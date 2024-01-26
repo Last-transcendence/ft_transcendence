@@ -18,8 +18,8 @@ export class Participant {
 	socketId: string;
 
 	@ApiProperty({ description: 'User nickname' })
-	userNickname?: string | null;
+	nickname?: string | null;
 
 	@ApiProperty({ description: 'User profile image uri' })
-	userProfileImageURI?: string | null;
+	profileImageURI?: string | null;
 }
