@@ -71,7 +71,7 @@ class InviteGateway {
             if (!channelInfo) {
                 throw new BadRequestException('channel not found');
             }
-			const isBlocked = await this.blockService.find(userId, destUser.id);
+			const isBlocked = await this.blockService.find(destUser.id, userId);
 			if (!isBlocked) {
 				socket.to('invite').emit('invite', {
 					srcId: userId,

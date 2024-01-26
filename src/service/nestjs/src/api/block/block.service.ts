@@ -24,7 +24,7 @@ class BlockService {
 
 	async find(userId: string, destId: string): Promise<BlockModel> {
 		try {
-			return await this.prismaService.block.findFirst({ where: { userId: destId, blockedId: userId } });
+			return await this.prismaService.block.findFirst({ where: { userId: userId, blockedId: destId } });
 		} catch (error) {
 			throw new Error(error.message);
 		}
