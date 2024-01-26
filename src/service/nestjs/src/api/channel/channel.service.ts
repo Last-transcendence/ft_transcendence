@@ -5,10 +5,10 @@ import MuteService from 'api/mute/mute.service';
 import * as bcrypt from 'bcrypt';
 import { plainToClass } from 'class-transformer';
 import { validate } from 'class-validator';
+import ParticipantModel from 'common/model/participant.model';
 import PrismaService from 'common/prisma/prisma.service';
 import { Socket } from 'socket.io';
 import * as Dto from './dto';
-import ParticipantModel from 'common/model/participant.model';
 
 @Injectable()
 class ChannelService {
@@ -186,9 +186,15 @@ class ChannelService {
 			});
 
 			for (const channel of emptyChannelList) {
-				await this.prismaService.channel.delete({
+				const existingChannel = await this.prismaService.channel.findUnique({
 					where: { id: channel.id },
 				});
+
+				if (existingChannel) {
+					await this.prismaService.channel.delete({
+						where: { id: channel.id },
+					});
+				}
 			}
 		} catch (error) {
 			throw new Error(error.message);

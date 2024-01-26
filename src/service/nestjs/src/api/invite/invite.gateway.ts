@@ -71,18 +71,16 @@ class InviteGateway {
             if (!channelInfo) {
                 throw new BadRequestException('channel not found');
             }
-			const isBlocked = await this.blockService.find(userId, destUser.id);
-			if (isBlocked) {
-				throw new BadRequestException('Blocked user');
+			const isBlocked = await this.blockService.find(destUser.id, userId);
+			if (!isBlocked) {
+				socket.to('invite').emit('invite', {
+					srcId: userId,
+					destId: destUser.id,
+					srcNickname: socket.user.nickname,
+					channelId: messageDto.channelId,
+					channelTitle: channelInfo.title,
+				});
 			}
-
-			socket.to('invite').emit('invite', {
-				srcId: userId,
-				destId: destUser.id,
-				srcNickname: socket.user.nickname,
-                channelId: messageDto.channelId,
-                channelTitle: channelInfo.title,
-            });
 			return { res: true };
 		} catch (error) {
 			console.error("An error occurred invite.gateway 'message':", error);
