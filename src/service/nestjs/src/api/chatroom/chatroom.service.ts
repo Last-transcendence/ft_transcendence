@@ -1,10 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { ChatRoomModel } from 'common/model';
 import PrismaService from 'common/prisma/prisma.service';
-
 @Injectable()
 class ChatRoomService {
-	constructor(private readonly prismaService: PrismaService) {}
+	constructor(private readonly prismaService: PrismaService ) {}
 
 	async get(srcId: string): Promise<ChatRoomModel[]> {
 		try {
@@ -34,7 +33,6 @@ class ChatRoomService {
 					destId: srcId,
 				},
 			});
-
 			return await this.prismaService.chatRoom.create({
 				data: {
 					srcId,
@@ -58,8 +56,15 @@ class ChatRoomService {
 
 	async delete(chatRoomId: string): Promise<void> {
 		try {
+			await this.prismaService.chat.deleteMany({
+				where: {
+					chatRoomId: chatRoomId
+				}
+			});
 			await this.prismaService.chatRoom.delete({
-				where: { id: chatRoomId },
+				where: {
+					id: chatRoomId
+				}
 			});
 		} catch (error) {
 			throw new Error(error.message);
