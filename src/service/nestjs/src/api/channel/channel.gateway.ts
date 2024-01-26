@@ -99,14 +99,12 @@ class ChannelGateway {
 
 			let participant = await this.participantService.getByUserId(userId);
 			if (participant) {
-				if (participant.channelId !== channel.id) {
-					socket.leave(participant.channelId);
-					participant = await this.participantService.update(participant.id, {
-						channelId: channel.id,
-						socketId: socket.id,
-						role: 'USER',
-					});
-				}
+				socket.leave(participant.channelId);
+				participant = await this.participantService.update(participant.id, {
+					channelId: channel.id,
+					socketId: socket.id,
+					role: 'USER',
+				});
 			} else {
 				participant = await this.participantService.create({
 					channelId: channel.id,
@@ -286,6 +284,11 @@ class ChannelGateway {
 		try {
 			if (!(await this.participantService.isParticipated(socket['user']['id']))) {
 				throw new BadRequestException('User is not participated');
+			}
+
+			const participant = await this.participantService.getByUserId(socket['user']['id']);
+			if (!participant) {
+				throw new BadRequestException('Participant not found');
 			}
 
 			const opponent = await this.userService.findByNickname(inviteRequestDto.nickname);
