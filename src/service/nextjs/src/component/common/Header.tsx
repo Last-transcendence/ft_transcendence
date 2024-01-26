@@ -1,8 +1,10 @@
 import { Avatar, Box, IconButton, Stack, Typography } from '@mui/material';
 import { Menu, ArrowBackIosNew } from '@mui/icons-material';
 import HambergurMenu from '@/component/common/hambergur-menu';
-import React, { ReactNode, useState } from 'react';
+import React, { ReactNode, useContext, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import AuthContext from '@/context/auth.context';
+import CustomImage from './CustomImage';
 
 interface MenuHeaderProps {
 	type?: 'friend' | 'chat';
@@ -37,6 +39,7 @@ export const Header = ({ title }: { title: string }) => {
 };
 
 export const MenuHeader = ({ type, title, children }: MenuHeaderProps) => {
+	const { me } = useContext(AuthContext);
 	const [openMenu, setOpenMenu] = useState(false);
 	const router = useRouter();
 
@@ -65,7 +68,13 @@ export const MenuHeader = ({ type, title, children }: MenuHeaderProps) => {
 					</IconButton>
 				) : (
 					<IconButton onClick={() => router.push('/profile/myProfile')}>
-						<Avatar />
+						{!me?.profileImageURI ? (
+							<Avatar />
+						) : (
+							<Avatar>
+								<CustomImage img={me?.profileImageURI} useLoader alt={me?.nickname || 'user'} />
+							</Avatar>
+						)}
 					</IconButton>
 				)}
 				<Typography>{title}</Typography>

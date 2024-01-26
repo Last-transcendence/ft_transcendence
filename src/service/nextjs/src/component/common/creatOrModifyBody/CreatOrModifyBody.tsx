@@ -99,6 +99,11 @@ const CreatOrModifyBody = ({
 		} catch (error: any) {
 			setErrorMessageNickName('');
 			setErrorMessageEmail('');
+			// 값 확인
+			console.log(error);
+			if (!error?.response?.status) {
+				setModarErrorMessage('서버에러입니다');
+			}
 			if (error.response.status === 401) {
 				router.push('/auth/login');
 				// window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/ft`;

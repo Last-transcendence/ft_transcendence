@@ -18,10 +18,6 @@
   flex-direction: column;
 }
 
-.my-profile-body__div {
-  margin-top: -30px;
-}
-
 .my-profile-bottombutton {
   position: fixed;
   bottom: 0;
