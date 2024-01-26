@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, HttpException } from '@nestjs/common';
 import UserService from 'api/user/user.service';
 import * as Dto from '../dto';
 import { UserModel } from 'common/model';
@@ -35,7 +35,7 @@ export class AuthService {
 			}
 			return await this.userSerivice.create(intraId, registerRequestDto);
 		} catch (error) {
-			throw new Error(error.message);
+			throw new HttpException(error.message, error.status);
 		}
 	}
 }
