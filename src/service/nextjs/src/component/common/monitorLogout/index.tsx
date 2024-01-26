@@ -1,21 +1,17 @@
 // components/LogoutOnUnload.tsx
 import { useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { deleteFetcher } from '@/service/api';
+import { postFetcher } from '@/service/api';
 
 const LogoutOnUnload = () => {
 	const router = useRouter();
 
 	useEffect(() => {
-		const handleUnload = async () => {
-			await deleteFetcher('/auth/logout');
-			router.push('/login');
+		window.onbeforeunload = () => {
+			postFetcher('/user/offline');
 		};
-
-		window.addEventListener('beforeunload', handleUnload);
-
 		return () => {
-			window.removeEventListener('beforeunload', handleUnload);
+			window.onbeforeunload = () => {};
 		};
 	}, [router]);
 
