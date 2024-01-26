@@ -199,7 +199,7 @@ class ChannelGateway {
 
 	@SubscribeMessage('leave')
 	@UseGuards(Auth.Guard.UserWsJwt)
-	async handleLeave(@MessageBody() data, @ConnectedSocket() socket) {
+	async handleLeave(@ConnectedSocket() socket) {
 		try {
 			if ((await this.participantService.isParticipated(socket.user.id)) === false) {
 				throw new Error('User is not a participant');
