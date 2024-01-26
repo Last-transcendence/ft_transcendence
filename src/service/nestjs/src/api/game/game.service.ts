@@ -10,7 +10,7 @@ class GameService {
 
 	async getBySocketId(socketId: string): Promise<GameModel> {
 		try {
-			return await this.prismaService.game.findUnique({
+			return await this.prismaService.game.findFirst({
 				where: {
 					socketId,
 				},
@@ -37,6 +37,11 @@ class GameService {
 
 	async create(createRequestDto: Dto.Request.Create): Promise<GameModel> {
 		try {
+			if (createRequestDto?.userId) {
+				await this.prismaService.game.deleteMany({
+					where: { userId: createRequestDto.userId },
+				});
+			}
 			return await this.prismaService.game.create({
 				data: {
 					...createRequestDto,

@@ -61,19 +61,22 @@ class Queue extends Phaser.Scene {
 
 	create() {
 		if (this.gameRoomId && this.scene) {
-			this.scene.start('Main', {
-				navigate: this.navigate,
-				socket: this.socket,
-				room: this.gameRoomId,
-			});
+			this.socket.emit('matched', { room: this.gameRoomId });
+			setTimeout(() => {
+				this.scene.start('Main', {
+					navigate: this.navigate,
+					socket: this.socket,
+					room: this.gameRoomId,
+				});
+			}, 1000);
+		} else {
+			this.initLoadingText();
+			this.initSocket();
 		}
-
-		this.initLoadingText();
-		this.initSocket();
 	}
 
 	update(time: number, delta: number) {
-		if (time % 1000 < delta) {
+		if (time % 1000 < delta && this.loadingText) {
 			this.loadingText[this.loadingTextIdx].setVisible(false);
 			this.loadingTextIdx = (this.loadingTextIdx + 1) % this.loadingText.length;
 			this.loadingText[this.loadingTextIdx].setVisible(true);

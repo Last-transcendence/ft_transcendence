@@ -67,9 +67,6 @@ class GameGateway {
 		const opponentSocketId = Array.from(this.getRoom(room)).find(
 			socketId => socketId !== socket.id,
 		);
-		if (!opponentSocketId) {
-			throw new Error('Opponent socket id not found');
-		}
 		return opponentSocketId;
 	}
 
@@ -112,6 +109,27 @@ class GameGateway {
 		}
 	}
 
+	@SubscribeMessage('matched')
+	async handleMatchedEvent(@ConnectedSocket() socket: Socket, @MessageBody() data: any) {
+		try {
+			socket.join(data.room);
+			this.userService.playing(socket['user']['id']);
+
+			let game = await this.gameService.getByUserId(socket['user']['id']);
+			if (!game) {
+				throw new Error('Game not found');
+			}
+			game = await this.gameService.update(game.id, { socketId: socket.id });
+
+			return { status: 'SUCCESS' };
+		} catch (error) {
+			return {
+				message: error.message,
+				status: error.status,
+			};
+		}
+	}
+
 	@SubscribeMessage('connected')
 	async handleConnectedEvent(
 		@ConnectedSocket() socket: Socket,
@@ -119,18 +137,22 @@ class GameGateway {
 	) {
 		let game = await this.gameService.getBySocketId(socket.id);
 		if (!game) {
-			return { status: 'SUCCESS' };
+			game = await this.gameService.getByUserId(socket['user']['id']);
+		} else {
+			if (!game.userId) {
+				game = await this.gameService.update(game.id, { userId: socket['user']['id'] });
+			}
 		}
 
 		try {
-			if (!game.userId) {
-				await this.gameService.deleteByUserId(socket['user']['id']);
-				game = await this.gameService.update(game.id, { userId: socket['user']['id'] });
-			}
 			await this.gameService.update(game.id, { updatedAt: new Date() });
 
 			const opponentSocketId = this.getOpponentSocketId(socket, connectedRequestDto.room);
 			const opponentGame = await this.gameService.getBySocketId(opponentSocketId);
+
+			if (3000 < Math.abs(opponentGame.updatedAt.getTime() - game.updatedAt.getTime())) {
+				throw new Error('DISCONNECTED');
+			}
 
 			void opponentGame;
 
