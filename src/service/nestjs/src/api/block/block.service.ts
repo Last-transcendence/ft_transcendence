@@ -29,6 +29,19 @@ class BlockService {
 			throw new Error(error.message);
 		}
 	}
+
+	async delete(userId: string, blockedId: string): Promise<void> {
+		try {
+			const block = await this.prismaService.block.findFirst({ where: { userId, blockedId } });
+			if (!block) {
+				return null;
+			}
+
+			await this.prismaService.block.delete({ where: { id: block.id } });
+		} catch (error) {
+			throw new Error(error.message);
+		}
+	}
 }
 
 export default BlockService;
