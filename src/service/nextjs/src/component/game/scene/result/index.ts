@@ -35,7 +35,7 @@ class Result extends Phaser.Scene {
 		}
 		this.load.image(
 			'defaultProfileImage',
-			'https://dev.transcendence.42seoul.kr/upload/unknown_user.png',
+			'https://dev.transcendence.42seoul.kr/public/unknown_user.png',
 		);
 	}
 
