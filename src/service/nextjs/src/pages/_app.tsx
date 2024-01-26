@@ -5,6 +5,7 @@ import Layout from '@/component/common/Layout';
 import ContextProvider from '@/context';
 import { theme } from '@/style/theme';
 import { ThemeProvider } from '@mui/material/styles';
+import LogoutOnUnload from '@/component/common/monitorLogout';
 
 const globalStyles = css`
 	body {
@@ -29,6 +30,7 @@ export default function App({ Component, pageProps }: AppProps) {
 			<ThemeProvider theme={theme}>
 				<Layout>
 					<ContextProvider>
+						<LogoutOnUnload />
 						<Component {...pageProps} />
 					</ContextProvider>
 				</Layout>

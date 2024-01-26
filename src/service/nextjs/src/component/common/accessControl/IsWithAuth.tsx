@@ -1,35 +1,29 @@
 import { useRouter } from 'next/router';
 import { useContext, useEffect, ComponentType, useState } from 'react';
 import AuthContext from '@/context/auth.context';
-import { getFetcher } from '@/service/api';
+import { postFetcher } from '@/service/api';
 
 const IsWithAuth = <P extends object>(Destination: ComponentType<P>) => {
 	const WrappedComponent = (props: P) => {
-		const [on, setOn] = useState<boolean>(false);
 		const router = useRouter();
 		const { me } = useContext(AuthContext);
+		const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
 		useEffect(() => {
-			const accessControl = async () => {
-				try {
-					const me = await getFetcher('user/me');
-					setOn(true);
-				} catch (error) {
-					alert('로그인하셔야합니다.');
+			setTimeout(() => {
+				setIsLoaded(true);
+			}, 100);
+			if (isLoaded) {
+				if (!me) {
+					alert('로그인이 필요합니다.');
 					router.push('/auth/login');
+				} else {
+					postFetcher('/user/online');
 				}
-			};
-
-			if (me === null) {
-				accessControl();
-			} else {
-				setOn(true);
 			}
-		}, [me, router]);
+		}, [me, router, isLoaded, setIsLoaded]);
 
-		if (on === true) {
-			return <Destination {...props} />;
-		}
+		return <Destination {...props} />;
 	};
 
 	return WrappedComponent;
