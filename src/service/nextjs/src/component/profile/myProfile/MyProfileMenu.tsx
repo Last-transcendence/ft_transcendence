@@ -1,12 +1,14 @@
 import { Typography, Box } from '@mui/material';
 import { deleteFetcher } from '@/service/api';
 import CustomSnackbar from '@/component/common/CustomSnackbar';
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import { useRouter } from 'next/navigation';
+import AuthContext from '@/context/auth.context';
 
 const MyProfileMenu = () => {
 	const [errorMessage, setErrorMessage] = useState<string>('');
 	const [loading, setLoading] = useState<boolean>(false);
+	const { setMe } = useContext(AuthContext);
 	const router = useRouter();
 
 	const setCursorStyle = () => ({
@@ -17,7 +19,10 @@ const MyProfileMenu = () => {
 		try {
 			if (loading === true) return;
 			setLoading(true);
-			const response = await deleteFetcher('/auth/logout');
+			deleteFetcher('/auth/logout');
+			setTimeout(() => {
+				setMe(null);
+			}, 100);
 			router.push('/auth/login');
 		} catch (error: any) {
 			setErrorMessage(error.message);
