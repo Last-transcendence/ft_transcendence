@@ -108,7 +108,7 @@ class Result extends Phaser.Scene {
 				this.button.setColor('#ffffff');
 			})
 			.on('pointerdown', () => {
-				this.navigate.push('/');
+				this.navigate.push('/game/callback');
 			});
 	}
 
