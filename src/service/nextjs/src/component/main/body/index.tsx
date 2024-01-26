@@ -46,7 +46,7 @@ const MainPageBody = () => {
 			channelSocket?.emit('join', { channelId, password }, (res: any) => {
 				console.log('channel join res', res);
 				if (res?.res) router.push(`/chat/${channelId}/common`);
-				else alert('채널 입장에 실패했습니다.');
+				else alert(`채널 입장에 실패했습니다. ${res?.message?.message}}`);
 			});
 		},
 		[channelSocket, router],
@@ -55,7 +55,8 @@ const MainPageBody = () => {
 	const navigateChatroom = useCallback(
 		(destId: string) => {
 			if (!chatSocket) return;
-			chatSocket.emit('join', { destId }, () => {
+			chatSocket.emit('join', { destId }, (res: any) => {
+				console.log('join emit res', res);
 				router.push(`/chat/${destId}/private`);
 			});
 		},

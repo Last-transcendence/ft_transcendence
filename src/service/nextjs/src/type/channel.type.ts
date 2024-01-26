@@ -28,7 +28,7 @@ interface CommonInterface {
 	profileImageURI: string;
 }
 
-export interface Participant extends CommonInterface {
+export interface Participant {
 	id: string;
 	userId: string;
 	role: string;

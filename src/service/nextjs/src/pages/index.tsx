@@ -21,7 +21,7 @@ const MainPage = () => {
 				<link rel="icon" href="/favicon.ico" />
 			</Head>
 			<div className={style.container}>
-				<MenuHeader title={'채널 목록'} type={'friend'}>
+				<MenuHeader title={''} type={'friend'}>
 					<FriendPage />
 				</MenuHeader>
 				<MainPageBody />

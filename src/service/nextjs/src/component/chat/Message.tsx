@@ -3,10 +3,11 @@ import React from 'react';
 import NickMenu from '@/component/chat/NickMenu';
 import AdminNickMenu from '@/component/chat/AdminNickMenu';
 import { AdminActionType, Participant, ParticipantRole } from '@/type/channel.type';
+import User from '@/type/user.type';
 import OpenProfileAvatar from '@/component/common/detailProfile/OpenProfileAvatar';
 
 interface ChatMsgProps {
-	userData: Participant;
+	userData: Participant | User;
 	channelId: string;
 	myRole?: ParticipantRole;
 	ownerId: string | undefined;
@@ -25,17 +26,32 @@ export const ChatMsg = ({
 	return (
 		<Stack flexDirection={'row'} alignItems={'center'} gap={1}>
 			<Stack flexDirection={'row'} gap={1} alignItems={'center'}>
-				<OpenProfileAvatar otherUserId={userData?.id} imgUrl={userData?.profileImageURI} />
+				<OpenProfileAvatar
+					otherUserId={userData?.id}
+					imgUrl={
+						(userData as Participant)?.user?.profileImageURI || (userData as User)?.profileImageURI
+					}
+				/>
 				{myRole && myRole !== ParticipantRole.USER ? (
 					<AdminNickMenu
 						adminAction={adminAction}
-						nickname={userData?.user?.nickname || userData?.nickname || '알수없음'}
+						nickname={
+							(userData as Participant)?.user?.nickname ||
+							(userData as User)?.nickname ||
+							'알수없음'
+						}
 						userId={userData.id}
 						channelId={channelId}
 						ownerId={ownerId}
 					/>
 				) : (
-					<NickMenu nickname={userData?.nickname} />
+					<NickMenu
+						nickname={
+							(userData as Participant)?.user?.nickname ||
+							(userData as User)?.nickname ||
+							'알수없음'
+						}
+					/>
 				)}
 			</Stack>
 			<Typography>{message}</Typography>

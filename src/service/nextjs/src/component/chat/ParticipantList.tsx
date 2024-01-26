@@ -55,7 +55,7 @@ const ParticipantList = ({
 		(userId: string) => {
 			if (!userId) return false;
 			if (!channelData?.mute || channelData?.mute.length == 0) return false;
-			return channelData?.mute?.some((data: Mute) => data?.id === userId);
+			return channelData?.mute?.some((data: Mute) => data?.userId === userId);
 		},
 		[channelData?.mute],
 	);

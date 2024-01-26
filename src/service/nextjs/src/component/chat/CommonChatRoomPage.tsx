@@ -44,7 +44,12 @@ const CommonChatRoomPage = () => {
 			console.log('info res', res);
 			setChannelData(res);
 		});
-	}, []);
+	}, [channelSocket, params?.id]);
+
+	useEffect(() => {
+		if (!params?.id) return;
+		getChannelInfo();
+	}, [channelSocket, params?.id]);
 
 	useEffect(() => {
 		if (!params?.id) return;
@@ -166,7 +171,7 @@ const CommonChatRoomPage = () => {
 					break;
 			}
 		},
-		[setActionMessage],
+		[getChannelInfo, setActionMessage],
 	);
 
 	// 이용자 게임 초대
@@ -199,7 +204,7 @@ const CommonChatRoomPage = () => {
 
 	//이용자 킥
 	useListeningChannelEvent('kick', (res: any) => {
-		console.log('kick', res);
+		console.log('kick listen', res);
 		if (res?.userId === me?.id) {
 			alert('채널에서 킥되었습니다.');
 			router.push('/');
@@ -209,7 +214,7 @@ const CommonChatRoomPage = () => {
 
 	//이용자 어드민 임명
 	useListeningChannelEvent('role', (res: { userId: string; nickname: string }) => {
-		console.log('res', res);
+		console.log('role res', res);
 		if (res?.userId === me?.id) {
 			alert('채널 어드민으로 임명되었습니다.');
 		}
