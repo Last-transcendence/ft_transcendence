@@ -54,6 +54,7 @@ const MainPageBody = () => {
 
 	const navigateChatroom = useCallback(
 		(destId: string) => {
+			if (!destId) return;
 			if (!chatSocket) return;
 			chatSocket.emit('join', { destId }, (res: any) => {
 				// console.log('join emit res', res);
