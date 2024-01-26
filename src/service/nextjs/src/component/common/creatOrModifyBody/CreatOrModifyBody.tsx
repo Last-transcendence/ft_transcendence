@@ -96,7 +96,15 @@ const CreatOrModifyBody = ({
 		} catch (error: any) {
 			setErrorMessageNickName('');
 			setErrorMessageEmail('');
-			setModarErrorMessage(error.message);
+			if (error.response.status === 401) {
+				router.push('auth/login');
+				// window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/ft`;
+			} else if(error.response.status === 400) {
+				setModarErrorMessage('이미 쓰고있는 닉네임입니다.');
+			}
+			 else {
+				setModarErrorMessage(error.message);
+			}
 		} finally {
 			setLoading(false);
 		}
