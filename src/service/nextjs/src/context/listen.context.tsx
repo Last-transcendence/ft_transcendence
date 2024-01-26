@@ -14,6 +14,7 @@ import { useParams } from 'next/navigation';
 import useFetchData from '@/hook/useFetchData';
 import FriendType from '@/type/friend.type';
 import CustomConfirmModal from '@/component/common/CustomConfirmModal';
+import AuthContext from '@/context/auth.context';
 
 type DmType = {
 	channelId: string;
@@ -57,6 +58,7 @@ export const ListenProvider = (props: { children: ReactNode }) => {
 		channelTitle: string;
 		channelId: string;
 	} | null>(null);
+	const { me } = useContext(AuthContext);
 
 	useEffect(() => {
 		//게임 중이면 무시
@@ -64,13 +66,13 @@ export const ListenProvider = (props: { children: ReactNode }) => {
 			if (friendDatas) {
 				friendDatas?.forEach(data => {
 					(sockets.chatSocket as any).emit('join', { destId: data?.id }, (res: any) => {
-						console.log('join', res);
+						// console.log('join', res);
 					});
 				});
 			}
 
 			(sockets.chatSocket as any).on('message', (res: any) => {
-				console.log('listen chat msg', res);
+				// console.log('listen chat msg', res);
 				if (router.pathname.includes('game')) return;
 				if (!res?.message || res.message === '') return;
 				if (router.pathname.includes('private')) {
@@ -88,16 +90,23 @@ export const ListenProvider = (props: { children: ReactNode }) => {
 		if (sockets?.inviteSocket) {
 			//invite 참여
 			(sockets.inviteSocket as any).emit('join', (res: any) => {
-				console.log('invite join res', res);
+				// console.log('invite join res', res);
 			});
 			//invite 구독
 			(sockets.inviteSocket as any).on(
 				'invite',
-				(res: { srcId: string; srcNickname: string; channelTitle: string; channelId: string }) => {
-					console.log('invite on res', res);
+				(res: {
+					srcId: string;
+					srcNickname: string;
+					channelTitle: string;
+					channelId: string;
+					destId: string;
+				}) => {
+					if (res?.destId !== me?.id) return;
+					// console.log('invite on res', res);
 					setMessage({
-						title: 'private 채널 초대',
-						content: `${res?.srcNickname}님이 private 채널 (:${res?.channelTitle})에 초대했습니다.`,
+						title: '채널 초대',
+						content: `${res?.srcNickname}님이 채널 (:${res?.channelTitle})에 초대했습니다.`,
 					});
 					setInviteRes(res);
 					setOpen(true);

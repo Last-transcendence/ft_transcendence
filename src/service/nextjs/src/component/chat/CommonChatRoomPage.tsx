@@ -41,7 +41,7 @@ const CommonChatRoomPage = () => {
 	const getChannelInfo = useCallback(() => {
 		if (!params?.id) return;
 		channelSocket?.emit('info', { channelId: params?.id }, (res: any) => {
-			console.log('info res', res);
+			// console.log('info res', res);
 			setChannelData(res);
 		});
 	}, [channelSocket, params?.id]);
@@ -97,7 +97,7 @@ const CommonChatRoomPage = () => {
 
 	//이용자 참여
 	useListeningChannelEvent('join', (res: any) => {
-		console.log('join listen res', res);
+		// console.log('join listen res', res);
 		setActionMessage(`${res?.nickname}님이 들어오셨습니다.`);
 		getChannelInfo();
 		// setChannelData(prev => {
@@ -115,24 +115,23 @@ const CommonChatRoomPage = () => {
 
 	//이용자 퇴장
 	useListeningChannelEvent('leave', (res: any) => {
-		console.log('listen leave', res);
-		setActionMessage(`${getNickname(res.id)}님이 나가셨습니다.`);
+		// console.log('listen leave', res);
+		setActionMessage(`${res?.nickname}님이 나가셨습니다.`);
 		getChannelInfo();
 	});
 
 	const responseInvite = useCallback(
 		(inviteResponse: any, response: 'ACCEPT' | 'REJECT') => {
 			channelSocket?.emit('invite/response', { ...inviteResponse, response }, (res: any) => {
-				console.log(res);
+				// console.log(res);
 			});
 		},
 		[channelSocket],
 	);
 
 	const adminAction = useCallback(
-		(action: AdminActionType, nickname: string, id: string) => {
+		(action: AdminActionType, nickname: string) => {
 			if (action === 'setting') return getChannelInfo();
-			if (!id) return;
 			if (!nickname) return;
 			switch (action) {
 				case 'kick':
@@ -176,6 +175,7 @@ const CommonChatRoomPage = () => {
 
 	// 이용자 게임 초대
 	useListeningChannelEvent('invite', (res: any) => {
+		// console.log('invite game listen', res);
 		setIsOpened(true);
 		setInviteResponse(res);
 	});
@@ -190,7 +190,7 @@ const CommonChatRoomPage = () => {
 		if (res?.userId === me?.id) {
 			alert('채널에서 뮤트되었습니다.');
 		}
-		adminAction('mute', res?.nickname, res?.id);
+		adminAction('mute', res?.nickname);
 	});
 
 	//이용자 차단
@@ -199,26 +199,26 @@ const CommonChatRoomPage = () => {
 			alert('채널에서 밴되었습니다.');
 			router.push('/');
 		}
-		adminAction('ban', res?.nickname, res?.id);
+		adminAction('ban', res?.nickname);
 	});
 
 	//이용자 킥
 	useListeningChannelEvent('kick', (res: any) => {
-		console.log('kick listen', res);
+		// console.log('kick listen', res);
 		if (res?.userId === me?.id) {
 			alert('채널에서 킥되었습니다.');
 			router.push('/');
 		}
-		adminAction('kick', res?.nickname, res?.id);
+		adminAction('kick', res?.nickname);
 	});
 
 	//이용자 어드민 임명
 	useListeningChannelEvent('role', (res: { userId: string; nickname: string }) => {
-		console.log('role res', res);
+		// console.log('role res', res);
 		if (res?.userId === me?.id) {
 			alert('채널 어드민으로 임명되었습니다.');
 		}
-		adminAction('admin', res?.nickname, res?.userId);
+		adminAction('admin', res?.nickname);
 	});
 
 	const myRole = useMemo(() => {
@@ -256,7 +256,7 @@ const CommonChatRoomPage = () => {
 			{isOpened && (
 				<CustomConfirmModal
 					setIsOpened={setIsOpened}
-					title={`${inviteResponse?.nickname}님이 게임에 초대하셨습니다.`}
+					title={`${inviteResponse?.nickname}님이 ${inviteResponse?.mode}게임에 초대하셨습니다.`}
 					content="수락하시겠습니까?"
 					onConfirm={() => {
 						responseInvite(inviteResponse, 'ACCEPT');

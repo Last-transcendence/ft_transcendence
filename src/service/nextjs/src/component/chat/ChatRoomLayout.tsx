@@ -7,6 +7,7 @@ import {
 	useContext,
 	useEffect,
 	useRef,
+	useState,
 } from 'react';
 import { Stack } from '@mui/material';
 import { ChatMsg, HelpMsg, StatusMsg } from '@/component/chat/Message';
@@ -48,13 +49,13 @@ const ChatRoomLayout = ({
 	const { me } = useContext(AuthContext);
 	const { currentDm } = useContext(ListenContext);
 	const scrollRef = useRef<HTMLDivElement>(null);
+	const [disabled, setDisabled] = useState<boolean>(false);
 
 	//채널 메세지 수신 (한번만 등록)
 	useEffect(() => {
 		if (type === 'chatroom') return;
 		if (!channelSocket) return;
 		channelSocket.on('message', res => {
-			console.log('listen message', res);
 			if (res.userId === me?.id) return;
 			setChatLiveData((prev: ChatLiveDataType[]) => [
 				...prev,
@@ -77,10 +78,11 @@ const ChatRoomLayout = ({
 	}, [currentDm]);
 
 	const isMute = useCallback(
-		(userId: string) => {
-			if (!userId) return false;
+		(myId: string) => {
+			if (!myId) return false;
 			if (!data || !data?.mute || data?.mute.length == 0) return false;
-			return data.mute.some((data: Mute) => data?.userId === userId);
+			// console.log('isMute', data?.mute);
+			return data.mute.some((data: Mute) => data?.userId === myId);
 		},
 		[data],
 	);
@@ -99,7 +101,8 @@ const ChatRoomLayout = ({
 
 			// send message
 			(type === 'channel' ? channelSocket : chatSocket)?.emit('message', req, (res: any) => {
-				console.log('message emit', message, res);
+				// console.log('message emit', message, res);
+				if (disabled) return;
 				if (res?.res) {
 					setChatLiveData((prev: ChatLiveDataType[]) => [
 						...prev,
@@ -108,9 +111,13 @@ const ChatRoomLayout = ({
 				} else {
 					if (isMute(me?.id)) alert('뮤트된 사용자입니다');
 				}
+				setDisabled(true);
+				setTimeout(() => {
+					setDisabled(false);
+				}, 500);
 			});
 		},
-		[channelSocket, chatSocket, isMute, me?.id, params?.id, setChatLiveData, type],
+		[channelSocket, chatSocket, disabled, isMute, me?.id, params?.id, setChatLiveData, type],
 	);
 
 	const commandAction = (
@@ -131,12 +138,12 @@ const ChatRoomLayout = ({
 						channelId,
 						destNickname: nickname,
 					},
-					(res: any) => {
-						console.log('invite res', res);
-					},
+					(res: any) => {},
 				);
 				break;
 			case 'GAME':
+				// console.log('mode', channelId, nickname, mode);
+				if (!mode || !(mode === 'HARD' || mode === 'NORMAL')) return;
 				channelSocket?.emit('invite', {
 					channelId,
 					userId: me?.id,
@@ -187,7 +194,7 @@ const ChatRoomLayout = ({
 					else if (chat.type === 'action') return <StatusMsg message={chat?.message} key={index} />;
 				})}
 			</Stack>
-			<SendChat sendAction={sendAction} commandAction={commandAction} />
+			<SendChat sendAction={sendAction} commandAction={commandAction} disabled={disabled} />
 		</Stack>
 	);
 };

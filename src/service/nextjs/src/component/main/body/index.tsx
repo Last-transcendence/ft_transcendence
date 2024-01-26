@@ -44,9 +44,9 @@ const MainPageBody = () => {
 		(channelId: string | undefined, password?: string) => {
 			if (!channelSocket) return;
 			channelSocket?.emit('join', { channelId, password }, (res: any) => {
-				console.log('channel join res', res);
+				// console.log('channel join res', res);
 				if (res?.res) router.push(`/chat/${channelId}/common`);
-				else alert(`채널 입장에 실패했습니다. ${res?.message?.message}}`);
+				else alert(`채널 입장에 실패했습니다. ${res?.message?.message}`);
 			});
 		},
 		[channelSocket, router],
@@ -56,7 +56,7 @@ const MainPageBody = () => {
 		(destId: string) => {
 			if (!chatSocket) return;
 			chatSocket.emit('join', { destId }, (res: any) => {
-				console.log('join emit res', res);
+				// console.log('join emit res', res);
 				router.push(`/chat/${destId}/private`);
 			});
 		},

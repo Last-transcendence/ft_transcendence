@@ -72,8 +72,8 @@ export const HelpMsg = () => {
 				도움말
 			</Typography>
 			<Typography fontSize={'small'}>
-				<span style={helpTextStyle}>/g &lt;닉네임&gt;:</span> &lt;닉네임&gt;에게 1:1 게임 매칭을
-				요청합니다
+				<span style={helpTextStyle}>/g &lt;닉네임&gt; &lt;MODE&gt;:</span> &lt;닉네임&gt;에게
+				&lt;MODE&gt;인 1:1 게임 매칭을 요청합니다 [MODE: NORMAL(일반모드), HARD(어려움모드)].
 			</Typography>
 			<Typography fontSize={'small'}>
 				<span style={helpTextStyle}>/i &lt;닉네임&gt;:</span> &lt;닉네임&gt;에게 현재방 초대 요청을

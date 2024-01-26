@@ -86,7 +86,7 @@ const ChannelSetting = ({
 		//채널은 생성되면 아이디 받고 이동하기
 		if (isCreate) {
 			channelSocket?.emit('create', req, (res: any) => {
-				console.log(res);
+				// console.log(res);
 				res.channelId && router.push(`/chat/${res.channelId}/common`);
 			});
 			//navigate

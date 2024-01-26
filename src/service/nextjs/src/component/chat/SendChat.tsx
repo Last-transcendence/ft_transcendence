@@ -12,18 +12,21 @@ interface SendChatProps {
 		message?: string,
 		channelId?: string,
 	) => void;
+	disabled: boolean;
 }
 
-const SendChat = ({ sendAction, commandAction }: SendChatProps) => {
+const SendChat = ({ sendAction, commandAction, disabled }: SendChatProps) => {
 	const [chat, setChat] = useState('');
 	const params = useParams<{ id: string }>();
 
 	const onEnter = () => {
+		if (disabled) return;
 		if (chat === '' || !chat) return;
 		if (chat[0] === '/') {
 			const chatSplit = chat.split(' ');
 			const command = chatSplit?.[0];
 			const nickname = chatSplit?.[1];
+			const mode = chatSplit?.[2];
 
 			switch (command) {
 				case '/help':
@@ -33,7 +36,7 @@ const SendChat = ({ sendAction, commandAction }: SendChatProps) => {
 					commandAction('INVITE', nickname, params?.id);
 					break;
 				case '/g':
-					commandAction('GAME', nickname, params?.id);
+					commandAction('GAME', nickname, params?.id, mode);
 					break;
 				default:
 					sendAction(chat ?? '');

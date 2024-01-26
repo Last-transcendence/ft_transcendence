@@ -1,3 +1,4 @@
+import { CircularProgress } from '@mui/material';
 import { createContext, Dispatch, ReactNode, SetStateAction, useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 
@@ -84,7 +85,7 @@ export const SocketProvider = (props: { children: ReactNode }) => {
 		}
 	}, [sockets]);
 
-	if (!socketLoading) return <></>;
+	if (!socketLoading) return <CircularProgress />;
 	return (
 		<>
 			<SocketContext.Provider value={{ sockets, setSocket }}>{children}</SocketContext.Provider>

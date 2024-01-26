@@ -267,8 +267,9 @@ class ChannelGateway {
 				throw new Error('Fail to update role');
 			}
 
-			socket.emit('role', { userId: participant.userId, nickname: participant.nickname });
-
+			this.server
+				.to(participant.channelId)
+				.emit('role', { userId: participant.userId, nickname: participant.nickname });
 			return { res: true };
 		} catch (error) {
 			return { res: false, message: error };
@@ -282,6 +283,7 @@ class ChannelGateway {
 		@MessageBody() inviteRequestDto: Dto.Request.Invite,
 	) {
 		try {
+			console.log(inviteRequestDto);
 			if (!(await this.participantService.isParticipated(socket['user']['id']))) {
 				throw new BadRequestException('User is not participated');
 			}
