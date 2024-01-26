@@ -106,6 +106,14 @@ class UserService {
 			throw new Error(error.message);
 		}
 	}
+
+	async deleteUser(userId: string) {
+		try {
+			return await this.prismaService.user.delete({ where: { id: userId } });
+		} catch (error) {
+			throw new Error(error.message);
+		}
+	}
 }
 
 export default UserService;
