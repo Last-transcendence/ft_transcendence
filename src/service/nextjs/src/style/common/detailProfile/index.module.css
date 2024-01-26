@@ -1,0 +1,8 @@
+.open-profile-avatar__nickname {
+  font-size: 28px;
+}
+
+.open-profile-avatar__status {
+  opacity: 0.5;
+  margin-top: -10px;
+}

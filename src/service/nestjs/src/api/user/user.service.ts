@@ -30,20 +30,36 @@ class UserService {
 		}
 	}
 
-	async create(intraId: string, { use2fa, file, ...registerRequestDto}: Dto.Request.Create): Promise<User> {
+	async create(
+		intraId: string,
+		{ use2fa, file, ...registerRequestDto }: Dto.Request.Create,
+	): Promise<User> {
 		try {
 			return await this.prismaService.user.create({
-				data: { intraId, ...registerRequestDto, profileImageURI: file, use2fa: use2fa === 'true' ? true : false },
+				data: {
+					intraId,
+					...registerRequestDto,
+					profileImageURI: file,
+					use2fa: use2fa === 'true' ? true : false,
+				},
 			});
 		} catch (error) {
 			throw new Error(error.message);
 		}
 	}
 
-	async updateUserById(id: string,  { use2fa, file, ...updateRequestDto}: Partial<Dto.Request.UpdateUser>): Promise<User> {
+	async updateUserById(
+		id: string,
+		{ use2fa, file, ...updateRequestDto }: Partial<Dto.Request.UpdateUser>,
+	): Promise<User> {
 		try {
-			return await this.prismaService.user.update({ 
-				where: { id }, data: { profileImageURI: file, use2fa: use2fa === 'true' ? true : false,  ...updateRequestDto },
+			return await this.prismaService.user.update({
+				where: { id },
+				data: {
+					profileImageURI: file,
+					use2fa: use2fa === 'true' ? true : false,
+					...updateRequestDto,
+				},
 			});
 		} catch (error) {
 			throw new Error(error.message);
@@ -60,7 +76,10 @@ class UserService {
 
 	async online(userId: string) {
 		try {
-			return await this.prismaService.user.update({ where: { id: userId }, data: { status: 'ONLINE' } });
+			return await this.prismaService.user.update({
+				where: { id: userId },
+				data: { status: 'ONLINE' },
+			});
 		} catch (error) {
 			throw new Error(error.message);
 		}
@@ -68,7 +87,10 @@ class UserService {
 
 	async offline(userId: string) {
 		try {
-			return await this.prismaService.user.update({ where: { id: userId }, data: { status: 'OFFLINE' } });
+			return await this.prismaService.user.update({
+				where: { id: userId },
+				data: { status: 'OFFLINE' },
+			});
 		} catch (error) {
 			throw new Error(error.message);
 		}
@@ -76,7 +98,10 @@ class UserService {
 
 	async playing(userId: string) {
 		try {
-			return await this.prismaService.user.update({ where: { id: userId }, data: { status: 'PLAYING' } });
+			return await this.prismaService.user.update({
+				where: { id: userId },
+				data: { status: 'PLAYING' },
+			});
 		} catch (error) {
 			throw new Error(error.message);
 		}

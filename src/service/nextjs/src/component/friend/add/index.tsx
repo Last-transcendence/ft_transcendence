@@ -111,7 +111,7 @@ const AddFriend = ({ friendList, refetch, blockList, blockRefetch }: AddFriendPr
 							/>
 							{me?.id !== user.id &&
 								(blockList?.find(item => item.blockedId === user.id) ? (
-									<div>차단된 유저</div>
+									<div className={style['user-block']}>차단된 유저</div>
 								) : isFriend(user.id) ? (
 									<button onClick={() => setFriend(user.id, 'delete')}>삭제</button>
 								) : (

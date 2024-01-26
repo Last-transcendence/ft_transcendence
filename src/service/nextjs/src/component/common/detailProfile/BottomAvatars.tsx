@@ -6,9 +6,9 @@ interface bottomAvatarsType {
 }
 
 const BottomAvatarsGrid = ({ avatars }: bottomAvatarsType) => (
-	<Grid container justifyContent="space-around">
+	<Grid container justifyContent="space-between">
 		{avatars.map((avatar, index) => (
-			<Grid item key={index} xs={4}>
+			<Grid item key={index} xs={3}>
 				<Box textAlign="center">
 					<NewIcon {...avatar} />
 				</Box>

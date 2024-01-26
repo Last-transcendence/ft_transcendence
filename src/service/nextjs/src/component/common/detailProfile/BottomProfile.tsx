@@ -102,13 +102,6 @@ const BottomProfile = ({ otherUserId, isFriend, setIsFriend, refetch }: BottomPr
 		},
 		{
 			image: '/Add User Male.png',
-			name: '1:1 게임',
-			sxStyle: sxStyle,
-			avatarImgStyle: undefined,
-			message: '1:1 게임',
-		},
-		{
-			image: '/Ping Pong.png',
 			name: isFriend ? '친구 제거' : '친구 추가',
 			sxStyle: sxStyle,
 			avatarImgStyle: undefined,
