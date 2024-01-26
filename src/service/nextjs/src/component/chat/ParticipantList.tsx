@@ -62,7 +62,7 @@ const ParticipantList = ({
 
 	const handleLeave = useCallback(() => {
 		channelSocket!.emit('leave', { channelId, userId: me?.id }, (res: any) => {
-			console.log('leave emit', res);
+			// console.log('leave emit', res);
 			if (res?.res) {
 				router.push('/');
 			}

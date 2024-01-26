@@ -40,7 +40,7 @@ class Main extends Phaser.Scene {
 		this.socket = socket;
 		this.room = room;
 
-		console.log(this.socket);
+		// console.log(this.socket);
 
 		if (this.socket) {
 			this.initSocket();
@@ -56,7 +56,7 @@ class Main extends Phaser.Scene {
 			this.enemyPaddle.x = 360 - response.x;
 		});
 		this.socket.on('score', response => {
-			console.log('score response ', response);
+			// console.log('score response ', response);
 			if (response.state === 'network-delay') {
 				this.reset(this.game.canvas.width / 2, this.game.canvas.height / 2, 0, 0);
 				this.readyText.setVisible(false);
@@ -95,7 +95,7 @@ class Main extends Phaser.Scene {
 			this.socket.off('score');
 			this.socket.off('end');
 
-			console.log('end', response);
+			// console.log('end', response);
 
 			if (response.state === 'DISCONNECTED' && this.scene) {
 				this.scene.start('Disconnected', {

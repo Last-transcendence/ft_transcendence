@@ -130,9 +130,8 @@ const CommonChatRoomPage = () => {
 	);
 
 	const adminAction = useCallback(
-		(action: AdminActionType, nickname: string, id: string) => {
+		(action: AdminActionType, nickname: string) => {
 			if (action === 'setting') return getChannelInfo();
-			if (!id) return;
 			if (!nickname) return;
 			switch (action) {
 				case 'kick':
@@ -176,6 +175,7 @@ const CommonChatRoomPage = () => {
 
 	// 이용자 게임 초대
 	useListeningChannelEvent('invite', (res: any) => {
+		// console.log('invite game listen', res);
 		setIsOpened(true);
 		setInviteResponse(res);
 	});
@@ -190,7 +190,7 @@ const CommonChatRoomPage = () => {
 		if (res?.userId === me?.id) {
 			alert('채널에서 뮤트되었습니다.');
 		}
-		adminAction('mute', res?.nickname, res?.id);
+		adminAction('mute', res?.nickname);
 	});
 
 	//이용자 차단
@@ -199,7 +199,7 @@ const CommonChatRoomPage = () => {
 			alert('채널에서 밴되었습니다.');
 			router.push('/');
 		}
-		adminAction('ban', res?.nickname, res?.id);
+		adminAction('ban', res?.nickname);
 	});
 
 	//이용자 킥
@@ -209,7 +209,7 @@ const CommonChatRoomPage = () => {
 			alert('채널에서 킥되었습니다.');
 			router.push('/');
 		}
-		adminAction('kick', res?.nickname, res?.id);
+		adminAction('kick', res?.nickname);
 	});
 
 	//이용자 어드민 임명
@@ -218,7 +218,7 @@ const CommonChatRoomPage = () => {
 		if (res?.userId === me?.id) {
 			alert('채널 어드민으로 임명되었습니다.');
 		}
-		adminAction('admin', res?.nickname, res?.userId);
+		adminAction('admin', res?.nickname);
 	});
 
 	const myRole = useMemo(() => {
@@ -256,7 +256,7 @@ const CommonChatRoomPage = () => {
 			{isOpened && (
 				<CustomConfirmModal
 					setIsOpened={setIsOpened}
-					title={`${inviteResponse?.nickname}님이 게임에 초대하셨습니다.`}
+					title={`${inviteResponse?.nickname}님이 ${inviteResponse?.mode}게임에 초대하셨습니다.`}
 					content="수락하시겠습니까?"
 					onConfirm={() => {
 						responseInvite(inviteResponse, 'ACCEPT');
