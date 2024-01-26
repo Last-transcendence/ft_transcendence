@@ -103,6 +103,7 @@ class ChannelGateway {
 					socket.leave(participant.channelId);
 					participant = await this.participantService.update(participant.id, {
 						channelId: channel.id,
+						socketId: socket.id,
 					});
 				}
 			} else {
@@ -243,7 +244,10 @@ class ChannelGateway {
 				throw new Error('Participant not found');
 			}
 
-			participant = await this.participantService.update(participant.id, { role: data.role });
+			participant = await this.participantService.update(participant.id, {
+				socketId: socket.id,
+				role: data.role,
+			});
 			if (!participant) {
 				throw new Error('Fail to update role');
 			}
