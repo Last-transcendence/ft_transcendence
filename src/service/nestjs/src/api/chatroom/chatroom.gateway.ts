@@ -71,7 +71,7 @@ class ChatRoomGateway {
 		try {
 			const userId: string = socket.user.id;
 			const destId: string = messageDto.destId;
-			const isBlocked = await this.blockService.find(userId, destId);
+			const isBlocked = await this.blockService.find(destId, userId);
 			const chatRoomName = [userId, destId].sort().join('_');
 			await this.chatService.create(userId, destId, messageDto.message);
 			if (!isBlocked) {
