@@ -28,6 +28,15 @@ class ChatRoomService {
 
 	async create(srcId: string, destId: string): Promise<ChatRoomModel> {
 		try {
+			const existingChatRoom = await this.prismaService.chatRoom.findFirst({
+				where: {
+					srcId,
+					destId,
+				},
+			});
+			if (existingChatRoom) {
+				return existingChatRoom;
+			}
 			await this.prismaService.chatRoom.create({
 				data: {
 					srcId: destId,
