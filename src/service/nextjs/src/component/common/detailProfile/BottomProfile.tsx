@@ -79,6 +79,7 @@ const BottomProfile = ({ otherUserId, isFriend, setIsFriend, refetch }: BottomPr
 			// if (chatroom === undefined) {
 			//	const id = await makeNewChatroom(otherUserId);
 			// }
+			if (!otherUserId) return;
 			chatSocket?.emit('join', { destId: otherUserId }, (res: any) => {
 				// console.log('res', res);
 			});
