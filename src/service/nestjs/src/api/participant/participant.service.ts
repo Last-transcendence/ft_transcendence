@@ -117,7 +117,7 @@ class ParticipantService {
 			}
 
 			await this.prismaService.participant.update({
-				where: { userId: id },
+				where: { userId: userId },
 				data: { ...updateParticipantDto },
 			});
 		} catch (error) {
