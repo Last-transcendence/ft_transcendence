@@ -105,7 +105,11 @@ const CreatOrModifyBody = ({
 				setModarErrorMessage('서버에러입니다');
 			}
 			if (error.response.status === 401) {
-				router.push('/auth/login');
+				try {
+					router.push('/auth/login');
+				} catch (routerError) {
+					setModarErrorMessage('라우터 이동 중 에러가 발생했습니다.');
+				}
 				// window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/ft`;
 			} else if (error.response.status === 400) {
 				setModarErrorMessage('이미 쓰고있는 닉네임입니다.');
