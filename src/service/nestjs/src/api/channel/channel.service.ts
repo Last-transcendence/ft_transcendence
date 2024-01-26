@@ -184,12 +184,9 @@ class ChannelService {
 			});
 
 			for (const channel of emptyChannelList) {
-				await this.prismaService.ban.deleteMany({
-					where: { channelId: channel.id },
-				});
-
 				await this.prismaService.channel.delete({
 					where: { id: channel.id },
+					include: { participant: true, mute: true, ban: true },
 				});
 			}
 		} catch (error) {
