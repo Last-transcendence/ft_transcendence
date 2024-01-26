@@ -245,7 +245,7 @@ class ChannelGateway {
 			}
 
 			participant = await this.participantService.update(participant.id, {
-				socketId: participant.socketId,
+				socketId: socket.id,
 				role: data.role,
 			});
 			if (!participant) {
