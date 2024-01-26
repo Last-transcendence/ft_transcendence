@@ -76,40 +76,40 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: ./service/postgresql/data
+      device: '${PWD}/service/postgresql/data'
   nestjs_src_volume:
     name: nestjs_src_volume
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: ./service/nestjs/src
+      device: '${PWD}/service/nestjs/src'
   nestjs_prisma_volume:
     name: nestjs_prisma_volume
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: ./service/nestjs/prisma
+      device: '${PWD}/service/nestjs/prisma'
   nestjs_upload_volume:
     name: nestjs_upload_volume
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: ./service/nestjs/upload
+      device: '${PWD}/service/nestjs/upload'
   nextjs_src_volume:
     name: nextjs_src_volume
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: ./service/nextjs/src
+      device: '${PWD}/service/nextjs/src'
   nginx_log_volume:
     name: nginx_log_volume
     driver: local
     driver_opts:
-      device: ./service/nginx/log
+      device: '${PWD}/service/nginx/log'
       type: none
       o: bind
 
