@@ -181,4 +181,20 @@ export class AuthController {
 			throw new HttpException(error.message, error.status);
 		}
 	}
+
+	@Delete('User')
+	@UseGuards(Auth.Guard.FtJwt)
+	@ApiOperation({ summary: 'delete user' })
+	@ApiOkResponse({ description: 'Delete user successfully' })
+	@ApiBadRequestResponse({ description: 'Bad request' })
+	async deleteUser(@Req() req) {
+		try {
+			const user = await this.userService.findByIntraId(req.user.intraId);
+			await this.userService.deleteUser(user.id);
+			return { message: 'Delete user successfully' };
+		} catch (error) {
+			throw new HttpException(error.message, error.status);
+		}
+	}
+	
 }
