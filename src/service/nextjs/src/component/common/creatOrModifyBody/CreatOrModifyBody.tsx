@@ -50,7 +50,7 @@ const CreatOrModifyBody = ({
 			if (me !== null) {
 				setUserName(me.nickname);
 				setTwoFATrueFalse(me.use2fa);
-				if (me.email2fa !== undefined) setTwoFactorEmail(me.email2fa);
+				if (me.email2fa !== undefined && me.email2fa !== null) setTwoFactorEmail(me.email2fa);
 				if (me.profileImageURI !== undefined) setImg(me.profileImageURI);
 			}
 		};
