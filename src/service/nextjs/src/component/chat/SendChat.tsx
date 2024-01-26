@@ -63,7 +63,10 @@ const SendChat = ({ sendAction, commandAction, disabled }: SendChatProps) => {
 					sx={{ backgroundColor: 'white' }}
 					onKeyDown={e => {
 						if (e.key === 'Enter') {
-							onEnter();
+							if (!e.nativeEvent.isComposing) {
+								e.preventDefault();
+								onEnter();
+							}
 						}
 					}}
 				/>
