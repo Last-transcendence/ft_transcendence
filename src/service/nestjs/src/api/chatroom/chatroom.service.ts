@@ -58,8 +58,15 @@ class ChatRoomService {
 
 	async delete(chatRoomId: string): Promise<void> {
 		try {
+			await this.prismaService.chat.deleteMany({
+				where: {
+					chatRoomId: chatRoomId
+				}
+			});
 			await this.prismaService.chatRoom.delete({
-				where: { id: chatRoomId },
+				where: {
+					id: chatRoomId
+				}
 			});
 		} catch (error) {
 			throw new Error(error.message);

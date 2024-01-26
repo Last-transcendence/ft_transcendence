@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpException, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpException, Post, Req, UseGuards } from '@nestjs/common';
 import { ApiBadRequestResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import BlockService from './block.service';
 import { BlockModel } from 'common/model';
@@ -41,6 +41,20 @@ class BlockController {
 			throw new HttpException(error.message, error.status);
 		}
 	}
+
+	@Delete()
+	@UseGuards(Auth.Guard.UserJwt)
+	@ApiOperation({ summary: 'Unblock user' })
+	@ApiOkResponse({ description: 'Unblock user successfully' })
+	@ApiBadRequestResponse({ description: 'Bad request' })
+	async unblockUser(@Body() blockRequestDto: Dto.Request.Create, @Req() req): Promise<void> {
+		try {
+			await this.blockService.delete(req.user.id, blockRequestDto.blockedId);
+		} catch (error) {
+			throw new HttpException(error.message, error.status);
+		}
+	}
+	
 }
 
 export default BlockController;
