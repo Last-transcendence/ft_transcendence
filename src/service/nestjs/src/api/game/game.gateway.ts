@@ -35,14 +35,8 @@ class GameGateway {
 
 	handleConnection(socket: Socket) {
 		try {
-			//console.log('Client connected to game namespace');
-			this.gameService.getByUserId(socket['user']['id']).then(async game => {
-				if (game) {
-					await this.gameService.delete(game.id);
-					await this.gameService.deleteFirstHistory(game.userId);
-					await this.userService.online(game.userId);
-				}
-			});
+			console.log('Client connected to game namespace');
+			void socket;
 		} catch (error) {
 			console.error(error);
 		}
@@ -51,11 +45,13 @@ class GameGateway {
 	handleDisconnect(socket: Socket) {
 		try {
 			console.log('Client disconnected from game namespace');
-			this.gameService.getByUserId(socket['user']['id']).then(async game => {
+			this.gameService.getBySocketId(socket.id).then(async game => {
 				if (game) {
 					await this.gameService.delete(game.id);
-					await this.gameService.deleteFirstHistory(game.userId);
-					await this.userService.online(game.userId);
+					if (game.userId) {
+						await this.gameService.deleteFirstHistory(game.userId);
+						await this.userService.online(game.userId);
+					}
 				}
 			});
 		} catch (error) {
@@ -130,7 +126,6 @@ class GameGateway {
 			if (!game.userId) {
 				await this.gameService.deleteByUserId(socket['user']['id']);
 				game = await this.gameService.update(game.id, { userId: socket['user']['id'] });
-				console.log(game);
 			}
 			await this.gameService.update(game.id, { updatedAt: new Date() });
 
