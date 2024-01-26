@@ -9,7 +9,7 @@ const Odds = ({ gameRecords, message }: { gameRecords: Game[]; message: string }
 					count++;
 				}
 			});
-			return `${gameRecords.length === 0 ? 0 : (count / gameRecords.length) * 100}%`;
+			return `${gameRecords.length === 0 ? 0 : ((count / gameRecords.length) * 100).toFixed(0)}%`;
 		} else {
 			return '로딩 실패';
 		}
