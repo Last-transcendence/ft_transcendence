@@ -110,7 +110,7 @@ class ChannelGateway {
 				if (error.length > 0) {
 					throw new Error('Failed validation: ' + JSON.stringify(error));
 				}
-				await this.participantService.update(participant.userId, newSocketId);
+				await this.participantService.update(participant.id, newSocketId);
 			} else {
 				await this.participantService.create({
 					channelId: joinData.channelId,

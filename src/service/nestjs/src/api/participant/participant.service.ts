@@ -106,7 +106,10 @@ class ParticipantService {
 		}
 	}
 
-	async update(id: string, updateParticipantDto: Dto.Request.Update) {
+	async update(
+		id: string,
+		updateParticipantDto: Dto.Request.Update,
+	) {
 		try {
 			const participant = await this.prismaService.participant.findFirst({
 				where: { userId: id },
@@ -118,7 +121,7 @@ class ParticipantService {
 
 			await this.prismaService.participant.update({
 				where: { userId: id },
-				data: { ...updateParticipantDto },
+				data: { role: updateParticipantDto.role },
 			});
 		} catch (error) {
 			throw new Error(error.message);
