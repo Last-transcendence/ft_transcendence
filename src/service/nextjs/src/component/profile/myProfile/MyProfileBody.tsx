@@ -2,7 +2,6 @@ import styles from '@/style/profile/myProfile/index.module.css';
 import { Container, Box } from '@mui/material';
 import FightRecords from './FightRecords';
 import MyProfileMenu from './MyProfileMenu';
-import ProfileAvatar from './ProfileAvatar';
 import TwoFACheck from './TwoFACheck';
 import { myImageProps } from '../common/MyImage';
 import UserId from '@/component/profile/myProfile/UserId';
@@ -10,6 +9,7 @@ import Game from '@/type/game.type';
 import Odds from './Odds';
 import { useState, useEffect, useContext } from 'react';
 import GameContext from '@/context/game.context';
+import ProfileAvatar from '@/component/profile/myProfile/ProfileAvatar';
 
 export interface myProfilePageProps extends myImageProps {
 	use2fa?: boolean;

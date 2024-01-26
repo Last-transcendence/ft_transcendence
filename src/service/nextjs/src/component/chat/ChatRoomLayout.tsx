@@ -10,7 +10,7 @@ import {
 } from 'react';
 import { Stack } from '@mui/material';
 import { ChatMsg, HelpMsg, StatusMsg } from '@/component/chat/Message';
-import { AdminActionType, ParticipantRole } from '@/type/channel.type';
+import { AdminActionType, Mute, ParticipantRole } from '@/type/channel.type';
 import SendChat from '@/component/chat/SendChat';
 import SocketContext from '@/context/socket.context';
 import AuthContext from '@/context/auth.context';
@@ -55,6 +55,7 @@ const ChatRoomLayout = ({
 		if (!channelSocket) return;
 		channelSocket.on('message', res => {
 			console.log('listen message', res);
+			if (res.userId === me?.id) return;
 			setChatLiveData((prev: ChatLiveDataType[]) => [
 				...prev,
 				{ type: 'chat', id: res?.userId, message: res?.message },
@@ -75,6 +76,15 @@ const ChatRoomLayout = ({
 		]);
 	}, [currentDm]);
 
+	const isMute = useCallback(
+		(userId: string) => {
+			if (!userId) return false;
+			if (!data || !data?.mute || data?.mute.length == 0) return false;
+			return data.mute.some((data: Mute) => data?.userId === userId);
+		},
+		[data],
+	);
+
 	const sendAction = useCallback(
 		(message: string) => {
 			if (message === '' || !params?.id || !me?.id) return;
@@ -89,17 +99,18 @@ const ChatRoomLayout = ({
 
 			// send message
 			(type === 'channel' ? channelSocket : chatSocket)?.emit('message', req, (res: any) => {
-				console.log('channelSocket', channelSocket);
-				console.log('message emit res', res);
-				// if (res?.res) {
-				// 	setChatLiveData((prev: ChatLiveDataType[]) => [
-				// 		...prev,
-				// 		{ type: 'chat', id: me?.id, message: message, me: true },
-				// 	]);
-				// }
+				console.log('message emit', message, res);
+				if (res?.res) {
+					setChatLiveData((prev: ChatLiveDataType[]) => [
+						...prev,
+						{ type: 'chat', id: me?.id, message: message, me: true },
+					]);
+				} else {
+					if (isMute(me?.id)) alert('뮤트된 사용자입니다');
+				}
 			});
 		},
-		[me?.id, params?.id, setChatLiveData, type],
+		[channelSocket, chatSocket, isMute, me?.id, params?.id, setChatLiveData, type],
 	);
 
 	const commandAction = (
@@ -162,6 +173,7 @@ const ChatRoomLayout = ({
 					if (chat.type === 'chat') {
 						console.log('chatId', chat?.id);
 						const userData = getUser(chat?.id);
+						console.log('userdata', userData);
 						return (
 							<ChatMsg
 								userData={userData}

@@ -53,27 +53,27 @@ const ChannelSetting = ({
 				title: '비밀번호를 입력해주세요.',
 				success: false,
 			});
+			return setShowSnackbar(true);
 		}
 		if (visibility === ChannelVisibility.PROTECTED && password.length !== 6) {
 			setMessage({
 				title: '비밀번호는 6자리 숫자로 입력해주세요.',
 				success: false,
 			});
+			return setShowSnackbar(true);
 		}
 		if (!title || title === '') {
 			setMessage({
 				title: '채널명을 입력해주세요.',
 				success: false,
 			});
+			return setShowSnackbar(true);
 		}
 		if (title.length > 20) {
 			setMessage({
 				title: '채널명은 20byte 이내로 입력해주세요.',
 				success: false,
 			});
-		}
-
-		if (message.title.length > 1) {
 			return setShowSnackbar(true);
 		}
 
@@ -113,8 +113,8 @@ const ChannelSetting = ({
 		channelSocket,
 		isCreate,
 		label,
-		message.title.length,
 		password,
+		refetch,
 		router,
 		setOpen,
 		title,
@@ -128,13 +128,13 @@ const ChannelSetting = ({
 				<Stack gap={4}>
 					<CreateChatVisibility visibility={visibility} setVisibility={setVisibility} />
 					<CreateChatTitle title={title} setTitle={setTitle} />
+					{visibility === 'PROTECTED' && (
+						<CreateChatPassword password={password} setPassword={setPassword} />
+					)}
 					{showSnackbar && (
 						<Typography variant={'inherit'} color={message?.success ? 'green' : 'red'}>
 							{message?.title}
 						</Typography>
-					)}
-					{visibility === 'PROTECTED' && (
-						<CreateChatPassword password={password} setPassword={setPassword} />
 					)}
 				</Stack>
 				{isCreate ? (
