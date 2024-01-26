@@ -42,7 +42,7 @@ export interface Mute {
 	userId: string;
 }
 
-export type AdminActionType = 'kick' | 'ban' | 'mute' | 'admin';
+export type AdminActionType = 'kick' | 'ban' | 'mute' | 'admin' | 'setting';
 export type ChannelSocketResponse = {
 	channelId: string;
 	userId: string;
