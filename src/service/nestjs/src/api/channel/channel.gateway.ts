@@ -83,8 +83,6 @@ class ChannelGateway {
 		try {
 			const userId = socket.user.id;
 
-			await this.channelService.joinCheck(socket, joinData.channelId, userId);
-
 			const channel = await this.channelService.getChannel(joinData.channelId);
 			if (!channel) {
 				throw new BadRequestException('Channel not found');
@@ -106,6 +104,7 @@ class ChannelGateway {
 					participant = await this.participantService.update(participant.id, {
 						channelId: channel.id,
 						socketId: socket.id,
+						role: 'USER',
 					});
 				}
 			} else {
@@ -213,13 +212,29 @@ class ChannelGateway {
 				throw new Error('Participant not found');
 			}
 
+			participant = await this.channelService.leaveChannel(socket, socket.user.id);
+
 			socket.to(participant.channelId).emit('leave', {
 				channelId: participant.channelId,
 				userId: socket.user.id,
 				nickname: socket.user.nickname,
 			});
 
-			participant = await this.channelService.leaveChannel(socket, socket.user.id);
+			const participants = await this.channelService.getParticipants(channel.id);
+			if (!participants.length) {
+				this.channelService.deleteEmptyChannel();
+			} else {
+				if (participant.role === 'OWNER') {
+					const admins = participants.filter(participant => participant.role === 'ADMIN').reverse();
+					if (!admins.length) {
+						const users = participants.filter(participant => participant.role === 'USER').reverse();
+
+						this.participantService.update(users[0].id, { role: 'OWNER' });
+					} else {
+						this.participantService.update(admins[0].id, { role: 'OWNER' });
+					}
+				}
+			}
 
 			return { res: true };
 		} catch (error) {
