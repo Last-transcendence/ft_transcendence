@@ -1,10 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { ChatRoomModel } from 'common/model';
 import PrismaService from 'common/prisma/prisma.service';
-
 @Injectable()
 class ChatRoomService {
-	constructor(private readonly prismaService: PrismaService) {}
+	constructor(private readonly prismaService: PrismaService ) {}
 
 	async get(srcId: string): Promise<ChatRoomModel[]> {
 		try {
@@ -28,22 +27,12 @@ class ChatRoomService {
 
 	async create(srcId: string, destId: string): Promise<ChatRoomModel> {
 		try {
-			const existingChatRoom = await this.prismaService.chatRoom.findFirst({
-				where: {
-					srcId,
-					destId,
-				},
-			});
-			if (existingChatRoom) {
-				return existingChatRoom;
-			}
 			await this.prismaService.chatRoom.create({
 				data: {
 					srcId: destId,
 					destId: srcId,
 				},
 			});
-
 			return await this.prismaService.chatRoom.create({
 				data: {
 					srcId,

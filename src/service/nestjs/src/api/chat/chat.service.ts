@@ -14,15 +14,25 @@ class ChatService {
 		try {
 			const srcChatRoom = await this.chatRoomService.find(srcId, destId);
 			const destChatRoom = await this.chatRoomService.find(destId, srcId);
-			const chat = await this.prismaService.chat.findMany({
-				where: { OR: [{ chatRoomId: srcChatRoom.id }, { chatRoomId: destChatRoom.id }] },
-			});
-
-			chat.sort((a, b) => {
+			let chats: ChatModel[] = [];
+			if (srcChatRoom && destChatRoom) {
+				chats = await this.prismaService.chat.findMany({
+					where: { OR: [{ chatRoomId: srcChatRoom.id }, { chatRoomId: destChatRoom.id }] },
+				});
+			} else if (!srcChatRoom) {
+				chats = await this.prismaService.chat.findMany({
+					where: { chatRoomId: destChatRoom.id },
+				});
+			} else if (!destChatRoom) {
+				chats = await this.prismaService.chat.findMany({
+					where: { chatRoomId: srcChatRoom.id },
+				});
+			}
+			chats.sort((a, b) => {
 				return a.createdAt.getTime() - b.createdAt.getTime();
 			});
 
-			return chat;
+			return chats;
 		} catch (error) {
 			throw new Error(error.message);
 		}
