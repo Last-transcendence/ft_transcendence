@@ -83,8 +83,6 @@ class ChannelGateway {
 		try {
 			const userId = socket.user.id;
 
-			await this.channelService.joinCheck(socket, joinData.channelId, userId);
-
 			const channel = await this.channelService.getChannel(joinData.channelId);
 			if (!channel) {
 				throw new BadRequestException('Channel not found');
