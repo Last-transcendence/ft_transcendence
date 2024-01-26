@@ -1,3 +1,4 @@
+import styles from "@/style/common/detailProfile/index.module.css"
 import { Container, Typography, Box } from '@mui/material';
 import NewIcon from '../../profile/common/NewIcon';
 import BottomProfile from './BottomProfile';
@@ -32,11 +33,11 @@ const ProfilePageBody = ({
 		<Loading />
 	) : (
 		<div>
-			<Container maxWidth="xs">
+			<Container maxWidth="lg">
 				<NewIcon {...ar} image={userData.profileImageURI} name={userData.nickname} />
 				<Box marginTop="4%" display="flex" flexDirection="column" alignItems="center">
-					<p style={{ fontSize: 28 }}>{userData.nickname}</p>
-					<Typography style={{ opacity: 0.5, marginTop: -10 }} variant="body1">
+					<p className={styles['open-profile-avatar__nickname']}>{userData.nickname}</p>
+					<Typography className={styles['open-profile-avatar__status']} variant="body1">
 						{userData.status}
 					</Typography>
 				</Box>
