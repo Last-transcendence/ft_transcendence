@@ -13,6 +13,7 @@ import { useRouter } from 'next/router';
 import { useParams } from 'next/navigation';
 import useFetchData from '@/hook/useFetchData';
 import FriendType from '@/type/friend.type';
+import CustomConfirmModal from '@/component/common/CustomConfirmModal';
 
 type DmType = {
 	channelId: string;
@@ -45,12 +46,22 @@ export const ListenProvider = (props: { children: ReactNode }) => {
 	const [toastOpen, setToastOpen] = useState<boolean>(false);
 	const [toastMessage, setToastMessage] = useState<string>('');
 	const { data: friendDatas } = useFetchData<FriendType[]>('/friend');
+	const [open, setOpen] = useState<boolean>(false);
+	const [message, setMessage] = useState<{ title: string; content: string }>({
+		title: '',
+		content: '',
+	});
+	const [inviteRes, setInviteRes] = useState<{
+		srcId: string;
+		srcNickname: string;
+		channelTitle: string;
+		channelId: string;
+	} | null>(null);
 
 	useEffect(() => {
 		//게임 중이면 무시
 		if (sockets?.chatSocket) {
 			if (friendDatas) {
-				console.log('dmDatas', friendDatas);
 				friendDatas?.forEach(data => {
 					(sockets.chatSocket as any).emit('join', { destId: data?.id }, (res: any) => {
 						console.log('join', res);
@@ -61,55 +72,72 @@ export const ListenProvider = (props: { children: ReactNode }) => {
 			(sockets.chatSocket as any).on('message', (res: any) => {
 				if (router.pathname.includes('game')) return;
 				if (!res?.message || res.message === '') return;
-				//DM방에 있을때, 해당 DM방에서 보낸 메세지면 setCurrentDm
 				if (router.pathname.includes('private')) {
-					console.log('params res', params?.id, res?.srcId);
 					if (params?.id && params?.id === res?.srcId) {
-						console.log(params.id, res.srcId);
 						setCurrentDm(res);
 					}
 				} else {
-					console.log('toast', res?.srcNickname, res?.message);
 					const message = res?.message.slice(0, 8);
 					setToastMessage(`${res?.srcNickname}: ${message}`);
 					setToastOpen(true);
 				}
 			});
+		}
 
-			// (sockets.chatSocket as any).on('game', (res: any) => {
-			// 	setMessage({
-			// 		title: '게임 초대',
-			// 		content: `${res?.nickname}님이 1:1 게임을 초대했습니다`,
-			// 	});
-			// 	setOpen(true);
-			// });
+		if (sockets?.inviteSocket) {
+			//invite 참여
+			(sockets.inviteSocket as any).emit('join', (res: any) => {
+				console.log('invite join res', res);
+			});
+			//invite 구독
+			(sockets.inviteSocket as any).on(
+				'invite',
+				(res: { srcId: string; srcNickname: string; channelTitle: string; channelId: string }) => {
+					console.log('invite on res', res);
+					setMessage({
+						title: 'private 채널 초대',
+						content: `${res?.srcNickname}님이 private 채널 (:${res?.channelTitle})에 초대했습니다.`,
+					});
+					setInviteRes(res);
+					setOpen(true);
+				},
+			);
 		}
 		return () => {
 			if (sockets?.chatSocket) {
 				(sockets.chatSocket as any).off('message');
 				// (sockets.chatSocket as any).off('game');
 			}
+			if (sockets?.inviteSocket) {
+				(sockets.inviteSocket as any).off('invite');
+			}
 		};
 	}, [friendDatas, params?.id, router.pathname, sockets]);
 
 	return (
 		<>
-			{/*{open && (*/}
-			{/*	<CustomConfirmModal*/}
-			{/*		setIsOpened={setOpen}*/}
-			{/*		onConfirm={() => {*/}
-			{/*			setOpen(false);*/}
-			{/*			//게임 승낙*/}
-			{/*			sockets.channelSocket?.emit('game');*/}
-			{/*		}}*/}
-			{/*		onCancel={() => {*/}
-			{/*			setOpen(false);*/}
-			{/*			//게임 거절*/}
-			{/*		}}*/}
-			{/*		title={message.title}*/}
-			{/*		content={message.content}*/}
-			{/*	/>*/}
-			{/*)}*/}
+			{open && (
+				<CustomConfirmModal
+					setIsOpened={setOpen}
+					onConfirm={() => {
+						setOpen(false);
+						//초대 승낙
+						sockets.channelSocket?.emit(
+							'join',
+							{ channelId: inviteRes?.channelId, password: '' },
+							(res: any) => {
+								if (res?.res) router.push(`/chat/${inviteRes?.channelId}/common`);
+							},
+						);
+					}}
+					onCancel={() => {
+						setOpen(false);
+						//초대 거절
+					}}
+					title={message.title}
+					content={message.content}
+				/>
+			)}
 			<Snackbar
 				anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
 				open={toastOpen}

@@ -43,32 +43,40 @@ const AdminNickMenu = ({
 			toUserId: userId,
 			nickname,
 		};
+
+		const adminReq = {
+			...req,
+			role: 'ADMIN',
+		};
+
 		console.log('req', req);
 		switch (targetId) {
 			case 'kickBtn':
 				channelSocket?.emit('kick', req, (res: any) => {
 					console.log('kick res', res);
+					if (!res?.res) return alert('킥에 실패했습니다.');
 					adminAction('kick', nickname, userId);
 				});
 				break;
 			case 'banBtn':
 				channelSocket?.emit('ban', req, (res: any) => {
 					console.log('ban res', res);
+					if (!res?.res) return alert('밴에 실패했습니다.');
 					adminAction('ban', nickname, userId);
 				});
 				break;
 			case 'muteBtn':
 				channelSocket?.emit('mute', req, (res: any) => {
 					console.log('mute res', res);
+					if (!res?.res) return alert('뮤트에 실패했습니다.');
 					adminAction('mute', nickname, userId);
 				});
 				break;
 			case 'adminBtn':
-				channelSocket?.emit('role', req, (res: any) => {
+				channelSocket?.emit('role', adminReq, (res: any) => {
 					console.log('admin res', res);
-					if (adminAction) {
-						adminAction('admin', nickname, userId);
-					}
+					if (!res?.res) return alert('어드민 임명에 실패했습니다.');
+					adminAction('admin', nickname, userId);
 				});
 				break;
 			default:

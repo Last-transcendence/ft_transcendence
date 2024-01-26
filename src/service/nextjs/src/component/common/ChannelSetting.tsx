@@ -1,16 +1,14 @@
 import style from '@/style/chat/create/index.module.css';
 import { Header } from '@/component/common/Header';
-import { Stack, Typography } from '@mui/material';
+import { Button, Stack, Typography } from '@mui/material';
 import CreateChatVisibility from '@/component/chat/create/visibility';
 import CreateChatTitle from '@/component/chat/create/title';
 import CreateChatPassword from '@/component/chat/create/password';
 import { BottomButton } from '@/component/common/ButtomButton';
 import { ChannelVisibility } from '@/type/channel.type';
 import { Dispatch, SetStateAction, useCallback, useContext, useState } from 'react';
-import PositionableSnackbar from '@/component/common/PositionableSnackbar';
 import SocketContext from '@/context/socket.context';
 import { useRouter } from 'next/navigation';
-import useListeningChannelEvent from '@/hook/useListeningChannelEvent';
 import { ChannelInfo } from '@/type/channel-info.type';
 
 interface ChannelSettingProps {
@@ -37,6 +35,7 @@ const ChannelSetting = ({ isCreate, setOpen, channelData, channelId }: ChannelSe
 	});
 
 	const handleSubmit = useCallback(() => {
+		setShowSnackbar(false);
 		// 채널 생성
 		setMessage({
 			title: '',
@@ -60,9 +59,9 @@ const ChannelSetting = ({ isCreate, setOpen, channelData, channelId }: ChannelSe
 				success: false,
 			});
 		}
-		if (title.length > 10) {
+		if (title.length > 20) {
 			setMessage({
-				title: '채널명은 10byte 이내로 입력해주세요.',
+				title: '채널명은 20byte 이내로 입력해주세요.',
 				success: false,
 			});
 		}
@@ -96,6 +95,7 @@ const ChannelSetting = ({ isCreate, setOpen, channelData, channelId }: ChannelSe
 						title: `${label} 실패 ${res?.message ? ': ' + res?.message : ''}`,
 						success: false,
 					});
+					setOpen && setOpen(false);
 				}
 				setShowSnackbar(true);
 			});
@@ -108,25 +108,23 @@ const ChannelSetting = ({ isCreate, setOpen, channelData, channelId }: ChannelSe
 		message.title.length,
 		password,
 		router,
+		setOpen,
 		title,
 		visibility,
 	]);
 
 	return (
 		<div>
-			<PositionableSnackbar
-				open={showSnackbar}
-				onClose={() => setShowSnackbar(false)}
-				message={message.title}
-				success={message.success}
-				position={'top'}
-				horizontal={'center'}
-			/>
 			<div className={isCreate ? style.container : style.editContainer}>
 				{isCreate ? <Header title={label} /> : <Typography>채널 설정</Typography>}
 				<Stack gap={4}>
 					<CreateChatVisibility visibility={visibility} setVisibility={setVisibility} />
 					<CreateChatTitle title={title} setTitle={setTitle} />
+					{showSnackbar && (
+						<Typography variant={'inherit'} color={message?.success ? 'green' : 'red'}>
+							{message?.title}
+						</Typography>
+					)}
 					{visibility === 'PROTECTED' && (
 						<CreateChatPassword password={password} setPassword={setPassword} />
 					)}
@@ -135,8 +133,12 @@ const ChannelSetting = ({ isCreate, setOpen, channelData, channelId }: ChannelSe
 					<BottomButton title={'생성하기'} onClick={handleSubmit} />
 				) : (
 					<Stack flexDirection={'row'} gap={1}>
-						<button onClick={() => setOpen && setOpen(false)}>취소</button>
-						<button onClick={handleSubmit}>수정하기</button>
+						<Button variant={'contained'} onClick={() => setOpen && setOpen(false)}>
+							취소
+						</Button>
+						<Button variant={'contained'} onClick={handleSubmit}>
+							수정하기
+						</Button>
 					</Stack>
 				)}
 			</div>

@@ -55,6 +55,16 @@ class ChatRoomService {
 			throw new Error(error.message);
 		}
 	}
+
+	async delete(chatRoomId: string): Promise<void> {
+		try {
+			await this.prismaService.chatRoom.delete({
+				where: { id: chatRoomId },
+			});
+		} catch (error) {
+			throw new Error(error.message);
+		}
+	}
 }
 
 export default ChatRoomService;

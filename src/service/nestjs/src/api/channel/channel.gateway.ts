@@ -49,6 +49,15 @@ class ChannelGateway {
 		console.log('Client connected to channel namespace');
 	}
 
+	async handleDisconnect(@ConnectedSocket() socket) {
+		try {
+			await this.channelService.deleteEmptyChannel();
+		} catch (error) {
+			console.error("An error occurred in channel.gateway 'handleDisconnect':", error);
+			socket.emit('error', { message: "An error occurred in channel.gateway 'handleDisconnect'" });
+		}
+	}
+
 	@SubscribeMessage('create')
 	async handleCreate(@ConnectedSocket() socket, @MessageBody() data) {
 		try {
@@ -83,7 +92,7 @@ class ChannelGateway {
 			if (!channel) {
 				throw new BadRequestException('Channel not found');
 			}
-			if (await this.banService.isBanned(userId, joinData.channelId)) {
+			if (await this.banService.isBanned(joinData.channelId, userId)) {
 				throw new BadRequestException('User is banned');
 			}
 			if (
@@ -133,7 +142,10 @@ class ChannelGateway {
 			if (!channel) {
 				throw new BadRequestException('Channel not found');
 			}
-			if (data.visibility === "PROTECTED" && (!data.password || data.password.length !== 6 || !/^\d+$/.test(data.password))) {
+			if (
+				data.visibility === 'PROTECTED' &&
+				(!data.password || data.password.length !== 6 || !/^\d+$/.test(data.password))
+			) {
 				throw new BadRequestException('Password error');
 			}
 			if (data.title.length > 30) {
@@ -196,8 +208,9 @@ class ChannelGateway {
 			const participant = await this.participantService.get(socket.user.id);
 
 			socket.to(participant.channelId).emit('leave', {
-				message: `${socket.user.id} has left the channel`,
-				profileImageURI: participant.userProfileImageURI,
+				channelId: participant.channelId,
+				userId: socket.user.id,
+				nickname: socket.user.nickname,
 			});
 			await this.channelService.leaveChannel(socket, socket.user.id);
 
@@ -212,17 +225,19 @@ class ChannelGateway {
 	@UseGuards(Auth.Guard.UserWsJwt)
 	async handleRole(@MessageBody() data, @ConnectedSocket() socket) {
 		try {
+			const toUser = await this.userService.get(data.toUserId);
+			if (!toUser) {
+				throw new Error('User not found');
+			}
 			if ((await this.participantService.isOwner(socket.user.id)) === false) {
 				throw new Error('Permission denied');
 			}
 
-			const newRole = plainToClass(ParticipantDto.Request.Update, data.role);
-			const error = await validate(newRole);
+			const newRole: ParticipantDto.Request.Update = { role: data.role, socketId: socket.id };
 
-			if (error.length > 0) {
-				throw new Error('Failed validation: ' + JSON.stringify(error));
-			}
 			await this.participantService.update(data.toUserId, newRole);
+
+			socket.emit('role', { userId: data.toUserId, nickname: toUser.nickname });
 
 			return { res: true };
 		} catch (error) {
@@ -381,7 +396,9 @@ class ChannelGateway {
 			}
 
 			this.participantService.kickByUserId(data.toUserId);
-			this.banService.create(data.channelId, data.toUserId);
+			if ((await this.banService.isBanned(data.channelId, data.toUserId)) === false) {
+				this.banService.create(data.channelId, data.toUserId);
+			}
 
 			socket.leave(data.channelId);
 

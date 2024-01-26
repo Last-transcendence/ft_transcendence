@@ -75,12 +75,11 @@ class ChatRoomGateway {
 			const chatRoomName = [userId, destId].sort().join('_');
 			await this.chatService.create(userId, destId, messageDto.message);
 			if (isBlocked) {
-				throw new BadRequestException('Blocked user');
+				socket.to(chatRoomName).emit('message', {
+					srcId: userId,
+					srcNickname: socket.user.nickname,
+					message: messageDto.message});
 			}
-			socket.to(chatRoomName).emit('message', {
-				srcId: userId,
-				srcNickname: socket.user.nickname,
-				message: messageDto.message});
 			return { res: true };
 		} catch (error) {
 			console.error("An error occurred chatRoom.gateway 'message':", error);
