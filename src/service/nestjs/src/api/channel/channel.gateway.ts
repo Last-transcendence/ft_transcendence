@@ -372,7 +372,6 @@ class ChannelGateway {
 			if (!mute) {
 				throw new Error('Fail to mute');
 			}
-			console.log('mute', channel.id);
 			this.server.to(channel.id).emit('mute', {
 				channelId: channel.id,
 				userId: participant.id,
