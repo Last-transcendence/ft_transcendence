@@ -14,11 +14,11 @@ import {
 	UseGuards,
 } from '@nestjs/common';
 import { ApiBadRequestResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { MuteModel } from 'common/model';
-import MuteService from './mute.service';
 import ParticipantService from 'api/participant/participant.service';
+import { MuteModel } from 'common/model';
 import * as Auth from '../../common/auth';
 import * as Dto from './dto';
+import MuteService from './mute.service';
 
 @Controller('mute')
 @ApiTags('mute')
@@ -86,7 +86,7 @@ class MuteController {
 				throw new UnauthorizedException('User is not authorized');
 			}
 
-			return await this.muteService.unmuteUser(userId);
+			return await this.muteService.unmuteUser(req.channeId, userId);
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
 		}

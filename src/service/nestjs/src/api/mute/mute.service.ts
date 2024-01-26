@@ -37,10 +37,23 @@ class MuteService {
 		}
 	}
 
-	async unmuteUser(userId: string): Promise<MuteModel> {
+	async unmuteUser(channelId: string, userId: string): Promise<MuteModel> {
 		try {
+			const muteRecord = await this.prismaService.mute.findFirst({
+				where: {
+					channelId: channelId,
+					userId: userId,
+				},
+			});
+
+			if (!muteRecord) {
+				return null;
+			}
+
 			return await this.prismaService.mute.delete({
-				where: { userId },
+				where: {
+					id: muteRecord.id,
+				},
 			});
 		} catch (error) {
 			throw new Error(error.message);
