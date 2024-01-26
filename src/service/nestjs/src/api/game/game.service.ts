@@ -22,9 +22,14 @@ class GameService {
 
 	async getByUserId(userId: string): Promise<GameModel> {
 		try {
-			return await this.prismaService.game.findFirst({
+			const game = await this.prismaService.game.findFirst({
 				where: { userId },
 			});
+			if (!game) {
+				return null;
+			}
+
+			return game;
 		} catch (error) {
 			throw new Error(error.message);
 		}
@@ -63,7 +68,7 @@ class GameService {
 			}
 
 			return await this.prismaService.game.delete({
-				where: { id: game.id },
+				where: { id },
 			});
 		} catch (error) {
 			throw new Error(error.message);
@@ -90,6 +95,7 @@ class GameService {
 
 	async getHistory(userId: string): Promise<GameHistoryModel[]> {
 		try {
+			console.log(userId);
 			const histories = await this.prismaService.gameHistory.findMany({
 				where: {
 					player1Id: userId,
@@ -98,6 +104,7 @@ class GameService {
 					createdAt: 'desc',
 				},
 			});
+			console.log(histories);
 
 			return histories.filter(history => history.result !== 'PENDING');
 		} catch (error) {
@@ -117,10 +124,10 @@ class GameService {
 		}
 	}
 
-	async getFirstHistory(gameId: string): Promise<GameHistoryModel> {
+	async getFirstHistory(gameId: string, player1Id: string): Promise<GameHistoryModel> {
 		try {
 			return await this.prismaService.gameHistory.findFirst({
-				where: { gameId },
+				where: { gameId, player1Id },
 			});
 		} catch (error) {
 			throw new Error(error.message);
@@ -144,17 +151,20 @@ class GameService {
 	}
 
 	async updateHistory(
-		gameId: string,
+		id: string,
 		updateRequestDto: Dto.Request.UpdateHistory,
 	): Promise<GameHistoryModel> {
 		try {
+			const history = await this.prismaService.gameHistory.findFirst({
+				where: { id },
+			});
+			if (!history) {
+				return null;
+			}
+
 			return await this.prismaService.gameHistory.update({
-				where: {
-					id: gameId,
-				},
-				data: {
-					...updateRequestDto,
-				},
+				where: { id },
+				data: { ...updateRequestDto },
 			});
 		} catch (error) {
 			throw new Error(error.message);

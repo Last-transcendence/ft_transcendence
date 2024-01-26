@@ -17,13 +17,15 @@ class Disconnected extends Phaser.Scene {
 	init(data: { navigate: AppRouterInstance }) {
 		const { navigate } = data;
 
-		this.scene.setVisible(false);
+		if (this.scene) {
+			this.scene.setVisible(false);
+		}
 
 		this.navigate = navigate;
 	}
 
 	create() {
-		if (this.navigate) {
+		if (this.navigate && this.scene) {
 			this.scene.setVisible(true);
 		}
 
