@@ -47,7 +47,7 @@ class MuteService {
 			});
 
 			if (!muteRecord) {
-				throw new Error('Mute record not found');
+				return null;
 			}
 
 			return await this.prismaService.mute.delete({
