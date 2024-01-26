@@ -1,17 +1,17 @@
 import AuthContext from '@/context/auth.context';
-import { axiosInstance } from '@/service/api';
+import { getFetcher } from '@/service/api';
 import { useRouter } from 'next/navigation';
 import { useContext, useEffect } from 'react';
+import Me from '@/type/me.type';
 
 const LoginCallBackPage = () => {
 	const { setMe } = useContext(AuthContext);
 	const navigate = useRouter();
 
 	useEffect(() => {
-		axiosInstance
-			.get('/user/me')
+		getFetcher<Me | null>('/user/me')
 			.then(response => {
-				setMe(response.data);
+				setMe(response);
 				navigate.push('/');
 			})
 			.catch(err => {

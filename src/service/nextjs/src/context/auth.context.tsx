@@ -1,14 +1,7 @@
-import {
-	Dispatch,
-	PropsWithChildren,
-	ReactNode,
-	SetStateAction,
-	createContext,
-	useEffect,
-	useState,
-} from 'react';
+import { Dispatch, ReactNode, SetStateAction, createContext, useEffect, useState } from 'react';
 import axios from 'axios';
 import Me from '@/type/me.type';
+import { getFetcher } from '@/service/api';
 
 const AuthContext = createContext<{
 	me: Me | null;
@@ -24,14 +17,12 @@ export const AuthProvider = (props: { children: ReactNode }) => {
 
 	useEffect(() => {
 		if (!me) {
-			axios
-				.get(`${process.env.NEXT_PUBLIC_API_URL}/user/me`, { withCredentials: true })
-				.then(response => {
-					setMe(response.data);
+			getFetcher('/user/me')
+				.then((response: any) => {
+					setMe(response);
 				})
 				.catch(error => {
 					setMe(null);
-					console.error(error);
 				});
 		}
 	}, [me]);
