@@ -54,6 +54,13 @@ class GameService {
 
 	async update(id: string, updateRequestDto: Dto.Request.Update): Promise<GameModel> {
 		try {
+			const game = await this.prismaService.game.findFirst({
+				where: { id },
+			});
+			if (!game) {
+				return null;
+			}
+
 			return await this.prismaService.game.update({
 				where: { id },
 				data: { ...updateRequestDto },
