@@ -2,6 +2,7 @@ import GameContext from '@/context/game.context';
 import { getFetcher } from '@/service/api';
 import { useRouter } from 'next/navigation';
 import { useContext, useEffect } from 'react';
+import IsWithAuth from '@/component/common/accessControl/IsWithAuth';
 
 const GameCallbackPage = () => {
 	const { setGame } = useContext(GameContext);
@@ -21,4 +22,4 @@ const GameCallbackPage = () => {
 	return <></>;
 };
 
-export default GameCallbackPage;
+export default IsWithAuth(GameCallbackPage);
