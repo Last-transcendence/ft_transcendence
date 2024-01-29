@@ -1,4 +1,3 @@
-import { CircularProgress } from '@mui/material';
 import { createContext, Dispatch, ReactNode, SetStateAction, useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 
@@ -53,7 +52,6 @@ export const SocketProvider = (props: { children: ReactNode }) => {
 		gameSocket: null,
 		inviteSocket: null,
 	});
-	const [socketLoading, setSocketLoading] = useState<boolean>(false);
 
 	useEffect(() => {
 		if (!sockets.chatSocket) {
@@ -80,12 +78,8 @@ export const SocketProvider = (props: { children: ReactNode }) => {
 				inviteSocket: initSocket('invite'),
 			});
 		}
-		if (sockets.chatSocket && sockets.channelSocket && sockets.gameSocket && sockets.inviteSocket) {
-			setSocketLoading(true);
-		}
 	}, [sockets]);
 
-	if (!socketLoading) return <CircularProgress />;
 	return (
 		<>
 			<SocketContext.Provider value={{ sockets, setSocket }}>{children}</SocketContext.Provider>
