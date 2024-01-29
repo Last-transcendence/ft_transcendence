@@ -94,8 +94,12 @@ class ChannelGateway {
 				participant = await this.participantService.update(participant.id, {
 					channelId: channel.id,
 					socketId: socket.id,
-					role: 'USER',
 				});
+				if (joinData.channelId !== participant.channelId) {
+					participant = await this.participantService.update(participant.id, {
+						role: 'USER',
+					});
+				}
 			} else {
 				participant = await this.participantService.create({
 					channelId: channel.id,
