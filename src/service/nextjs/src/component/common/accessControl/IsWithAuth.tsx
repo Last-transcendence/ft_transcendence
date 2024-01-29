@@ -8,30 +8,25 @@ const IsWithAuth = <P extends object>(Destination: ComponentType<P>) => {
 		const router = useRouter();
 		const { me, setMe } = useContext(AuthContext);
 		const [isLoaded, setIsLoaded] = useState<boolean>(false);
-		const [goPage, setGoPage] = useState<Boolean>(false);
+		const [goPage, setGoPage] = useState<boolean>(false);
 
+		setTimeout(() => {
+			setIsLoaded(true);
+		}, 500);
 		useEffect(() => {
-			setTimeout(() => {
-				setIsLoaded(true);
-			}, 150);
-			const accessControl = async (me : any) => {
-				try {
-					if (!me) {
-						alert('로그인이 필요합니다.');
-						router.push('/auth/login');
-					} else {
-						await postFetcher('/user/online');
-						setGoPage(true);
-					}
-				} catch (error) {
-					setMe(null);
+			if (isLoaded) {
+				if (!me) {
+					alert('로그인이 필요합니다.');
 					router.push('/auth/login');
+				} else {
+					postFetcher('/user/online').catch(() => {
+						setMe(null);
+						router.push('/auth/login');
+					});
+					setGoPage(true);
 				}
 			}
-		if (isLoaded) {
-			accessControl(me);
-		}
-		}, [me, router, isLoaded, setIsLoaded]);
+		}, [me, isLoaded]);
 
 		return goPage && <Destination {...props} />;
 	};

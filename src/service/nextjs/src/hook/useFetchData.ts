@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
+import AuthContext from '@/context/auth.context';
 import { AxiosError } from 'axios';
 import { getFetcher } from '@/service/api';
 
@@ -13,18 +14,16 @@ const useFetchData = <T>(
 	const [data, setData] = useState<T | undefined>(undefined);
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState<AxiosError | undefined>(undefined);
+	const { me } = useContext(AuthContext);
 
+	
 	const fetchData = async () => {
 		if (!url) return;
-		try {
-			setIsLoading(true);
-			const res = await getFetcher<T>(url);
-			setData(res);
-		} catch (err) {
-			setError(err as AxiosError);
-		} finally {
-			setIsLoading(false);
-		}
+		setIsLoading(true);
+		getFetcher<T>(url)
+			.then(res => setData(res))
+			.catch(err => setError(err));
+		setIsLoading(false);
 	};
 
 	useEffect(() => {
