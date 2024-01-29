@@ -109,6 +109,41 @@ class GameGateway {
 			};
 		}
 	}
+	
+	@SubscribeMessage('leave')
+	async handleLeaveEvent(@ConnectedSocket() socket: Socket) {
+		try {
+			const room = this.getRoom('queue');
+			if (room.has(socket.id)) {
+				socket.leave('queue');
+				await this.userService.online(socket['user']['id']);
+				return { status: 'SUCCESS' };
+			}
+
+			const game = await this.gameService.getBySocketId(socket.id);
+			if (game) {
+				const opponentSocketId = this.getOpponentSocketId(socket, game.id);
+				if (opponentSocketId) {
+					this.server.to(opponentSocketId).emit('end', {
+						state: 'DISCONNECTED',
+					});
+				}
+				await this.gameService.delete(game.id);
+				if (game.userId) {
+					await this.gameService.deleteFirstHistory(game.id, game.userId);
+					await this.userService.online(game.userId);
+				}
+				socket.leave(game.id);
+			}
+			
+			return { status: 'SUCCESS' };
+		} catch (error) {
+			return {
+				message: error.message,
+				status: error.status,
+			};
+		}
+	}
 
 	@SubscribeMessage('matched')
 	async handleMatchedEvent(
