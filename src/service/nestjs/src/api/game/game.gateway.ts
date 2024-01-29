@@ -74,6 +74,7 @@ class GameGateway {
 	async handleQueueEvent(@ConnectedSocket() socket: Socket) {
 		try {
 			socket.join('queue');
+
 			this.userService.playing(socket['user']['id']);
 
 			const room = this.getRoom('queue');
@@ -110,9 +111,10 @@ class GameGateway {
 	}
 
 	@SubscribeMessage('matched')
-	async handleMatchedEvent(@ConnectedSocket() socket: Socket, @MessageBody() data: any) {
+	async handleMatchedEvent(@ConnectedSocket() socket: Socket, @MessageBody() matchedRequestDto: Dto.Request.Matched) {
 		try {
-			socket.join(data.room);
+			socket.join(matchedRequestDto.room);
+
 			this.userService.playing(socket['user']['id']);
 
 			let game = await this.gameService.getByUserId(socket['user']['id']);
@@ -136,16 +138,20 @@ class GameGateway {
 		@MessageBody() connectedRequestDto: Dto.Request.Connected,
 	) {
 		let game = await this.gameService.getBySocketId(socket.id);
-		if (!game) {
-			game = await this.gameService.getByUserId(socket['user']['id']);
-			game = await this.gameService.update(game.id, { socketId: socket.id });
-		} else {
-			if (!game.userId) {
-				game = await this.gameService.update(game.id, { userId: socket['user']['id'] });
-			}
-		}
-
+		
 		try {
+			if (!game) {
+				game = await this.gameService.getByUserId(socket['user']['id']);
+				if (!game) {
+					throw new Error("Game not found");
+				}
+				game = await this.gameService.update(game.id, { socketId: socket.id });
+			} else {
+				if (!game.userId) {
+					game = await this.gameService.update(game.id, { userId: socket['user']['id'] });
+				}
+			}
+
 			await this.gameService.update(game.id, { updatedAt: new Date() });
 
 			const opponentSocketId = this.getOpponentSocketId(socket, connectedRequestDto.room);
@@ -177,13 +183,16 @@ class GameGateway {
 	) {
 		try {
 			let game = await this.gameService.getBySocketId(socket.id);
+			if (!game) {
+				throw new Error('Game not found');
+			}
 			if (!game.ready) {
 				game = await this.gameService.update(game.id, { ready: true });
 			}
 
 			const opponentSocketId = this.getOpponentSocketId(socket, readyRequestDto.room);
 			const opponentGame = await this.gameService.getBySocketId(opponentSocketId);
-			if (!opponentGame.ready) {
+			if (!opponentGame || !opponentGame.ready) {
 				return;
 			}
 

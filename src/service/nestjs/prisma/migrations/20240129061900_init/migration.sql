@@ -54,7 +54,7 @@ CREATE TABLE "Block" (
 CREATE TABLE "Game" (
     "id" UUID NOT NULL,
     "userId" UUID,
-    "socketId" TEXT NOT NULL,
+    "socketId" TEXT,
     "mode" "GameMode" NOT NULL DEFAULT 'NORMAL',
     "score" INTEGER NOT NULL DEFAULT 0,
     "ready" BOOLEAN NOT NULL DEFAULT false,
@@ -189,10 +189,7 @@ CREATE UNIQUE INDEX "Participant_socketId_key" ON "Participant"("socketId");
 CREATE UNIQUE INDEX "Ban_channelId_userId_key" ON "Ban"("channelId", "userId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Mute_channelId_key" ON "Mute"("channelId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Mute_userId_key" ON "Mute"("userId");
+CREATE UNIQUE INDEX "Mute_channelId_userId_key" ON "Mute"("channelId", "userId");
 
 -- CreateIndex
 CREATE INDEX "srcId" ON "ChatRoom"("srcId");
