@@ -8,4 +8,4 @@ export { default as Ready } from './ready';
 export { default as Move } from './move';
 export { default as Score } from './score';
 export { default as Ball } from './ball';
-export { default as Matched } from './Matched';
+export { default as Matched } from './matched';
