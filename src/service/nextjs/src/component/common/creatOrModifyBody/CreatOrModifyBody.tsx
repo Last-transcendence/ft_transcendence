@@ -8,7 +8,7 @@ import { Dispatch, SetStateAction } from 'react';
 import CustomSnackbar from '@/component/common/CustomSnackbar';
 import CustomTextField, { customTextFieldProps } from '@/component/common/CustomInputField';
 import { useCallback } from 'react';
-import { postFetcher, patchFetcher } from '@/service/api';
+import { postFetcher, patchFetcher, getFetcher } from '@/service/api';
 import AuthContext from '@/context/auth.context';
 import Me from '@/type/me.type';
 import { useSearchParams } from 'next/navigation';
@@ -103,15 +103,25 @@ const CreatOrModifyBody = ({
 				setModarErrorMessage('서버에러입니다');
 				return ;
 			}
-			if (error.response.status === 401) {
+			console.log(error);
+			if (error.response.data.statusCode === 401) {
 				try {
+					alert('잘못된 접근입니다');
 					router.push('/auth/login');
 				} catch (routerError) {
 					setModarErrorMessage('라우터 이동 중 에러가 발생했습니다.');
 				}
-				// window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/ft`;
-			} else if (error.response.status === 400) {
-				setModarErrorMessage('이미 쓰고있는 닉네임입니다.');
+			} else if (error.response.data.statusCode === 400) {
+				if (error.response.data.message === 'User is already registered') {
+						alert('이미 가입된 유저입니다. 로그인페이지로 이동됩니다.');
+						router.push('/auth/login');
+					} else if (error.response.data.message === 'Nickname is already taken') {
+						setModarErrorMessage('이미 사용중인 닉네임입니다.');
+					}	else if (error.response.data.message === 'Email used in 2fa is empty') {
+						setModarErrorMessage('이미 사용중인 이메일입니다.');
+					} else {
+						setModarErrorMessage('서버 에러입니다.');
+					}
 			} else {
 				setModarErrorMessage(error.message);
 			}
