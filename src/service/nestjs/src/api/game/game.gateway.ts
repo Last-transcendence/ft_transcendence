@@ -111,7 +111,10 @@ class GameGateway {
 	}
 
 	@SubscribeMessage('matched')
-	async handleMatchedEvent(@ConnectedSocket() socket: Socket, @MessageBody() matchedRequestDto: Dto.Request.Matched) {
+	async handleMatchedEvent(
+		@ConnectedSocket() socket: Socket,
+		@MessageBody() matchedRequestDto: Dto.Request.Matched,
+	) {
 		try {
 			socket.join(matchedRequestDto.room);
 
@@ -138,12 +141,12 @@ class GameGateway {
 		@MessageBody() connectedRequestDto: Dto.Request.Connected,
 	) {
 		let game = await this.gameService.getBySocketId(socket.id);
-		
+
 		try {
 			if (!game) {
 				game = await this.gameService.getByUserId(socket['user']['id']);
 				if (!game) {
-					throw new Error("Game not found");
+					throw new Error('Game not found');
 				}
 				game = await this.gameService.update(game.id, { socketId: socket.id });
 			} else {
