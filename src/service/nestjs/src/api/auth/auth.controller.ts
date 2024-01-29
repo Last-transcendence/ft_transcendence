@@ -82,6 +82,7 @@ export class AuthController {
 			const user = await this.authService.login(req.user.intraId);
 			if (user.use2fa) {
 				res.redirect(`${this.configService.getOrThrow('NEXTJS_URL')}/auth/2fa`);
+				return { message: '2fa인증이 필요합니다.' };
 			}
 
 			const jwt = this.cookieService.createJwt({
