@@ -101,7 +101,6 @@ class ChannelGateway {
 				let updateParticipantDto: ParticipantDto.Request.Update = {
 					channelId: channel.id,
 					socketId: socket.id,
-					role: participant.role,
 				};
 				if (joinData.channelId !== participant.channelId) {
 					updateParticipantDto.role = 'USER';
