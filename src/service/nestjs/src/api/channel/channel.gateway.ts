@@ -8,6 +8,7 @@ import {
 	WebSocketServer,
 } from '@nestjs/websockets';
 import BanService from 'api/ban/ban.service';
+import BlockService from 'api/block/block.service';
 import GameService from 'api/game/game.service';
 import MuteService from 'api/mute/mute.service';
 import ParticipantService from 'api/participant/participant.service';
@@ -38,6 +39,7 @@ class ChannelGateway {
 		private readonly userService: UserService,
 		private readonly muteService: MuteService,
 		private readonly gameService: GameService,
+		private readonly blockService: BlockService,
 	) {}
 
 	@WebSocketServer()
@@ -298,18 +300,21 @@ class ChannelGateway {
 			}
 
 			const opponent = await this.userService.findByNickname(inviteRequestDto.nickname);
+
 			if (!opponent || !(await this.participantService.isParticipated(opponent.id))) {
 				throw new BadRequestException('Opponent not found');
 			}
 
 			const opponentParticipant = await this.participantService.getByUserId(opponent.id);
 
-			this.server.to(opponentParticipant.socketId).emit('invite', {
-				channelId: inviteRequestDto.channelId,
-				userId: socket['user']['id'],
-				nickname: socket['user']['nickname'],
-				mode: inviteRequestDto.mode,
-			});
+			if ((await this.blockService.find(opponent.id, socket['user']['id'])) === null) {
+				this.server.to(opponentParticipant.socketId).emit('invite', {
+					channelId: inviteRequestDto.channelId,
+					userId: socket['user']['id'],
+					nickname: socket['user']['nickname'],
+					mode: inviteRequestDto.mode,
+				});
+			}
 
 			return { status: 'SUCCESS' };
 		} catch (error) {
