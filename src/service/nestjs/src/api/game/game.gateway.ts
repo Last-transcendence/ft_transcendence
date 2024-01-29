@@ -47,10 +47,10 @@ class GameGateway {
 			console.log('Client disconnected from game namespace');
 			this.gameService.getBySocketId(socket.id).then(async game => {
 				if (game) {
-					await this.gameService.delete(game.id);
+					this.gameService.delete(game.id);
 					if (game.userId) {
-						await this.gameService.deleteFirstHistory(game.userId);
-						await this.userService.online(game.userId);
+						this.gameService.deleteFirstHistory(game.id, game.userId);
+						this.userService.online(game.userId);
 					}
 				}
 			});
@@ -138,6 +138,7 @@ class GameGateway {
 		let game = await this.gameService.getBySocketId(socket.id);
 		if (!game) {
 			game = await this.gameService.getByUserId(socket['user']['id']);
+			game = await this.gameService.update(game.id, { socketId: socket.id });
 		} else {
 			if (!game.userId) {
 				game = await this.gameService.update(game.id, { userId: socket['user']['id'] });
@@ -150,7 +151,7 @@ class GameGateway {
 			const opponentSocketId = this.getOpponentSocketId(socket, connectedRequestDto.room);
 			const opponentGame = await this.gameService.getBySocketId(opponentSocketId);
 
-			if (3000 < Math.abs(opponentGame.updatedAt.getTime() - game.updatedAt.getTime())) {
+			if (3000 < Math.abs(game.updatedAt.getTime() - opponentGame.updatedAt.getTime())) {
 				throw new Error('DISCONNECTED');
 			}
 
@@ -162,7 +163,7 @@ class GameGateway {
 				state: 'DISCONNECTED',
 			});
 			this.gameService.delete(game.id);
-			this.gameService.deleteFirstHistory(game.userId);
+			this.gameService.deleteFirstHistory(game.id, game.userId);
 			this.userService.online(game.userId);
 
 			return { status: 'DISCONNECTED' };
