@@ -1,13 +1,18 @@
 // components/LogoutOnUnload.tsx
-import { useEffect } from 'react';
+import { useContext, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { postFetcher } from '@/service/api';
 
 const LogoutOnUnload = () => {
 	const router = useRouter();
+	const { pathname } = router;
+	const { sockets } = useContext(SocketContext);
 
 	useEffect(() => {
 		window.onbeforeunload = () => {
+			if (pathname === "/game") {
+
+			}
 			postFetcher('/user/offline').catch(async (error: any) => {});
 		};
 		return () => {

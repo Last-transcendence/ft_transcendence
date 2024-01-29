@@ -31,7 +31,7 @@ export const BlockProvider = (props: { children: ReactNode }) => {
 				})
 				.catch(error => {
 					setBlock(null);
-					console.error(error);
+					//console.error(error);
 				});
 		}
 	}, [block]);
