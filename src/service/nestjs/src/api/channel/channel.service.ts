@@ -20,15 +20,13 @@ class ChannelService {
 
 	async getChannelList(): Promise<Dto.Response.Channel[]> {
 		try {
-			const channelList: Dto.Response.Channel[] = await this.prismaService.channel.findMany({
+			return await this.prismaService.channel.findMany({
 				select: {
 					id: true,
 					title: true,
 					visibility: true,
 				},
 			});
-
-			return channelList;
 		} catch (error) {
 			throw new Error(error.message);
 		}
@@ -48,7 +46,7 @@ class ChannelService {
 		}>;
 	} | null> {
 		try {
-			const channelDetail = await this.prismaService.channel.findUnique({
+			return await this.prismaService.channel.findUnique({
 				where: { id },
 				select: {
 					id: true,
@@ -75,7 +73,6 @@ class ChannelService {
 					},
 				},
 			});
-			return channelDetail;
 		} catch (error) {
 			throw new Error(error.message);
 		}
@@ -88,7 +85,7 @@ class ChannelService {
 
 			createRequestDto.password = await bcrypt.hash(createRequestDto.password, 10);
 
-			if (error.length > 0) {
+			if (0 < error.length) {
 				throw new Error('Failed validation: ' + JSON.stringify(error));
 			}
 
@@ -103,9 +100,10 @@ class ChannelService {
 	async editChannel(@MessageBody() data) {
 		try {
 			const { channelId, ...updateData } = data;
+
 			updateData.password = await bcrypt.hash(updateData.password, 10);
 
-			await this.prismaService.channel.update({
+			return await this.prismaService.channel.update({
 				where: { id: channelId },
 				data: updateData,
 				select: {
@@ -149,11 +147,9 @@ class ChannelService {
 
 			socket.leave(participant.channelId);
 
-			const deletedParticipant = await this.prismaService.participant.delete({
+			return await this.prismaService.participant.delete({
 				where: { id: participant.id },
 			});
-
-			return deletedParticipant;
 		} catch (error) {
 			throw new Error(error.message);
 		}
@@ -174,11 +170,12 @@ class ChannelService {
 	async messageFilter(channelId: string, userId: string, message: string): Promise<string> {
 		const muteList = await this.muteService.getMuteList(channelId);
 		const isUserMuted = muteList.some(item => item.userId === userId);
+
 		if (isUserMuted) {
 			return 'This message is from a muted user';
-		} else {
-			return message;
 		}
+		
+		return message;
 	}
 
 	async deleteEmptyChannel(): Promise<void> {

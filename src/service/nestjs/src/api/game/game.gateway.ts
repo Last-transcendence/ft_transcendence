@@ -47,10 +47,10 @@ class GameGateway {
 			console.log('Client disconnected from game namespace');
 			this.gameService.getBySocketId(socket.id).then(async game => {
 				if (game) {
-					this.gameService.delete(game.id);
+					await this.gameService.delete(game.id);
 					if (game.userId) {
-						this.gameService.deleteFirstHistory(game.id, game.userId);
-						this.userService.online(game.userId);
+						await this.gameService.deleteFirstHistory(game.id, game.userId);
+						await this.userService.online(game.userId);
 					}
 				}
 			});
@@ -75,7 +75,7 @@ class GameGateway {
 		try {
 			socket.join('queue');
 
-			this.userService.playing(socket['user']['id']);
+			await this.userService.playing(socket['user']['id']);
 
 			const room = this.getRoom('queue');
 			if (room.size === 1) {
@@ -115,7 +115,7 @@ class GameGateway {
 		try {
 			socket.join(matchedRequestDto.room);
 
-			this.userService.playing(socket['user']['id']);
+			await this.userService.playing(socket['user']['id']);
 
 			let game = await this.gameService.getByUserId(socket['user']['id']);
 			if (!game) {
@@ -169,10 +169,10 @@ class GameGateway {
 				state: 'DISCONNECTED',
 			});
 			if (game) {
-				this.gameService.delete(game.id);
+				await this.gameService.delete(game.id);
 				if (game.userId) {
-					this.gameService.deleteFirstHistory(game.id, game.userId);
-					this.userService.online(game.userId);
+					await this.gameService.deleteFirstHistory(game.id, game.userId);
+					await this.userService.online(game.userId);
 				}
 			}
 
@@ -200,8 +200,8 @@ class GameGateway {
 				return;
 			}
 
-			this.gameService.update(game.id, { ready: false });
-			this.gameService.update(opponentGame.id, { ready: false });
+			await this.gameService.update(game.id, { ready: false });
+			await this.gameService.update(opponentGame.id, { ready: false });
 
 			const speed = game.mode === 'NORMAL' ? 0.15 : 0.3;
 			const randomX =
@@ -328,26 +328,26 @@ class GameGateway {
 				}
 				if (parseInt(scoreRequestDto.score) === 4) {
 					if (player1History) {
-						this.gameService.updateHistory(player1History.id, {
+						await this.gameService.updateHistory(player1History.id, {
 							result: 'LOSE',
 						});
 					}
 					if (player2History) {
-						this.gameService.updateHistory(player2History.id, {
+						await this.gameService.updateHistory(player2History.id, {
 							result: 'WIN',
 						});
 					}
 					if (game) {
-						this.gameService.delete(game.id);
+						await this.gameService.delete(game.id);
 					}
 					if (opponentGame) {
-						this.gameService.delete(opponentGame.id);
+						await this.gameService.delete(opponentGame.id);
 					}
 					if (me) {
-						this.userService.online(me.id);
+						await this.userService.online(me.id);
 					}
 					if (opponent) {
-						this.userService.online(opponent.id);
+						await this.userService.online(opponent.id);
 					}
 				}
 			}

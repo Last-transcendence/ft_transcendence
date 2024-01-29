@@ -54,11 +54,12 @@ class ChannelGateway {
 			if (participant) {
 				const participants = await this.channelService.getParticipants(participant.channelId);
 				if (!participants.length) {
-					this.channelService.deleteEmptyChannel();
+					await this.channelService.deleteEmptyChannel();
 				}
 			}
 
 			const newChannel = await this.channelService.createChannel(data);
+			
 			await this.participantService.create({
 				channelId: newChannel.id,
 				userId: socket.user.id,
@@ -150,7 +151,8 @@ class ChannelGateway {
 			if (!data.title) {
 				data.title = channel.title;
 			}
-			this.channelService.editChannel(data);
+			await this.channelService.editChannel(data);
+
 			socket.broadcast.to(socket.user.channelId).emit('edit', {
 				title: data.title,
 				visibility: data.visibility,
@@ -167,26 +169,20 @@ class ChannelGateway {
 	@SubscribeMessage('info')
 	@UseGuards(Auth.Guard.UserWsJwt)
 	async handleInfo(@MessageBody() data) {
-		return this.channelService.getChannel(data.channelId);
+		return await this.channelService.getChannel(data.channelId);
 	}
 
 	@SubscribeMessage('message')
 	@UseGuards(Auth.Guard.UserWsJwt)
 	async handleMessage(@MessageBody() data, @ConnectedSocket() socket) {
 		try {
-			const filteredMessage = await this.channelService.messageFilter(
-				data.channelId,
-				data.userId,
-				data.message,
-			);
-
 			if (await this.muteService.isMuted(data.channelId, data.userId)) {
 				throw new Error('User is muted');
 			}
 
 			this.server.to(data.channelId).emit('message', {
 				userId: data.userId,
-				message: filteredMessage,
+				message: data.message,
 			});
 
 			return { res: true };
@@ -225,16 +221,16 @@ class ChannelGateway {
 
 			const participants = await this.channelService.getParticipants(channel.id);
 			if (!participants.length) {
-				this.channelService.deleteEmptyChannel();
+				await this.channelService.deleteEmptyChannel();
 			} else {
 				if (participant.role === 'OWNER') {
 					const admins = participants.filter(participant => participant.role === 'ADMIN').reverse();
 					if (!admins.length) {
 						const users = participants.filter(participant => participant.role === 'USER').reverse();
 
-						this.participantService.update(users[0].id, { role: 'OWNER' });
+						await this.participantService.update(users[0].id, { role: 'OWNER' });
 					} else {
-						this.participantService.update(admins[0].id, { role: 'OWNER' });
+						await this.participantService.update(admins[0].id, { role: 'OWNER' });
 					}
 				}
 			}
@@ -343,11 +339,11 @@ class ChannelGateway {
 			const participant = await this.participantService.getByUserId(socket['user']['id']);
 			const opponentParticipant = await this.participantService.getByUserId(opponent.id);
 
-			this.gameService.create({
+			await this.gameService.create({
 				userId: participant.userId,
 				mode: inviteResponseRequestDto.mode,
 			});
-			this.gameService.create({
+			await this.gameService.create({
 				userId: opponentParticipant.userId,
 				mode: inviteResponseRequestDto.mode,
 			});
@@ -391,6 +387,7 @@ class ChannelGateway {
 			if (!mute) {
 				throw new Error('Fail to mute');
 			}
+			
 			socket.broadcast.to(channel.id).emit('mute', {
 				channelId: channel.id,
 				userId: participant.id,
@@ -475,7 +472,7 @@ class ChannelGateway {
 			participant = await this.participantService.kick(participant.id);
 
 			if ((await this.banService.isBanned(channel.id, participant.userId)) === false) {
-				this.banService.create(channel.id, participant.userId);
+				await this.banService.create(channel.id, participant.userId);
 			}
 
 			if (participant && participant?.socketId) {
