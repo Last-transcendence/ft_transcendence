@@ -50,7 +50,13 @@ class ChannelGateway {
 	@SubscribeMessage('create')
 	async handleCreate(@ConnectedSocket() socket, @MessageBody() data) {
 		try {
-			await this.channelService.leaveChannel(socket, socket.user.id);
+			const participant = await this.channelService.leaveChannel(socket, socket.user.id);
+			if (participant) {
+				const participants = await this.channelService.getParticipants(participant.channelId);
+				if (!participants.length) {
+					this.channelService.deleteEmptyChannel();
+				}
+			}
 
 			const newChannel = await this.channelService.createChannel(data);
 			await this.participantService.create({
@@ -95,7 +101,6 @@ class ChannelGateway {
 				let updateParticipantDto: ParticipantDto.Request.Update = {
 					channelId: channel.id,
 					socketId: socket.id,
-					role: participant.role,
 				};
 				if (joinData.channelId !== participant.channelId) {
 					updateParticipantDto.role = 'USER';
