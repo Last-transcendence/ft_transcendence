@@ -14,6 +14,7 @@ import ParticipantService from 'api/participant/participant.service';
 import UserService from 'api/user/user.service';
 import { Namespace, Socket } from 'socket.io';
 import * as Auth from '../../common/auth';
+import * as ParticipantDto from '../participant/dto';
 import ChannelService from './channel.service';
 import * as Dto from './dto';
 
@@ -91,15 +92,15 @@ class ChannelGateway {
 			let participant = await this.participantService.getByUserId(userId);
 			if (participant) {
 				socket.leave(participant.channelId);
-				participant = await this.participantService.update(participant.id, {
+				let updateParticipantDto: ParticipantDto.Request.Update = {
 					channelId: channel.id,
 					socketId: socket.id,
-				});
+					role: participant.role,
+				};
 				if (joinData.channelId !== participant.channelId) {
-					participant = await this.participantService.update(participant.id, {
-						role: 'USER',
-					});
+					updateParticipantDto.role = 'USER';
 				}
+				participant = await this.participantService.update(participant.id, updateParticipantDto);
 			} else {
 				participant = await this.participantService.create({
 					channelId: channel.id,
