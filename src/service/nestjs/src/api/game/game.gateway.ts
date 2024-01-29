@@ -168,9 +168,13 @@ class GameGateway {
 			this.server.to(socket.id).emit('end', {
 				state: 'DISCONNECTED',
 			});
-			this.gameService.delete(game.id);
-			this.gameService.deleteFirstHistory(game.id, game.userId);
-			this.userService.online(game.userId);
+			if (game) {
+				this.gameService.delete(game.id);
+				if (game.userId) {
+					this.gameService.deleteFirstHistory(game.id, game.userId);
+					this.userService.online(game.userId);
+				}
+			}
 
 			return { status: 'DISCONNECTED' };
 		}
@@ -323,16 +327,28 @@ class GameGateway {
 					});
 				}
 				if (parseInt(scoreRequestDto.score) === 4) {
-					this.gameService.updateHistory(player1History.id, {
-						result: 'LOSE',
-					});
-					this.gameService.updateHistory(player2History.id, {
-						result: 'WIN',
-					});
-					this.gameService.delete(game.id);
-					this.gameService.delete(opponentGame.id);
-					this.userService.online(me.id);
-					this.userService.online(opponent.id);
+					if (player1History) {
+						this.gameService.updateHistory(player1History.id, {
+							result: 'LOSE',
+						});
+					}
+					if (player2History) {
+						this.gameService.updateHistory(player2History.id, {
+							result: 'WIN',
+						});
+					}
+					if (game) {
+						this.gameService.delete(game.id);
+					}
+					if (opponentGame) {
+						this.gameService.delete(opponentGame.id);
+					}
+					if (me) {
+						this.userService.online(me.id);
+					}
+					if (opponent) {
+						this.userService.online(opponent.id);
+					}
 				}
 			}
 
