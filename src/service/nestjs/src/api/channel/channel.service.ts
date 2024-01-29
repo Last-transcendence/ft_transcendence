@@ -149,9 +149,11 @@ class ChannelService {
 
 			socket.leave(participant.channelId);
 
-			return await this.prismaService.participant.delete({
+			const deletedParticipant = await this.prismaService.participant.delete({
 				where: { id: participant.id },
 			});
+
+			return deletedParticipant;
 		} catch (error) {
 			throw new Error(error.message);
 		}
