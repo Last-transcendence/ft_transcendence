@@ -66,7 +66,23 @@ const TwoFactorBody = () => {
 			await postFetcher('/auth/2fa', { twoFaCode: password });
 			router.push('/auth/login/callback');
 		} catch (error: any) {
-			setSnackErrorMessage(error.message);
+			if (error?.response?.data?.statusCode) {
+				if (error.response.data.statusCode === 404) {
+					setSnackErrorMessage("인증번호가 없습니다");
+				} else if(error.response.data.statusCode === 400) {
+					setSnackErrorMessage('인증번호가 일치하지 않습니다.');
+				} else {
+					setSnackErrorMessage('서버 에러 발생');
+				}
+				return ;
+			}
+			else {
+				if (error?.message) {
+					setErrorMessage(error.message);
+				} else {
+					setSnackErrorMessage("서버 에러 발생");
+				}
+			}
 		} finally {
 			setLoading(false);
 		}
