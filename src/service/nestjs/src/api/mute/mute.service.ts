@@ -62,12 +62,13 @@ class MuteService {
 
 	async isMuted(channelId: string, userId: string): Promise<boolean> {
 		try {
-			const mute = await this.prismaService.mute.findFirst({
+			let mute = await this.prismaService.mute.findFirst({
 				where: { channelId, userId },
 			});
 
-			if (mute && 300000 < new Date().getTime() - mute.updatedAt.getTime()) {
-				this.prismaService.mute.delete({
+			//if (mute && 300000 < new Date().getTime() - mute.updatedAt.getTime()) {
+			if (mute && 10000 < new Date().getTime() - mute.updatedAt.getTime()) {
+				mute = await this.prismaService.mute.delete({
 					where: { id: mute.id },
 				});
 				return false;

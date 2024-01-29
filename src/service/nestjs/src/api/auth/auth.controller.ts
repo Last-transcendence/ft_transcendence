@@ -116,7 +116,8 @@ export class AuthController {
 	): Promise<User> {
 		try {
 			registerRequestDto.file = file ? file.filename : req.user.profileImageURI;
-			return this.authService.register(req.user.intraId, registerRequestDto);
+			
+			return await this.authService.register(req.user.intraId, registerRequestDto);
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
 		}

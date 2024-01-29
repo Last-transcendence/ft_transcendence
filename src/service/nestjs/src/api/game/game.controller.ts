@@ -19,7 +19,7 @@ class GameController {
 	})
 	@ApiBadRequestResponse({ description: 'Failed to get game history' })
 	async getHistory(@Req() req): Promise<GameHistoryModel[]> {
-		return this.gameService.getHistory(req.user.id);
+		return await this.gameService.getHistory(req.user.id);
 	}
 
 	@Post('/history')
@@ -33,7 +33,7 @@ class GameController {
 		@Req() req,
 		@Body() createRequestDto: Dto.Request.CreateHistory,
 	): Promise<GameHistoryModel> {
-		return this.gameService.createHistory(req.user.id, createRequestDto);
+		return await this.gameService.createHistory(req.user.id, createRequestDto);
 	}
 }
 
