@@ -6,24 +6,34 @@ import { postFetcher } from '@/service/api';
 const IsWithAuth = <P extends object>(Destination: ComponentType<P>) => {
 	const WrappedComponent = (props: P) => {
 		const router = useRouter();
-		const { me } = useContext(AuthContext);
+		const { me, setMe } = useContext(AuthContext);
 		const [isLoaded, setIsLoaded] = useState<boolean>(false);
+		const [goPage, setGoPage] = useState<Boolean>(false);
 
 		useEffect(() => {
 			setTimeout(() => {
 				setIsLoaded(true);
 			}, 150);
-			if (isLoaded) {
-				if (!me) {
-					alert('로그인이 필요합니다.');
+			const accessControl = async (me : any) => {
+				try {
+					if (!me) {
+						alert('로그인이 필요합니다.');
+						router.push('/auth/login');
+					} else {
+						await postFetcher('/user/online');
+						setGoPage(true);
+					}
+				} catch (error) {
+					setMe(null);
 					router.push('/auth/login');
-				} else {
-					postFetcher('/user/online');
 				}
 			}
+		if (isLoaded) {
+			accessControl(me);
+		}
 		}, [me, router, isLoaded, setIsLoaded]);
 
-		return <Destination {...props} />;
+		return goPage && <Destination {...props} />;
 	};
 
 	return WrappedComponent;
