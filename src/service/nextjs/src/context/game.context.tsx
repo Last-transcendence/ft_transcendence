@@ -24,7 +24,7 @@ export const GameProvider = (props: { children: ReactNode }) => {
 				})
 				.catch(error => {
 					setGame(null);
-					console.error(error);
+					//console.error(error);
 				});
 		}
 	}, [game]);

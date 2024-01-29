@@ -14,7 +14,7 @@ const GameCallbackPage = () => {
 				setGame(response.data);
 			})
 			.catch((error: any) => {
-				console.error(error);
+				//console.error(error);
 			});
 		navigate.push('/');
 	}, [setGame, navigate]);

@@ -103,7 +103,7 @@ const CreatOrModifyBody = ({
 				setModarErrorMessage('서버에러입니다');
 				return ;
 			}
-			console.log(error);
+			//console.log(error);
 			if (error.response.data.statusCode === 401) {
 				try {
 					alert('잘못된 접근입니다');

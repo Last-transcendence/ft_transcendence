@@ -14,9 +14,9 @@ export class MulterConfigService implements MulterOptionsFactory {
     }
 
     mkdir() {
-            fs.readdirSync(this.dirPath);
-        } catch (error) {
-            fs.mkdirSync(this.dirPath);
+        fs.readdirSync(this.dirPath);
+    } catch (error) {
+        fs.mkdirSync(this.dirPath);
     }
 
     createMulterOptions() {

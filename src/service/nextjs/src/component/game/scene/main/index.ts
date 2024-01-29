@@ -48,28 +48,42 @@ class Main extends Phaser.Scene {
 	initSocket() {
 		this.socket.on('start', response => {
 			this.isPlaying = true;
-			this.ball.setVelocity(response.ball.velocityX, response.ball.velocityY);
+			if (this.ball) {
+				this.ball.setVelocity(response.ball.velocityX, response.ball.velocityY);
+			}
 		});
 		this.socket.on('move', response => {
-			this.enemyPaddle.x = 360 - response.x;
+			if (this.enemyPaddle) {
+				this.enemyPaddle.x = 360 - response.x;
+			}
 		});
 		this.socket.on('score', response => {
 			if (response.state === 'network-delay') {
 				this.reset(this.game.canvas.width / 2, this.game.canvas.height / 2, 0, 0);
-				this.readyText.setVisible(false);
-				this.networkDelayText.setVisible(true);
+				if (this.readyText) {
+					this.readyText.setVisible(false);
+				}
+				if (this.networkDelayText) {
+					this.networkDelayText.setVisible(true);
+				}
 				setTimeout(() => {
-					this.readyText.setVisible(true);
-					this.networkDelayText.setVisible(false);
+					if (this.readyText) {
+						this.readyText.setVisible(true);
+					}
+					if (this.networkDelayText) {
+						this.networkDelayText.setVisible(false);
+					}
 				}, 2000);
 				return;
 			}
 			if (response.state === 'confirmed') {
 				this.reset(this.game.canvas.width / 2, this.game.canvas.height / 2, 0, 0);
-				this.myScore.setText(parseInt(response.score, 10).toString());
+				if (this.myScore) {
+					this.myScore.setText(parseInt(response.score, 10).toString());
+				}
 				return;
 			}
-			if (this.ball.y < 628) {
+			if (this.ball && this.ball.y < 628) {
 				this.socket.emit('score', {
 					room: this.room,
 					score: parseInt(this.enemyScore.text, 10),
@@ -84,7 +98,9 @@ class Main extends Phaser.Scene {
 				state: 'confirmed',
 			});
 			this.reset(this.game.canvas.width / 2, this.game.canvas.height / 2, 0, 0);
-			this.enemyScore.setText(parseInt(response.score, 10).toString());
+			if (this.enemyScore) {
+				this.enemyScore.setText(parseInt(response.score, 10).toString());
+			}
 		});
 		this.socket.on('end', response => {
 			this.socket.off('start');
@@ -92,29 +108,31 @@ class Main extends Phaser.Scene {
 			this.socket.off('score');
 			this.socket.off('end');
 
-			if (response.state === 'DISCONNECTED' && this.scene) {
+			if (!this.scene) {
+				this.navigate.push('/');
+			}
+
+			if (response.state === 'DISCONNECTED') {
 				this.scene.start('Disconnected', {
 					navigate: this.navigate,
 				});
 				return;
 			}
 
-			if (this.scene) {
-				this.scene.start('Result', {
-					navigate: this.navigate,
-					socket: this.socket,
-					me: {
-						nickname: response.me.nickname,
-						profileImageURI: response.me.profileImageURI,
-						score: this.myScore.text,
-					},
-					opponent: {
-						nickname: response.opponent.nickname,
-						profileImageURI: response.opponent.profileImageURI,
-						score: this.enemyScore.text,
-					},
-				});
-			}
+			this.scene.start('Result', {
+				navigate: this.navigate,
+				socket: this.socket,
+				me: {
+					nickname: response.me.nickname,
+					profileImageURI: response.me.profileImageURI,
+					score: this.myScore.text,
+				},
+				opponent: {
+					nickname: response.opponent.nickname,
+					profileImageURI: response.opponent.profileImageURI,
+					score: this.enemyScore.text,
+				},
+			});
 		});
 	}
 
@@ -122,13 +140,21 @@ class Main extends Phaser.Scene {
 		this.resetFlag = false;
 		this.isPlaying = false;
 
-		this.ball.setVisible(false);
-		this.ball.setVelocity(velocityX, velocityY);
-		this.ball.setPosition(x, y);
-		this.ball.setVisible(true);
-		this.myPaddle.setVelocity(0, 0);
-		this.enemyPaddle.setVelocity(0, 0);
-		this.readyText.setVisible(true);
+		if (this.ball) {
+			this.ball.setVisible(false);
+			this.ball.setVelocity(velocityX, velocityY);
+			this.ball.setPosition(x, y);
+			this.ball.setVisible(true);
+		}
+		if (this.myPaddle) {
+			this.myPaddle.setVelocity(0, 0);
+		}
+		if (this.enemyPaddle) {
+			this.enemyPaddle.setVelocity(0, 0);
+		}
+		if (this.readyText) {
+			this.readyText.setVisible(true);
+		}
 
 		setTimeout(() => {
 			this.resetFlag = true;
@@ -136,13 +162,17 @@ class Main extends Phaser.Scene {
 	}
 
 	score() {
+		if (!this.ball) {
+			return;
+		}
+
 		if (10 < this.ball.y && this.ball.y < 630) {
 			return;
 		}
 
 		this.reset(this.ball.x, this.ball.y, 0, 0);
 
-		if (this.ball.y <= 10) {
+		if (this.ball.y <= 10 && this.socket) {
 			this.socket.emit('score', {
 				room: this.room,
 				score: parseInt(this.myScore.text, 10) + 1,
@@ -255,7 +285,7 @@ class Main extends Phaser.Scene {
 			if (this.room === '' || !this.resetFlag || !this.keys.space?.isDown) {
 				return;
 			}
-			if (!this.readyText.visible) {
+			if (!this.readyText || !this.readyText.visible) {
 				return;
 			}
 			this.readyText.setVisible(false);
@@ -285,10 +315,12 @@ class Main extends Phaser.Scene {
 			);
 		}
 
-		this.socket.emit('move', {
-			room: this.room,
-			x: this.myPaddle.x,
-		});
+		if (this.socket) {
+			this.socket.emit('move', {
+				room: this.room,
+				x: this.myPaddle.x,
+			});
+		}
 
 		this.score();
 	}

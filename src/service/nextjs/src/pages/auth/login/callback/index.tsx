@@ -15,7 +15,7 @@ const LoginCallBackPage = () => {
 				navigate.push('/');
 			})
 			.catch(err => {
-				console.error(err);
+				//console.error(err);
 				navigate.push('/auth/register');
 			});
 	}, [setMe, navigate]);
