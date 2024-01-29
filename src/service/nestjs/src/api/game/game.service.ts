@@ -174,10 +174,10 @@ class GameService {
 		}
 	}
 
-	async deleteFirstHistory(userId: string): Promise<GameHistoryModel> {
+	async deleteFirstHistory(gameId: string, player1Id: string): Promise<GameHistoryModel> {
 		try {
 			const history = await this.prismaService.gameHistory.findFirst({
-				where: { player1Id: userId },
+				where: { gameId, player1Id },
 			});
 			if (!history) {
 				return null;
