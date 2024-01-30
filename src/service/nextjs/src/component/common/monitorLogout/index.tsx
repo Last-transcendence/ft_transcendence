@@ -1,8 +1,8 @@
 // components/LogoutOnUnload.tsx
-import { useContext, useEffect } from 'react';
-import { useRouter } from 'next/router';
-import { postFetcher } from '@/service/api';
 import SocketContext from '@/context/socket.context';
+import { postFetcher } from '@/service/api';
+import { useRouter } from 'next/router';
+import { useContext, useEffect } from 'react';
 
 const LogoutOnUnload = () => {
 	const router = useRouter();
@@ -13,13 +13,13 @@ const LogoutOnUnload = () => {
 		if (sockets.gameSocket) {
 			window.onbeforeunload = () => {
 				if (pathname.indexOf('/game') === -1) {
-					sockets.gameSocket.emit('leave', { pathname });
+					sockets.gameSocket?.emit('leave', { pathname });
 				}
 				postFetcher('/user/offline').catch(async (error: any) => {});
 			};
 			router.events.on('routeChangeStart', () => {
 				if (pathname.indexOf('/game') === -1) {
-					sockets.gameSocket.emit('leave', { pathname });
+					sockets.gameSocket?.emit('leave', { pathname });
 				}
 			});
 		}
