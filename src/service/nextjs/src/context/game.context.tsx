@@ -1,7 +1,15 @@
-import { axiosInstance } from '@/service/api';
+import { getFetcher } from '@/service/api';
 import Game from '@/type/game.type';
-import axios from 'axios';
-import { Dispatch, ReactNode, SetStateAction, createContext, useEffect, useState } from 'react';
+import {
+	Dispatch,
+	ReactNode,
+	SetStateAction,
+	createContext,
+	useContext,
+	useEffect,
+	useState,
+} from 'react';
+import AuthContext from './auth.context';
 
 const GameContext = createContext<{
 	game: Game[] | null;
@@ -14,20 +22,19 @@ const GameContext = createContext<{
 export const GameProvider = (props: { children: ReactNode }) => {
 	const { children } = props;
 	const [game, setGame] = useState<Game[] | null>(null);
+	const { me } = useContext(AuthContext);
 
 	useEffect(() => {
-		if (!game) {
-			axiosInstance
-				.get('/game/history')
+		if (!game && me) {
+			getFetcher<Game[]>('/game/history')
 				.then(response => {
-					setGame(response.data);
+					setGame(response);
 				})
 				.catch(error => {
 					setGame(null);
-					//console.error(error);
 				});
 		}
-	}, [game]);
+	}, [game, me]);
 
 	return <GameContext.Provider value={{ game, setGame }}>{children}</GameContext.Provider>;
 };

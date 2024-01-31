@@ -25,9 +25,9 @@ class ChatRoomController {
 	async getChatRoom(@Req() req): Promise<Dto.Response.ChatRoom[]> {
 		try {
 			const chatRooms = await this.chatRoomService.get(req.user.id);
-			const blockedUsers = await this.blockService.get(req.user.id);
+			const blockedList = await this.blockService.get(req.user.id);
 			const chatRoomsWithoutBlockedUsers = chatRooms.filter(
-				chatRoom => !blockedUsers.find(blockedUser => blockedUser.id === chatRoom.destId),
+				chatRoom => !blockedList.find(block => block.blockedId === chatRoom.destId),
 			);
 
 			for (const chatRoom of chatRoomsWithoutBlockedUsers as Dto.Response.ChatRoom[]) {

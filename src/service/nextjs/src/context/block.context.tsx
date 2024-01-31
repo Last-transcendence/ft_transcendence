@@ -1,14 +1,15 @@
 import Block from '@/type/block.type';
-import axios from 'axios';
 import {
 	Dispatch,
-	PropsWithChildren,
 	ReactNode,
 	SetStateAction,
 	createContext,
+	useContext,
 	useEffect,
 	useState,
 } from 'react';
+import AuthContext from './auth.context';
+import { getFetcher } from '@/service/api';
 
 const BlockContext = createContext<{
 	block: Block[] | null;
@@ -21,20 +22,19 @@ const BlockContext = createContext<{
 export const BlockProvider = (props: { children: ReactNode }) => {
 	const { children } = props;
 	const [block, setBlock] = useState<Block[] | null>(null);
+	const { me } = useContext(AuthContext);
 
 	useEffect(() => {
-		if (!block) {
-			axios
-				.get(`${process.env.NEXT_PUBLIC_API_URL}/block`, { withCredentials: true })
+		if (!block && me) {
+			getFetcher<Block[]>('/block')
 				.then(response => {
-					setBlock(response.data);
+					setBlock(response);
 				})
 				.catch(error => {
 					setBlock(null);
-					//console.error(error);
 				});
 		}
-	}, [block]);
+	}, [block, me]);
 
 	return <BlockContext.Provider value={{ block, setBlock }}>{children}</BlockContext.Provider>;
 };
