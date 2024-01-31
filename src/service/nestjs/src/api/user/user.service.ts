@@ -30,9 +30,9 @@ class UserService {
 		}
 	}
 
-	async findByEmail(email: string): Promise<User> {
+	async findByEmail(email2fa: string): Promise<User> {
 		try {
-			return await this.prismaService.user.findFirst({ where: { email2fa: email } });
+			return await this.prismaService.user.findFirst({ where: { email2fa } });
 		} catch (error) {
 			throw new Error(error.message);
 		}
