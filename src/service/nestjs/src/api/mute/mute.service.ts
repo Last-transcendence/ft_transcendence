@@ -66,8 +66,7 @@ class MuteService {
 				where: { channelId, userId },
 			});
 
-			//if (mute && 300000 < new Date().getTime() - mute.updatedAt.getTime()) {
-			if (mute && 10000 < new Date().getTime() - mute.updatedAt.getTime()) {
+			if (mute && 300000 < new Date().getTime() - mute.updatedAt.getTime()) {
 				mute = await this.prismaService.mute.delete({
 					where: { id: mute.id },
 				});
