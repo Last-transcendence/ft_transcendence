@@ -33,6 +33,11 @@ export class AuthService {
 			if (registerRequestDto.use2fa === 'true' && !registerRequestDto.email2fa) {
 				throw new BadRequestException('Email used in 2fa is empty');
 			}
+			user = await this.userSerivice.findByEmail(registerRequestDto.email2fa);
+			if (user) {
+				throw new BadRequestException('Email used in 2fa is already taken');
+			}
+
 			return await this.userSerivice.create(intraId, registerRequestDto);
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
