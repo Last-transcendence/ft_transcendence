@@ -1,5 +1,5 @@
-import GameService from './game.service';
-import { Namespace, Socket } from 'socket.io';
+import { UseGuards } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import {
 	ConnectedSocket,
 	MessageBody,
@@ -7,11 +7,11 @@ import {
 	WebSocketGateway,
 	WebSocketServer,
 } from '@nestjs/websockets';
-import { UseGuards } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import UserService from 'api/user/user.service';
+import { Namespace, Socket } from 'socket.io';
 import * as Auth from '../../common/auth';
 import * as Dto from './dto';
-import UserService from 'api/user/user.service';
+import GameService from './game.service';
 
 const getCorsOrigin = () => {
 	const configService = new ConfigService();
@@ -49,7 +49,6 @@ class GameGateway {
 				if (game) {
 					await this.gameService.delete(game.id);
 					if (game.userId) {
-						await this.gameService.deleteFirstHistory(game.id, game.userId);
 						await this.userService.online(game.userId);
 					}
 				}
@@ -109,7 +108,7 @@ class GameGateway {
 			};
 		}
 	}
-	
+
 	@SubscribeMessage('leave')
 	async handleLeaveEvent(@ConnectedSocket() socket: Socket) {
 		try {
@@ -130,12 +129,11 @@ class GameGateway {
 				}
 				await this.gameService.delete(game.id);
 				if (game.userId) {
-					await this.gameService.deleteFirstHistory(game.id, game.userId);
 					await this.userService.online(game.userId);
 				}
 				socket.leave(game.id);
 			}
-			
+
 			return { status: 'SUCCESS' };
 		} catch (error) {
 			return {
@@ -209,7 +207,6 @@ class GameGateway {
 			if (game) {
 				await this.gameService.delete(game.id);
 				if (game.userId) {
-					await this.gameService.deleteFirstHistory(game.id, game.userId);
 					await this.userService.online(game.userId);
 				}
 			}
