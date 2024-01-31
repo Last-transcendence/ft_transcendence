@@ -54,14 +54,26 @@ class UserController {
 		@UploadedFile() file: Express.Multer.File,
 	): Promise<UserModel> {
 		try {
-			const dupNickname = await this.userService.findByNickname(updateData.nickname);
-			if (dupNickname && dupNickname.id !== req.user.id) {
+			let user = await this.userService.findByIntraId(req.user.intraId);
+			if (!user) {
+				throw new BadRequestException('User is not registered');
+			}
+
+			user = await this.userService.findByNickname(updateData.nickname);
+			if (user) {
 				throw new BadRequestException('Nickname is already taken');
 			}
+
+			user = await this.userService.findByEmail(updateData.email2fa);
+			if (user) {
+				throw new BadRequestException('Email is already taken');
+			}
+
 			updateData.file = file ? file.filename : req.user.profileImageURI;
 			if (file && fs.existsSync(join(process.cwd(), 'upload/') + req.user.profileImageURI)) {
 				fs.unlinkSync(join(process.cwd(), 'upload/') + req.user.profileImageURI);
 			}
+
 			return await this.userService.updateUserById(req.user.id, updateData);
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
