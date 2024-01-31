@@ -1,5 +1,14 @@
-import { createContext, Dispatch, ReactNode, SetStateAction, useEffect, useState } from 'react';
+import {
+	createContext,
+	Dispatch,
+	ReactNode,
+	SetStateAction,
+	useContext,
+	useEffect,
+	useState,
+} from 'react';
 import { io, Socket } from 'socket.io-client';
+import AuthContext from './auth.context';
 
 const connect = (namespace: string) => {
 	// alert(`Socket connected on ${namespace}`);
@@ -52,39 +61,36 @@ export const SocketProvider = (props: { children: ReactNode }) => {
 		gameSocket: null,
 		inviteSocket: null,
 	});
+	const { me } = useContext(AuthContext);
 
 	useEffect(() => {
-		if (!sockets.chatSocket) {
+		if (!sockets.chatSocket && me) {
 			setSocket({
 				...sockets,
 				chatSocket: initSocket('chatroom'),
 			});
 		}
-		if (!sockets.channelSocket) {
+		if (!sockets.channelSocket && me) {
 			setSocket({
 				...sockets,
 				channelSocket: initSocket('channel'),
 			});
 		}
-		if (!sockets.gameSocket) {
+		if (!sockets.gameSocket && me) {
 			setSocket({
 				...sockets,
 				gameSocket: initSocket('game'),
 			});
 		}
-		if (!sockets.inviteSocket) {
+		if (!sockets.inviteSocket && me) {
 			setSocket({
 				...sockets,
 				inviteSocket: initSocket('invite'),
 			});
 		}
-	}, [sockets]);
+	}, [sockets, me]);
 
-	return (
-		<>
-			<SocketContext.Provider value={{ sockets, setSocket }}>{children}</SocketContext.Provider>
-		</>
-	);
+	return <SocketContext.Provider value={{ sockets, setSocket }}>{children}</SocketContext.Provider>;
 };
 
 export default SocketContext;

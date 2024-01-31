@@ -61,68 +61,70 @@ export const ListenProvider = (props: { children: ReactNode }) => {
 	const { me } = useContext(AuthContext);
 
 	useEffect(() => {
-		//게임 중이면 무시
-		if (sockets?.chatSocket) {
-			if (friendDatas) {
-				friendDatas?.forEach(data => {
-					(sockets.chatSocket as any).emit('join', { destId: data?.id }, (res: any) => {
-						// console.log('join', res);
+		if (me) {
+			//게임 중이면 무시
+			if (sockets?.chatSocket) {
+				if (friendDatas) {
+					friendDatas?.forEach(data => {
+						(sockets.chatSocket as any).emit('join', { destId: data?.id }, (res: any) => {
+							// console.log('join', res);
+						});
 					});
+				}
+
+				(sockets.chatSocket as any).on('message', (res: any) => {
+					// console.log('listen chat msg', res);
+					if (router.pathname.includes('game')) return;
+					if (!res?.message || res.message === '') return;
+					if (router.pathname.includes('private')) {
+						if (params?.id && params?.id === res?.srcId) {
+							setCurrentDm(res);
+						}
+					} else {
+						const message = res?.message.slice(0, 8);
+						setToastMessage(`${res?.srcNickname}: ${message}`);
+						setToastOpen(true);
+					}
 				});
 			}
 
-			(sockets.chatSocket as any).on('message', (res: any) => {
-				// console.log('listen chat msg', res);
-				if (router.pathname.includes('game')) return;
-				if (!res?.message || res.message === '') return;
-				if (router.pathname.includes('private')) {
-					if (params?.id && params?.id === res?.srcId) {
-						setCurrentDm(res);
-					}
-				} else {
-					const message = res?.message.slice(0, 8);
-					setToastMessage(`${res?.srcNickname}: ${message}`);
-					setToastOpen(true);
-				}
-			});
-		}
-
-		if (sockets?.inviteSocket) {
-			//invite 참여
-			(sockets.inviteSocket as any).emit('join', (res: any) => {
-				// console.log('invite join res', res);
-			});
-			//invite 구독
-			(sockets.inviteSocket as any).on(
-				'invite',
-				(res: {
-					srcId: string;
-					srcNickname: string;
-					channelTitle: string;
-					channelId: string;
-					destId: string;
-				}) => {
-					if (res?.destId !== me?.id) return;
-					// console.log('invite on res', res);
-					setMessage({
-						title: '채널 초대',
-						content: `${res?.srcNickname}님이 채널 (:${res?.channelTitle})에 초대했습니다.`,
-					});
-					setInviteRes(res);
-					setOpen(true);
-				},
-			);
-		}
-		return () => {
-			if (sockets?.chatSocket) {
-				(sockets.chatSocket as any).off('message');
-				// (sockets.chatSocket as any).off('game');
-			}
 			if (sockets?.inviteSocket) {
-				(sockets.inviteSocket as any).off('invite');
+				//invite 참여
+				(sockets.inviteSocket as any).emit('join', (res: any) => {
+					// console.log('invite join res', res);
+				});
+				//invite 구독
+				(sockets.inviteSocket as any).on(
+					'invite',
+					(res: {
+						srcId: string;
+						srcNickname: string;
+						channelTitle: string;
+						channelId: string;
+						destId: string;
+					}) => {
+						if (res?.destId !== me?.id) return;
+						// console.log('invite on res', res);
+						setMessage({
+							title: '채널 초대',
+							content: `${res?.srcNickname}님이 채널 (:${res?.channelTitle})에 초대했습니다.`,
+						});
+						setInviteRes(res);
+						setOpen(true);
+					},
+				);
 			}
-		};
-	}, [friendDatas, params?.id, router.pathname, sockets]);
+			return () => {
+				if (sockets?.chatSocket) {
+					(sockets.chatSocket as any).off('message');
+					// (sockets.chatSocket as any).off('game');
+				}
+				if (sockets?.inviteSocket) {
+					(sockets.inviteSocket as any).off('invite');
+				}
+			};
+		}
+	}, [friendDatas, params?.id, router.pathname, sockets, me]);
 
 	return (
 		<>
