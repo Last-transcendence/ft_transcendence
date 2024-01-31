@@ -4,13 +4,11 @@ import BlockService from './block.service';
 import { BlockModel } from 'common/model';
 import * as Auth from '../../common/auth';
 import * as Dto from './dto';
-import ChatRoomService from 'api/chatroom/chatroom.service';
 
 @Controller('block')
 @ApiTags('block')
 class BlockController {
-	constructor(private readonly blockService: BlockService,
-				private readonly chatRoomService: ChatRoomService ) {}
+	constructor(private readonly blockService: BlockService) {}
 
 	@Get()
 	@UseGuards(Auth.Guard.UserJwt)
@@ -32,10 +30,6 @@ class BlockController {
 	@ApiBadRequestResponse({ description: 'Bad request' })
 	async blockUser(@Body() blockRequestDto: Dto.Request.Create, @Req() req): Promise<BlockModel> {
 		try {
-			const findChatRoom = await this.chatRoomService.find(req.user.id, blockRequestDto.blockedId)
-			if (findChatRoom) {
-				await this.chatRoomService.delete(findChatRoom.id);
-			}
 			return await this.blockService.create(req.user.id, blockRequestDto.blockedId);
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
@@ -54,7 +48,6 @@ class BlockController {
 			throw new HttpException(error.message, error.status);
 		}
 	}
-	
 }
 
 export default BlockController;
