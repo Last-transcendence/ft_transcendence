@@ -16,19 +16,13 @@ export interface myProfilePageProps extends myImageProps {
 }
 
 const MyProfileBody = ({ name, use2fa, image }: myProfilePageProps) => {
-	const [gameRecordsErrorMessage, setGameRecordsErrorMessage] = useState<string>('');
+	const [gameRecordsErrorMessage, setGameRecordsErrorMessage] =
+		useState<string>('게임 이력이 없습니다.');
 	const { game } = useContext(GameContext);
 
-	useEffect(() => {
-		const update = (game: Game[]) => {
-			if (game.length === 0) {
-				setGameRecordsErrorMessage('게임 이력이 없습니다.');
-			}
-		};
-		if (game !== null) {
-			update(game);
-		}
-	}, [game]);
+	if (!game) {
+		return null;
+	}
 
 	return (
 		<Box overflow="auto">
@@ -38,16 +32,12 @@ const MyProfileBody = ({ name, use2fa, image }: myProfilePageProps) => {
 				<UserId userName={name} />
 				<Box display="flex" flexDirection="column" alignItems="center">
 					<TwoFACheck twoFA={use2fa} />
-					{game === null ? (
-						<div>로딩 실패</div>
-					) : (
-						<div>
-							<Odds gameRecords={game} message={gameRecordsErrorMessage} />
-						</div>
-					)}
+					<div>
+						<Odds gameRecords={game} message={gameRecordsErrorMessage} />
+					</div>
 				</Box>
-				{game === null ? (
-					<p>데이터를 로드할 수 없습니다.</p>
+				{game.length === 0 ? (
+					<p>게임 이력이 없습니다.</p>
 				) : (
 					<FightRecords fightRecords={game.slice(0, 5)} message={gameRecordsErrorMessage} />
 				)}

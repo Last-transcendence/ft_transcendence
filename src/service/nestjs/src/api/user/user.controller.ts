@@ -60,15 +60,13 @@ class UserController {
 			}
 
 			if (user.nickname !== updateData.nickname) {
-				user = await this.userService.findByNickname(updateData.nickname);
-				if (user) {
+				if (await this.userService.findByNickname(updateData.nickname)) {
 					throw new BadRequestException('Nickname is already taken');
 				}
 			}
 
 			if (updateData?.email2fa && user.email2fa !== updateData.email2fa) {
-				user = await this.userService.findByEmail(updateData.email2fa);
-				if (user) {
+				if (await this.userService.findByEmail(updateData.email2fa)) {
 					throw new BadRequestException('Email used in 2fa is already taken');
 				}
 			}
