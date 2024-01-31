@@ -129,7 +129,6 @@ class GameGateway {
 				}
 				await this.gameService.delete(game.id);
 				if (game.userId) {
-					await this.gameService.deleteFirstHistory(game.id, game.userId);
 					await this.userService.online(game.userId);
 				}
 				socket.leave(game.id);
@@ -208,7 +207,6 @@ class GameGateway {
 			if (game) {
 				await this.gameService.delete(game.id);
 				if (game.userId) {
-					await this.gameService.deleteFirstHistory(game.id, game.userId);
 					await this.userService.online(game.userId);
 				}
 			}
