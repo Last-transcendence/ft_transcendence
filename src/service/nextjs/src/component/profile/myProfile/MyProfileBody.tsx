@@ -16,8 +16,7 @@ export interface myProfilePageProps extends myImageProps {
 }
 
 const MyProfileBody = ({ name, use2fa, image }: myProfilePageProps) => {
-	const [gameRecordsErrorMessage, setGameRecordsErrorMessage] =
-		useState<string>('게임 이력이 없습니다.');
+	const [gameRecordsErrorMessage, setGameRecordsErrorMessage] = useState<string>('전적 없음');
 	const { game } = useContext(GameContext);
 
 	if (!game) {
@@ -32,14 +31,16 @@ const MyProfileBody = ({ name, use2fa, image }: myProfilePageProps) => {
 				<UserId userName={name} />
 				<Box display="flex" flexDirection="column" alignItems="center">
 					<TwoFACheck twoFA={use2fa} />
-					<div>
-						<Odds gameRecords={game} message={gameRecordsErrorMessage} />
-					</div>
+					{game.length === 0 ? (
+						<p>{gameRecordsErrorMessage}</p>
+					) : (
+						<Odds gameRecords={game} message={''} />
+					)}
 				</Box>
 				{game.length === 0 ? (
-					<p>게임 이력이 없습니다.</p>
+					<p>{gameRecordsErrorMessage}</p>
 				) : (
-					<FightRecords fightRecords={game.slice(0, 5)} message={gameRecordsErrorMessage} />
+					<FightRecords fightRecords={game.slice(0, 5)} message={''} />
 				)}
 			</Container>
 		</Box>
