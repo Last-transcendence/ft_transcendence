@@ -2,6 +2,7 @@ import { useRouter } from 'next/router';
 import { useContext, useEffect, ComponentType, useState } from 'react';
 import AuthContext from '@/context/auth.context';
 import { postFetcher } from '@/service/api';
+import { UserStatus } from '@/type';
 
 const IsWithAuth = <P extends object>(Destination: ComponentType<P>) => {
 	const WrappedComponent = (props: P) => {
@@ -19,14 +20,18 @@ const IsWithAuth = <P extends object>(Destination: ComponentType<P>) => {
 					alert('로그인이 필요합니다.');
 					router.push('/auth/login');
 				} else {
-					postFetcher('/user/online').catch(() => {
-						setMe(null);
-						router.push('/auth/login');
-					});
+					postFetcher('/user/online')
+						.then(() => {
+							setMe({ ...me, status: UserStatus.ONLINE });
+						})
+						.catch(() => {
+							setMe(null);
+							router.push('/auth/login');
+						});
 					setGoPage(true);
 				}
 			}
-		}, [me, isLoaded]);
+		}, [me, setMe, isLoaded, router]);
 
 		return goPage && <Destination {...props} />;
 	};

@@ -26,14 +26,11 @@ class ChatRoomController {
 		try {
 			const chatRooms = await this.chatRoomService.get(req.user.id);
 			const blockedUsers = await this.blockService.get(req.user.id);
+			const chatRoomsWithoutBlockedUsers = chatRooms.filter(
+				chatRoom => !blockedUsers.find(blockedUser => blockedUser.id === chatRoom.destId),
+			);
 
-			chatRooms.forEach((chatRoom, index) => {
-				if (blockedUsers.find(blockedUser => blockedUser.id === chatRoom.destId)) {
-					chatRooms.splice(index, 1);
-				}
-			});
-
-			for (const chatRoom of chatRooms as Dto.Response.ChatRoom[]) {
+			for (const chatRoom of chatRoomsWithoutBlockedUsers as Dto.Response.ChatRoom[]) {
 				const dest = await this.userService.get(chatRoom.destId);
 
 				chatRoom.destNickname = dest.nickname;
