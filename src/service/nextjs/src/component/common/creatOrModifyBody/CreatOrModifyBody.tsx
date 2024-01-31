@@ -118,7 +118,9 @@ const CreatOrModifyBody = ({
 					} else if (error.response.data.message === 'Nickname is already taken') {
 						setModarErrorMessage('이미 사용중인 닉네임입니다.');
 					}	else if (error.response.data.message === 'Email used in 2fa is empty') {
-						setModarErrorMessage('이미 사용중인 이메일입니다.');
+						setModarErrorMessage('이메일을 입력해 주세요.');
+					} else if (error.response.data.message === 'Email used in 2fa is already taken') {
+						setModarErrorMessage('이미 사용중인 이메일입니다.')
 					} else {
 						setModarErrorMessage('서버 에러입니다.');
 					}
