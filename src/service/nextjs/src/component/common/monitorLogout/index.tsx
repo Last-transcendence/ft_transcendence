@@ -9,7 +9,6 @@ const LogoutOnUnload = () => {
 	const router = useRouter();
 	const { pathname } = router;
 	const { sockets } = useContext(SocketContext);
-	const { setMe } = useContext(AuthContext);
 
 	useEffect(() => {
 		if (sockets.gameSocket) {
@@ -18,7 +17,6 @@ const LogoutOnUnload = () => {
 					sockets.gameSocket?.emit('leave', { pathname });
 				}
 				postFetcher('/user/offline').catch(async (error: any) => {});
-				setMe(null);
 			};
 			router.events.on('routeChangeStart', () => {
 				if (pathname.indexOf('/game') === -1) {
