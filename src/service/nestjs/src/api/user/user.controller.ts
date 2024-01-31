@@ -66,7 +66,7 @@ class UserController {
 				}
 			}
 
-			if (updateData.email2fa && user.email2fa !== updateData.email2fa) {
+			if (updateData?.email2fa && user.email2fa !== updateData.email2fa) {
 				user = await this.userService.findByEmail(updateData.email2fa);
 				if (user) {
 					throw new BadRequestException('Email used in 2fa is already taken');
