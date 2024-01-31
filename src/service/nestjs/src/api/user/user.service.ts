@@ -30,6 +30,14 @@ class UserService {
 		}
 	}
 
+	async findByEmail(email: string): Promise<User> {
+		try {
+			return await this.prismaService.user.findFirst({ where: { email2fa: email } });
+		} catch (error) {
+			throw new Error(error.message);
+		}
+	}
+
 	async create(
 		intraId: string,
 		{ use2fa, file, ...registerRequestDto }: Dto.Request.Create,

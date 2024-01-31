@@ -109,7 +109,7 @@ class GameGateway {
 			};
 		}
 	}
-	
+
 	@SubscribeMessage('leave')
 	async handleLeaveEvent(@ConnectedSocket() socket: Socket) {
 		try {
@@ -135,7 +135,7 @@ class GameGateway {
 				}
 				socket.leave(game.id);
 			}
-			
+
 			return { status: 'SUCCESS' };
 		} catch (error) {
 			return {
