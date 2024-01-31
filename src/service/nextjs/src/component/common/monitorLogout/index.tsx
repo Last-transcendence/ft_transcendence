@@ -26,7 +26,7 @@ const LogoutOnUnload = () => {
 			window.onbeforeunload = () => {};
 			router.events.off('routeChangeStart', () => {});
 		};
-	}, [sockets.gameSocket]);
+	}, [sockets, router, pathname]);
 
 	return null;
 };
