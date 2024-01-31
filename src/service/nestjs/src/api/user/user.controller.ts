@@ -59,14 +59,18 @@ class UserController {
 				throw new BadRequestException('User is not registered');
 			}
 
-			user = await this.userService.findByNickname(updateData.nickname);
-			if (user) {
-				throw new BadRequestException('Nickname is already taken');
+			if (user.nickname !== updateData.nickname) {
+				user = await this.userService.findByNickname(updateData.nickname);
+				if (user) {
+					throw new BadRequestException('Nickname is already taken');
+				}
 			}
 
-			user = await this.userService.findByEmail(updateData.email2fa);
-			if (user) {
-				throw new BadRequestException('Email is already taken');
+			if (user.email2fa !== updateData.email2fa) {
+				user = await this.userService.findByEmail(updateData.email2fa);
+				if (user) {
+					throw new BadRequestException('Email is already taken');
+				}
 			}
 
 			updateData.file = file ? file.filename : req.user.profileImageURI;
