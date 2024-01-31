@@ -33,7 +33,7 @@ const IsWithAuth = <P extends object>(Destination: ComponentType<P>) => {
 					setGoPage(true);
 				}
 			}
-		}, [me, setMe, isLoaded, router]);
+		}, [me, isLoaded]);
 
 		return goPage && <Destination {...props} />;
 	};
