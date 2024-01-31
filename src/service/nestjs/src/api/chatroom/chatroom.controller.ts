@@ -6,13 +6,17 @@ import UserService from 'api/user/user.service';
 import * as Auth from '../../common/auth';
 import * as Dto from './dto';
 import { User } from 'prisma/prisma-client';
+import BlockService from 'api/block/block.service';
 
 @Controller('chatroom')
 @ApiTags('chatroom')
 @UseGuards(Auth.Guard.UserJwt)
 class ChatRoomController {
-	constructor(private readonly chatRoomService: ChatRoomService,
-				private readonly userService: UserService) {}
+	constructor(
+		private readonly chatRoomService: ChatRoomService,
+		private readonly userService: UserService,
+		private readonly blockService: BlockService,
+	) {}
 
 	@Get()
 	@ApiOperation({ summary: 'Get chat room' })
@@ -21,10 +25,20 @@ class ChatRoomController {
 	async getChatRoom(@Req() req): Promise<Dto.Response.ChatRoom[]> {
 		try {
 			const chatRooms = await this.chatRoomService.get(req.user.id);
-			for (let chatRoom of chatRooms as Dto.Response.ChatRoom[]) {
-				const destUser = await this.userService.get(chatRoom.destId);
-				chatRoom.destNickname = destUser.nickname;
+			const blockedUsers = await this.blockService.get(req.user.id);
+
+			chatRooms.forEach((chatRoom, index) => {
+				if (blockedUsers.find(blockedUser => blockedUser.id === chatRoom.destId)) {
+					chatRooms.splice(index, 1);
+				}
+			});
+
+			for (const chatRoom of chatRooms as Dto.Response.ChatRoom[]) {
+				const dest = await this.userService.get(chatRoom.destId);
+
+				chatRoom.destNickname = dest.nickname;
 			}
+
 			return chatRooms as Dto.Response.ChatRoom[];
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
