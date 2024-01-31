@@ -26,16 +26,21 @@ export class AuthService {
 			if (user) {
 				throw new BadRequestException('User is already registered');
 			}
+
 			user = await this.userSerivice.findByNickname(registerRequestDto.nickname);
 			if (user) {
 				throw new BadRequestException('Nickname is already taken');
 			}
-			if (registerRequestDto.use2fa === 'true' && !registerRequestDto.email2fa) {
-				throw new BadRequestException('Email used in 2fa is empty');
-			}
-			user = await this.userSerivice.findByEmail(registerRequestDto.email2fa);
-			if (user) {
-				throw new BadRequestException('Email used in 2fa is already taken');
+
+			if (registerRequestDto.use2fa === 'true') {
+				if (!registerRequestDto.email2fa) {
+					throw new BadRequestException('Email used in 2fa is empty');
+				} else {
+					user = await this.userSerivice.findByEmail(registerRequestDto.email2fa);
+					if (user) {
+						throw new BadRequestException('Email used in 2fa is already taken');
+					}
+				}
 			}
 
 			return await this.userSerivice.create(intraId, registerRequestDto);
