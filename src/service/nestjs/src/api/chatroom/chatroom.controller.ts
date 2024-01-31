@@ -36,7 +36,7 @@ class ChatRoomController {
 				chatRoom.destNickname = dest.nickname;
 			}
 
-			return chatRooms as Dto.Response.ChatRoom[];
+			return chatRoomsWithoutBlockedUsers as Dto.Response.ChatRoom[];
 		} catch (error) {
 			throw new HttpException(error.message, error.status);
 		}

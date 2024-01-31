@@ -20,14 +20,16 @@ const IsWithAuth = <P extends object>(Destination: ComponentType<P>) => {
 					alert('로그인이 필요합니다.');
 					router.push('/auth/login');
 				} else {
-					postFetcher('/user/online')
-						.then(() => {
-							setMe({ ...me, status: UserStatus.ONLINE });
-						})
-						.catch(() => {
-							setMe(null);
-							router.push('/auth/login');
-						});
+					if (me.status !== UserStatus.ONLINE) {
+						postFetcher('/user/online')
+							.then(() => {
+								setMe({ ...me, status: UserStatus.ONLINE });
+							})
+							.catch(() => {
+								setMe(null);
+								router.push('/auth/login');
+							});
+					}
 					setGoPage(true);
 				}
 			}
